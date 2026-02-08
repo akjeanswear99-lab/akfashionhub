@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AK FASHION HUB</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f4f4f4;
+    color:#333;
+}
+header{
+    background:#000;
+    color:#fff;
+    padding:20px;
+    text-align:center;
+}
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+.products{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:20px;
+}
+.card{
+    background:#fff;
+    border-radius:8px;
+    padding:15px;
+    box-shadow:0 4px 8px rgba(0,0,0,0.1);
+}
+.card img{
+    width:100%;
+    height:200px;
+    object-fit:cover;
+    border-radius:6px;
+}
+.slider{
+    position:relative;
+}
+.slider button{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    background:rgba(0,0,0,0.5);
+    color:#fff;
+    border:none;
+    padding:5px;
+    cursor:pointer;
+}
+.slider .prev{
+    left:0;
+}
+.slider .next{
+    right:0;
+}
+select, input, textarea, button{
+    width:100%;
+    padding:8px;
+    margin-top:6px;
+}
+button{
+    background:#000;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+}
+button:disabled{
+    background:gray;
+}
+.cart{
+    background:#fff;
+    padding:15px;
+    margin-top:30px;
+    border-radius:8px;
+}
+footer{
+    background:#000;
+    color:#fff;
+    text-align:center;
+    padding:15px;
+    margin-top:40px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>AK FASHION HUB</h1>
+    <p>Keshav Nagar, Swarg Aashram Road, Hapur</p>
+    <p>Support: 9599497909 | Instagram: a_k_fashion_hub_</p>
+</header>
+
+<div class="container">
+    <h2>Products</h2>
+    <div class="products" id="products"></div>
+
+    <div class="cart">
+        <h2>Cart</h2>
+        <div id="cartItems"></div>
+        <h3 id="total"></h3>
+
+        <h3>Checkout</h3>
+        <input id="name" placeholder="Name" type="text">
+        <input id="phone" placeholder="Phone" type="tel">
+        <textarea id="address" placeholder="Full Address"></textarea>
+        <textarea id="note" maxlength="50" placeholder="Note (max 50 words)"></textarea>
+        <p>Payment: UPI (9599497909@ptyes)</p>
+        <button onclick="checkout()">Place Order (WhatsApp)</button>
+    </div>
+</div>
+
+<footer>
+    <p>Return Policy: 3 Days Return Policy (Terms and Conditions Apply)</p>
+    <p>Support: 9599497909 | Instagram: a_k_fashion_hub_</p>
+</footer>
+
+<script>
+// Base64 encoded small colored images for offline use
+const img1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="; // Transparent
+const img2 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="; // Blue
+const img3 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="; // Red
+const img4 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="; // Black
+
+const products = [
+{
+ id:"AKJ001",
+ name:"Blue Denim Jeans",
+ category:"Jeans",
+ price:1999,
+ discount:20,
+ stock:4,
+ img:[img1, img2],
+ colors:["Blue","Black"],
+ sizes:["28","30","32","34","36"],
+ measure:"Waist, Length, Thigh"
+},
+{
+ id:"AKL002",
+ name:"Black Lower",
+ category:"Lower",
+ price:1499,
+ discount:15,
+ stock:4,
+ img:[img3, img4],
+ colors:["Black","Gray"],
+ sizes:["S","M","L","XL"],
+ measure:"Waist, Length, Thigh"
+},
+{
+ id:"AKT003",
+ name:"Cotton T-Shirt",
+ category:"T-Shirt",
+ price:999,
+ discount:30,
+ stock:4,
+ img:[img2, img3],
+ colors:["Red","White","Black"],
+ sizes:["S","M","L","XL","XXL"],
+ measure:"Chest, Waist, Shoulder"
+},
+{
+ id:"AKS004",
+ name:"Formal Shirt",
+ category:"Shirt",
+ price:1299,
+ discount:25,
+ stock:4,
+ img:[img4, img1],
+ colors:["White","Blue"],
+ sizes:["M","L","XL"],
+ measure:"Chest, Waist, Shoulder"
+},
+{
+ id:"AKK005",
+ name:"Embroidered Kurti",
+ category:"Kurti",
+ price:1799,
+ discount:20,
+ stock:4,
+ img:[img3, img2],
+ colors:["Pink","Green"],
+ sizes:["S","M","L"],
+ measure:"Chest, Waist, Shoulder, Length"
+}
+];
+
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let stocks = JSON.parse(localStorage.getItem('stocks')) || {};
+products.forEach(p => {
+    if (!stocks[p.id]) stocks[p.id] = p.stock;
+});
+
+function renderProducts(){
+ const box=document.getElementById("products");
+ box.innerHTML="";
+ products.forEach((p,i)=>{
+  const final=Math.round(p.price-(p.price*p.discount/100));
+  const currentStock = stocks[p.id];
+  box.innerHTML+=`
+  <div class="card">
+   <div class="slider">
+    <img id="img${i}" src="${p.img[0]}">
+    <button class="prev" onclick="changeImage(${i}, -1)">‹</button>
+    <button class="next" onclick="changeImage(${i}, 1)">›</button>
+   </div>
+   <h3>${p.name}</h3>
+   <p>SKU: ${p.id}</p>
+   <p>${p.category}</p>
+   <p>MRP ₹${p.price} | ${p.discount}% OFF</p>
+   <p><b>₹${final}</b></p>
+   <p>Measurements: ${p.measure}</p>
+   <select id="size${i}">
+     <option value="">Select Size</option>
+     ${p.sizes.map(s=>`<option>${s}</option>`).join("")}
+   </select>
+   <select id="color${i}">
+     <option value="">Select Color</option>
+     ${p.colors.map(c=>`<option>${c}</option>`).join("")}
+   </select>
+   <button onclick="addToCart(${i})" ${currentStock==0?"disabled":""}>
+     ${currentStock==0?"OUT OF STOCK":"Add to Cart"}
+   </button>
+  </div>`;
+ });
+}
+
+function changeImage(i, dir){
+ const p = products[i];
+ const imgEl = document.getElementById("img"+i);
+ let current = p.img.indexOf(imgEl.src);
+ current = (current + dir + p.img.length) % p.img.length;
+ imgEl.src = p.img[current];
+}
+
+function addToCart(i){
+ const size=document.getElementById("size"+i).value;
+ const color=document.getElementById("color"+i).value;
+ if(!size || !color){alert("Select size & color");return;}
+ const p=products[i];
+ if(stocks[p.id]<=0){alert("Out of stock");return;}
+ stocks[p.id]--;
+ localStorage.setItem('stocks', JSON.stringify(stocks));
+ cart.push({...p,size,color,qty:1});
+ localStorage.setItem('cart', JSON.stringify(cart));
+ updateCart();
+ renderProducts();
+}
+
+function updateCart(){
+ let total=0;
+ const box=document.getElementById("cartItems");
+ box.innerHTML="";
+ cart.forEach((c, index)=>{
+  const price=Math.round(c.price-(c.price*c.discount/100));
+  total+=price;
+  box.innerHTML+=`<p>${c.name} (${c.size}, ${c.color}) - ₹${price} <button onclick="removeFromCart(${index})">Remove</button></p>`;
+ });
+ document.getElementById("total").innerText="Total: ₹"+total;
+}
+
+function removeFromCart(index){
+ const item = cart.splice(index, 1)[0];
+ stocks[item.id]++;
+ localStorage.setItem('stocks', JSON.stringify(stocks));
+ localStorage.setItem('cart', JSON.stringify(cart));
+ updateCart();
+ renderProducts();
+}
+
+function checkout(){
+ const n=document.getElementById("name").value.trim();
+ const p=document.getElementById("phone").value.trim();
+ const a=document.getElementById("address").value.trim();
+ const note=document.getElementById("note").value.trim();
+ if(!n || !p || !a || cart.length==0){alert("Fill all details and add items to cart");return;}
+ let msg=`AK FASHION HUB\nKeshav Nagar, Hapur\n\n`;
+ cart.forEach(c=>{
+  const price=Math.round(c.price-(c.price*c.discount/100));
+  msg+=`${c.name}\nSKU:${c.id}\nSize:${c.size}\nColor:${c.color}\n₹${price}\n\n`;
+ });
+ msg+=`Customer: ${n}\nPhone:${p}\nAddress:${a}\nNote:${note}`;
+ window.open("https://wa.me/919599497909?text="+encodeURIComponent(msg));
+}
+
+renderProducts();
+updateCart();
+</script>
+
+</body>
+</html>
