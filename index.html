@@ -53,6 +53,18 @@ header{
     padding:5px;
     cursor:pointer;
 }
+    .slider {
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.product-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
 .slider .prev{
     left:0;
 }
@@ -206,9 +218,8 @@ function renderProducts(){
   box.innerHTML+=`
   <div class="card">
    <div class="slider">
-    <img id="img${i}" src="${p.img[0]}">
-    <button class="prev" onclick="changeImage(${i}, -1)">‹</button>
-    <button class="next" onclick="changeImage(${i}, 1)">›</button>
+   <img src="${p.img[0]}" class="product-img">
+
    </div>
    <h3>${p.name}</h3>
    <p>SKU: ${p.id}</p>
