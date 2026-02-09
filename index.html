@@ -61,7 +61,7 @@ header{
 
 .product-img {
   width: 100%;
-  height: auto;
+  height: 350px;
   object-fit: contain;
   display: block;
 }
@@ -218,8 +218,7 @@ function renderProducts(){
   box.innerHTML+=`
   <div class="card">
    <div class="slider">
-   <img src="${p.img[0]}" class="product-img">
-
+   <img src="${p.img[0]}" class="product-img" onclick="openImage('${p.img[0]}')">
    </div>
    <h3>${p.name}</h3>
    <p>SKU: ${p.id}</p>
@@ -306,3 +305,25 @@ updateCart();
 
 </body>
 </html>
+<script>
+function openImage(src) {
+  let modal = document.createElement("div");
+  modal.style.position = "fixed";
+  modal.style.top = "0";
+  modal.style.left = "0";
+  modal.style.width = "100%";
+  modal.style.height = "100%";
+  modal.style.background = "rgba(0,0,0,0.9)";
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+  modal.style.zIndex = "9999";
+
+  modal.innerHTML = `
+    <img src="${src}" style="max-width:90%; max-height:90%; border-radius:10px;">
+  `;
+
+  modal.onclick = () => modal.remove();
+  document.body.appendChild(modal);
+}
+</script>
