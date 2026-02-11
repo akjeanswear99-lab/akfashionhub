@@ -112,6 +112,34 @@ footer{
 </head>
 
 <body>
+    <!-- Order Tracking Section -->
+<div id="orderTracker" style="margin: 20px 0;">
+  <h2>Track Your Order</h2>
+  <input type="text" id="orderIDInput" placeholder="Enter Order ID" />
+  <button id="trackButton">Track Order</button>
+  <p id="statusDisplay" style="font-weight: bold; margin-top: 10px;"></p>
+</div>
+
+<!-- Review Section (hidden until Delivered) -->
+<div id="reviewSection" style="display:none; margin-top: 20px;">
+  <h3>Leave a Review</h3>
+  <label>
+    Rating: 
+    <select id="rating">
+      <option value="1">1 star</option>
+      <option value="2">2 stars</option>
+      <option value="3">3 stars</option>
+      <option value="4">4 stars</option>
+      <option value="5">5 stars</option>
+    </select>
+  </label><br/><br/>
+  <label>
+    Note: <br/>
+    <textarea id="reviewNote" rows="3" cols="30" placeholder="Optional comments"></textarea>
+  </label><br/><br/>
+  <button id="submitReview">Submit Review</button>
+  <p id="reviewMessage" style="color: green; margin-top: 10px;"></p>
+</div>
 
 <header>
     <h1>AK FASHION HUB</h1>
@@ -549,6 +577,60 @@ Requests without the original invoice will not be processed.<br><br>
    ">
   💬 Chat Now
 </a>
-    
+    <script>
+// Example order data (Order ID -> Status). 
+// You can use localStorage or a backend call instead in a real app.
+const orders = {
+  "ORDER1001": "Order Received (Payment Pending)",
+  "ORDER1002": "Payment Confirmed",
+  "ORDER1003": "Packed",
+  "ORDER1004": "Shipped",
+  "ORDER1005": "Delivered"
+};
+
+const trackButton = document.getElementById('trackButton');
+const statusDisplay = document.getElementById('statusDisplay');
+const reviewSection = document.getElementById('reviewSection');
+const submitReview = document.getElementById('submitReview');
+const reviewMessage = document.getElementById('reviewMessage');
+
+// When "Track Order" is clicked
+trackButton.addEventListener('click', function() {
+  const orderId = document.getElementById('orderIDInput').value.trim();
+  const status = orders[orderId];
+  if (!status) {
+    statusDisplay.textContent = "Order ID not found.";
+    reviewSection.style.display = 'none';
+    return;
+  }
+  statusDisplay.textContent = "Status: " + status;
+  
+  // Show review form only if delivered
+  if (status === "Delivered") {
+    reviewSection.style.display = 'block';
+  } else {
+    reviewSection.style.display = 'none';
+  }
+});
+
+// When "Submit Review" is clicked
+submitReview.addEventListener('click', function() {
+  const orderId = document.getElementById('orderIDInput').value.trim();
+  const rating = document.getElementById('rating').value;
+  const note = document.getElementById('reviewNote').value;
+  if (!orderId) {
+    alert("Please enter Order ID and track first.");
+    return;
+  }
+  // Save review in localStorage (not visible publicly)
+  const reviewData = { rating: rating, note: note };
+  localStorage.setItem("review_" + orderId, JSON.stringify(reviewData));
+  // Show a thank-you message
+  reviewMessage.textContent = "Thank you for your review!";
+  // (Leave the form visible if you want, or hide it)
+  reviewSection.style.display = 'none';
+});
+</script>
+
 </body>
 </html>
