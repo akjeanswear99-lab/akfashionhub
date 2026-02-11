@@ -526,6 +526,18 @@ function addToCart(i){
  const size=document.getElementById("size"+i).value;
  const color=document.getElementById("color"+i).value;
  if(!size || !color){alert("Select size & color");return;}
+    fetch("https://script.google.com/macros/s/AKfycbw-33Qf_qyrQyEjMK2LNROKV98tXEODriQsLfL1CcPjzZ3dAibmy1TacTHS5flrg3Bh0Q/exec", {
+  method: "POST",
+  body: JSON.stringify({
+    orderId: orderId,
+    name: n,
+    phone: p,
+    address: a,
+    products: cart.map(c => c.name + " (" + c.size + ")").join(", "),
+    total: total
+  })
+});
+
  const p=products[i];
  if(stocks[p.id]<=0){alert("Out of stock");return;}
  stocks[p.id]--;
