@@ -193,21 +193,22 @@ footer{
     <span></span>
   </div>
 </header>
+    
         <div id="sideMenu">
-
-  <!-- CLOSE BUTTON (YAHI ADD KARNA HAI) -->
-  <div style="text-align:right;">
-    <button onclick="toggleMenu()"
-      style="
-        background:none;
-        border:none;
-        font-size:22px;
-        cursor:pointer;
-        color:#000;
-      ">
-      ✕
-    </button>
-  </div>
+<!-- CLOSE BUTTON (LEFT – PREMIUM) -->
+<div style="text-align:left; margin-left:-6px; margin-bottom:6px;">
+  <button onclick="toggleMenu()"
+    style="
+      background:none;
+      border:none;
+      font-size:22px;
+      cursor:pointer;
+      color:#000;
+      padding:0;
+    ">
+    ✕
+  </button>
+</div>
 
   <h3>Track Your Order</h3>
 
@@ -254,8 +255,23 @@ footer{
         <h3>Checkout</h3>
         <input id="name" placeholder="Name" type="text">
         <input id="phone" placeholder="Phone" type="tel">
-        <textarea id="address" placeholder="Full Address"></textarea>
-        <textarea id="note" maxlength="50" placeholder="Note (max 50 words)"></textarea>
+        <!-- CUSTOMER ADDRESS DETAILS -->
+<textarea
+  id="address"
+  rows="4"
+  placeholder="House No. / Flat No., Street / Area, Landmark, City, State, Pincode"
+></textarea>
+
+<!-- OPTIONAL NOTE -->
+<textarea
+  id="note"
+  rows="2"
+  placeholder="Order Note (Optional – max 30 words)"
+></textarea>
+
+<p style="font-size:12px; color:#666; margin-top:4px;">
+  * Please provide complete and accurate address for smooth delivery.
+</p>
         <div style="margin-top:10px; font-size:14px; display:flex; align-items:center; gap:6px;">
   <input type="checkbox" id="terms" style="width:auto; margin:0;">
   <label for="terms" style="margin:0;">
@@ -271,7 +287,16 @@ footer{
 </div>
 
 <footer>
-    <p>Return Policy:(Terms and Conditions Apply)</p>
+   <p>
+  Return Policy:
+  <span
+    style="color:#4da3ff; cursor:pointer; text-decoration:underline;"
+    onclick="openTerms()"
+  >
+    (Terms and Conditions Apply)
+  </span>
+</p>
+    
  <p style="margin-bottom:10px; font-size:14px;">
   <b>Follow us on</b>
 </p>
@@ -384,6 +409,45 @@ const products = [
  sizes:["S","M","L"],
  measure:"Chest, Waist, Shoulder, Length"
 }
+    {
+ id:"AKS006",
+ gender:"Men",
+ name:"Formal Shirt",
+ category:"Shirt",
+ price:1299,
+ discount:25,
+ stock:4,
+ img:[img4, img1],
+ colors:["White","Blue"],
+ sizes:["M","L","XL"],
+ measure:"Chest, Waist, Shoulder"
+},
+    {
+ id:"AKS007",
+ gender:"Men",
+ name:"Formal Shirt",
+ category:"Shirt",
+ price:1299,
+ discount:25,
+ stock:4,
+ img:[img4, img1],
+ colors:["White","Blue"],
+ sizes:["M","L","XL"],
+ measure:"Chest, Waist, Shoulder"
+},
+        {
+ id:"AKS008",
+ gender:"Men",
+ name:"Formal Shirt",
+ category:"Shirt",
+ price:1299,
+ discount:25,
+ stock:4,
+ img:[img4, img1],
+ colors:["White","Blue"],
+ sizes:["M","L","XL"],
+ measure:"Chest, Waist, Shoulder"
+},
 ];
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -518,7 +582,7 @@ const orderId = generateOrderId();
 
 let msg=`AK FASHION HUB
 Order ID: ${orderId}
-Keshav Nagar, Hapur
+Keshav Nagar, Hapur 245101
 
 `;
  cart.forEach(c=>{
@@ -756,6 +820,14 @@ function toggleMenu(){
     !icon.contains(e.target)
   ) {
     menu.style.right = "-320px";
+  }
+});
+        const noteField = document.getElementById("note");
+
+noteField.addEventListener("input", function () {
+  const words = this.value.trim().split(/\s+/);
+  if (words.length > 30) {
+    this.value = words.slice(0, 30).join(" ");
   }
 });
 
