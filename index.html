@@ -112,6 +112,12 @@ footer{
 
 <div class="container">
     <h2>Products</h2>
+    <div style="margin-bottom:20px; display:flex; gap:10px;">
+  <button onclick="filterProducts('All')">All</button>
+  <button onclick="filterProducts('Men')">Men</button>
+  <button onclick="filterProducts('Women')">Women</button>
+</div>
+
     <div class="products" id="products"></div>
 
     <div class="cart">
@@ -140,7 +146,7 @@ footer{
 </div>
 
 <footer>
-    <p>Return Policy: 3 Days Return Policy (Terms and Conditions Apply)</p>
+    <p>Return Policy:(Terms and Conditions Apply)</p>
     <p>Support: 9599497909 | Instagram: a_k_fashion_hub_</p>
 </footer>
 
@@ -154,6 +160,7 @@ const img4 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJ
 const products = [
 {
  id:"AKJ001",
+ gender:"Men",  
  name:"Blue Denim Jeans",
  category:"Jeans",
  price:1999,
@@ -166,6 +173,7 @@ const products = [
 },
 {
  id:"AKL002",
+ gender:"Men",
  name:"Black Lower",
  category:"Lower",
  price:1499,
@@ -178,6 +186,7 @@ const products = [
 },
 {
  id:"AKT003",
+ gender:"Men",
  name:"Cotton T-Shirt",
  category:"T-Shirt",
  price:999,
@@ -190,6 +199,7 @@ const products = [
 },
 {
  id:"AKS004",
+ gender:"Men",
  name:"Formal Shirt",
  category:"Shirt",
  price:1299,
@@ -202,6 +212,7 @@ const products = [
 },
 {
  id:"AKK005",
+ gender:"Women",
  name:"Embroidered Kurti",
  category:"Kurti",
  price:1799,
@@ -219,11 +230,19 @@ let stocks = JSON.parse(localStorage.getItem('stocks')) || {};
 products.forEach(p => {
     if (!stocks[p.id]) stocks[p.id] = p.stock;
 });
+    let currentFilter = "All";
+
+function filterProducts(type){
+  currentFilter = type;
+  renderProducts();
+}
+
 
 function renderProducts(){
  const box=document.getElementById("products");
  box.innerHTML="";
  products.forEach((p,i)=>{
+     if(currentFilter !== "All" && p.gender !== currentFilter) return;
   const final=Math.round(p.price-(p.price*p.discount/100));
   const currentStock = stocks[p.id];
   box.innerHTML+=`
@@ -231,6 +250,10 @@ function renderProducts(){
    <div class="slider">
    <img src="${p.img[0]}" class="product-img" onclick="openImage('${p.img[0]}')">
    </div>
+   <p style="font-size:12px; font-weight:bold; color:#555;">
+  ${p.gender === "Men" ? "Men’s Product" : "Women’s Product"}
+</p>
+
    <h3>${p.name}</h3>
    <p>SKU: ${p.id}</p>
    <p>${p.category}</p>
@@ -319,9 +342,6 @@ renderProducts();
 updateCart();
 </script>
 
-</body>
-</html>
-<script>
 <script>
 function openImage(src){
   let modal = document.createElement("div");
@@ -395,22 +415,31 @@ function openTerms(){
       <h3>Terms & Conditions – AK FASHION HUB</h3>
 
       <p style="font-size:14px; line-height:1.6;">
-        • Product delivery ke baad <b>3 din ke andar</b> hi return / replacement request valid hai.<br><br>
+        • All product images displayed on this website are captured using professional camera equipment or generated/enhanced using AI technology. 
+Due to screen resolution, lighting conditions, camera settings, and pixel variations, there may be slight differences in color, texture, or appearance between the images shown and the actual product received.<br><br>
 
-        • <b>Video proof aur product receive hone ki clear photo dena compulsory hai.</b><br><br>
+• Return or replacement requests must be raised within <b>3 days</b> from the date of product delivery.<br><br>
 
-        • Dhula hua, ganda, damaged, ya used product accept nahi hoga.<br><br>
+• <b>A clear unboxing video and clear photos of the received product are mandatory</b> for any return or replacement request. 
+Requests without proper video and photo proof will not be accepted.<br><br>
 
-        • Original bill / invoice return ke time dena mandatory hai.<br><br>
+• The product must be <b>unused, unwashed, undamaged, and in original condition</b>. 
+Washed, worn, dirty, altered, or damaged products will not be eligible for return or replacement.<br><br>
 
-        • Refund sirf tabhi diya jayega jab product AK FASHION HUB ki taraf se galat ya damaged ho.<br><br>
+• <b>The original invoice/bill provided with the product must be submitted</b> at the time of return or replacement. 
+Requests without the original invoice will not be processed.<br><br>
 
-        • Size / fitting issue me sirf replacement hoga, refund nahi.<br><br>
+• <b>Refunds will be issued only in cases where an incorrect or damaged product is delivered from AK FASHION HUB.</b><br><br>
 
-        • Size / fitting replacement ke case me customer ko <b>ek side ka delivery charge</b> dena hoga.<br><br>
+• In case of <b>size or fitting issues, only replacement will be provided</b>. Refunds are not applicable for size or fitting concerns.<br><br>
 
-        • Screen lighting ya display ki wajah se colour me thoda difference ho sakta hai.
-      </p>
+• For size or fitting replacements, <b>the customer is required to pay one-side delivery/shipping charges</b>.<br><br>
+
+• Differences in color may occur due to screen brightness, display settings, or lighting conditions and shall not be considered a defect.<br><br>
+
+• By placing an order, the customer confirms that they have read, understood, and agreed to all the above Terms & Conditions.
+
+</p>
 
       <button style="width:100%; margin-top:10px;"
         onclick="
@@ -430,4 +459,5 @@ function openTerms(){
 }
 </script>
 
-
+</body>
+</html>
