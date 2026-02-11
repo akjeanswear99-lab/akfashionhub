@@ -526,18 +526,7 @@ function addToCart(i){
  const size=document.getElementById("size"+i).value;
  const color=document.getElementById("color"+i).value;
  if(!size || !color){alert("Select size & color");return;}
-    fetch("https://script.google.com/macros/s/AKfycbw-33Qf_qyrQyEjMK2LNROKV98tXEODriQsLfL1CcPjzZ3dAibmy1TacTHS5flrg3Bh0Q/exec", {
-  method: "POST",
-  body: JSON.stringify({
-    orderId: orderId,
-    name: n,
-    phone: p,
-    address: a,
-    products: cart.map(c => c.name + " (" + c.size + ")").join(", "),
-    total: total
-  })
-});
-
+    
  const p=products[i];
  if(stocks[p.id]<=0){alert("Out of stock");return;}
  stocks[p.id]--;
@@ -578,33 +567,36 @@ function removeFromCart(index){
   const random = Math.floor(1000 + Math.random() * 9000);
   return `AKFH-${date}-${random}`;
 }
-
 function checkout(){
-    const termsAccepted = document.getElementById("terms").checked;
-if(!termsAccepted){
-  alert("Please accept Terms & Conditions to place order");
-  return;
-}
- const n=document.getElementById("name").value.trim();
- const p=document.getElementById("phone").value.trim();
- const a=document.getElementById("address").value.trim();
- const note=document.getElementById("note").value.trim();
- if(!n || !p || !a || cart.length==0){alert("Fill all details and add items to cart");return;}
-const orderId = generateOrderId();
 
-let msg=`AK FASHION HUB
-Order ID: ${orderId}
-Keshav Nagar, Hapur 245101
+  // validations
+  const n = ...
+  const p = ...
+  const a = ...
+  const note = ...
 
-`;
- cart.forEach(c=>{
-  const price=Math.round(c.price-(c.price*c.discount/100));
-  msg+=`${c.name}\nSKU:${c.id}\nSize:${c.size}\nColor:${c.color}\n₹${price}\n\n`;
- });
- msg+=`Customer: ${n}\nPhone:${p}\nAddress:${a}\nNote:${note}`;
- window.open("https://wa.me/919599497909?text="+encodeURIComponent(msg));
-alert("Order Placed Successfully!\nYour Order ID: " + orderId);
+  const orderId = generateOrderId();   // 👈 YAHAN TAK ALREADY HAI
+
+  // 👇👇 YAHAN GOOGLE SHEET WALA CODE PASTE KARO 👇👇
+  fetch("YOUR_GOOGLE_SCRIPT_URL", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      orderId: orderId,
+      name: n,
+      phone: p,
+      address: a,
+      products: cart.map(c => c.name + " (" + c.size + ", " + c.color + ")").join(" | "),
+      total: totalAmount
+    })
+  });
+
+  // 👇 ISKE BAAD YE ALREADY HAI
+  window.open("https://wa.me/...");
+  alert("Order Placed Successfully!");
 }
+
+
 
 renderProducts();
 updateCart();
