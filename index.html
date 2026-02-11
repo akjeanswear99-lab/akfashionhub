@@ -25,8 +25,8 @@ header{
 }
 .products{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-    gap:20px;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:18px;
 }
 .card{
     background:#fff;
@@ -36,10 +36,10 @@ header{
 }
 .card img{
     width:100%;
-    height:auto;
-    max-height:650px;
+    height:320px;
     object-fit:contain;
     border-radius:6px;
+    background:#f7f7f7;
 }
 .slider{
     position:relative;
@@ -99,6 +99,15 @@ footer{
     padding:15px;
     margin-top:40px;
 }
+    .card h3{
+    font-size:16px;
+    margin:6px 0;
+}
+
+.card p{
+    font-size:13px;
+    margin:4px 0;
+}
 </style>
 </head>
 
@@ -107,7 +116,7 @@ footer{
 <header>
     <h1>AK FASHION HUB</h1>
     <p>Keshav Nagar, Swarg Aashram Road, Hapur</p>
-    <p>Support: 9599497909 | Instagram: a_k_fashion_hub_</p>
+    
 </header>
 
 <div class="container">
@@ -147,7 +156,37 @@ footer{
 
 <footer>
     <p>Return Policy:(Terms and Conditions Apply)</p>
-    <p>Support: 9599497909 | Instagram: a_k_fashion_hub_</p>
+   <div style="margin-top:10px; display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+
+  <a href="https://wa.me/919599497909"
+     target="_blank"
+     style="
+       background:#25D366;
+       color:#fff;
+       padding:10px 18px;
+       border-radius:25px;
+       text-decoration:none;
+       font-size:14px;
+       font-weight:bold;
+     ">
+    WhatsApp Us
+  </a>
+
+  <a href="https://www.instagram.com/a_k_fashion_hub_/"
+     target="_blank"
+     style="
+       background:#E1306C;
+       color:#fff;
+       padding:10px 18px;
+       border-radius:25px;
+       text-decoration:none;
+       font-size:14px;
+       font-weight:bold;
+     ">
+    Instagram
+  </a>
+       
+</div>
 </footer>
 
 <script>
@@ -236,8 +275,18 @@ function filterProducts(type){
   currentFilter = type;
   renderProducts();
 }
+function getStockText(stock){
+  if(stock <= 0)
+    return '<p style="color:red; font-size:12px; font-weight:bold;">Currently Out of Stock</p>';
 
+  if(stock === 1)
+    return '<p style="color:red; font-size:12px; font-weight:bold;">Only 1 left!</p>';
 
+  if(stock <= 3)
+    return `<p style="color:orange; font-size:12px;">Only ${stock} left</p>`;
+
+  return `<p style="color:green; font-size:12px;">${stock} in stock</p>`;
+}
 function renderProducts(){
  const box=document.getElementById("products");
  box.innerHTML="";
@@ -257,9 +306,12 @@ function renderProducts(){
    <h3>${p.name}</h3>
    <p>SKU: ${p.id}</p>
    <p>${p.category}</p>
-   <p>MRP ₹${p.price} | ${p.discount}% OFF</p>
-   <p><b>₹${final}</b></p>
-   <p>Measurements: ${p.measure}</p>
+  <p>MRP ₹${p.price} | ${p.discount}% OFF</p>
+<p><b>₹${final}</b></p>
+
+${getStockText(currentStock)}
+
+<p>Measurements: ${p.measure}</p>
    <select id="size${i}">
      <option value="">Select Size</option>
      ${p.sizes.map(s=>`<option>${s}</option>`).join("")}
@@ -268,9 +320,10 @@ function renderProducts(){
      <option value="">Select Color</option>
      ${p.colors.map(c=>`<option>${c}</option>`).join("")}
    </select>
-   <button onclick="addToCart(${i})" ${currentStock==0?"disabled":""}>
-     ${currentStock==0?"OUT OF STOCK":"Add to Cart"}
-   </button>
+  <button onclick="addToCart(${i})" ${currentStock==0?"disabled":""}>
+  ${currentStock==0?"CURRENTLY OUT OF STOCK":"Add to Cart"}
+</button>
+
   </div>`;
  });
 }
@@ -317,6 +370,16 @@ function removeFromCart(index){
  updateCart();
  renderProducts();
 }
+    function generateOrderId(){
+  const now = new Date();
+  const date =
+    now.getFullYear().toString() +
+    String(now.getMonth() + 1).padStart(2, "0") +
+    String(now.getDate()).padStart(2, "0");
+
+  const random = Math.floor(1000 + Math.random() * 9000);
+  return `AKFH-${date}-${random}`;
+}
 
 function checkout(){
     const termsAccepted = document.getElementById("terms").checked;
@@ -329,13 +392,20 @@ if(!termsAccepted){
  const a=document.getElementById("address").value.trim();
  const note=document.getElementById("note").value.trim();
  if(!n || !p || !a || cart.length==0){alert("Fill all details and add items to cart");return;}
- let msg=`AK FASHION HUB\nKeshav Nagar, Hapur\n\n`;
+const orderId = generateOrderId();
+
+let msg=`AK FASHION HUB
+Order ID: ${orderId}
+Keshav Nagar, Hapur
+
+`;
  cart.forEach(c=>{
   const price=Math.round(c.price-(c.price*c.discount/100));
   msg+=`${c.name}\nSKU:${c.id}\nSize:${c.size}\nColor:${c.color}\n₹${price}\n\n`;
  });
  msg+=`Customer: ${n}\nPhone:${p}\nAddress:${a}\nNote:${note}`;
  window.open("https://wa.me/919599497909?text="+encodeURIComponent(msg));
+alert("Order Placed Successfully!\nYour Order ID: " + orderId);
 }
 
 renderProducts();
@@ -458,6 +528,27 @@ Requests without the original invoice will not be processed.<br><br>
   document.body.appendChild(modal);
 }
 </script>
-
+    <a href="https://wa.me/919599497909"
+   target="_blank"
+   style="
+     position:fixed;
+     bottom:20px;
+     right:20px;
+     background:#25D366;
+     color:white;
+     padding:14px 20px;
+     border-radius:30px;
+     text-decoration:none;
+     font-weight:bold;
+     font-size:15px;
+     box-shadow:0 4px 10px rgba(0,0,0,0.3);
+     z-index:9999;
+     display:flex;
+     align-items:center;
+     gap:8px;
+   ">
+  💬 Chat Now
+</a>
+    
 </body>
 </html>
