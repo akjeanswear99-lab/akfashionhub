@@ -36,8 +36,9 @@ header{
 }
 .card img{
     width:100%;
-    height:200px;
-    object-fit:cover;
+    height:auto;
+    max-height:650px;
+    object-fit:contain;
     border-radius:6px;
 }
 .slider{
@@ -124,6 +125,16 @@ footer{
         <textarea id="address" placeholder="Full Address"></textarea>
         <textarea id="note" maxlength="50" placeholder="Note (max 50 words)"></textarea>
         <p>Payment: UPI (9599497909@ptyes)</p>
+        <div style="margin-top:10px; font-size:14px;">
+  <input type="checkbox" id="terms">
+  <label for="terms">
+  I agree to the 
+  <span style="color:blue; cursor:pointer;" onclick="openTerms()">
+    <b>Terms & Conditions</b>
+  </span>
+</label>
+</div>
+
         <button onclick="checkout()">Place Order (WhatsApp)</button>
     </div>
 </div>
@@ -285,6 +296,11 @@ function removeFromCart(index){
 }
 
 function checkout(){
+    const termsAccepted = document.getElementById("terms").checked;
+if(!termsAccepted){
+  alert("Please accept Terms & Conditions to place order");
+  return;
+}
  const n=document.getElementById("name").value.trim();
  const p=document.getElementById("phone").value.trim();
  const a=document.getElementById("address").value.trim();
@@ -327,3 +343,9 @@ function openImage(src) {
   document.body.appendChild(modal);
 }
 </script>
+<script>
+function openTerms(){
+  ...
+}
+</script>
+
