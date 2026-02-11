@@ -569,18 +569,36 @@ function removeFromCart(index){
 }
 function checkout(){
 
-  // validations
-  const n = ...
-  const p = ...
-  const a = ...
-  const note = ...
+  const termsAccepted = document.getElementById("terms").checked;
+  if(!termsAccepted){
+    alert("Please accept Terms & Conditions to place order");
+    return;
+  }
 
-  const orderId = generateOrderId();   // 👈 YAHAN TAK ALREADY HAI
+  const n = document.getElementById("name").value.trim();
+  const p = document.getElementById("phone").value.trim();
+  const a = document.getElementById("address").value.trim();
+  const note = document.getElementById("note").value.trim();
 
-  // 👇👇 YAHAN GOOGLE SHEET WALA CODE PASTE KARO 👇👇
-  fetch("YOUR_GOOGLE_SCRIPT_URL", {
+  if(!n || !p || !a || cart.length === 0){
+    alert("Fill all details and add items to cart");
+    return;
+  }
+
+  const orderId = generateOrderId();
+
+  // TOTAL CALCULATION
+  let totalAmount = 0;
+  cart.forEach(c => {
+    totalAmount += Math.round(c.price - (c.price * c.discount / 100));
+  });
+
+  // 👉 GOOGLE SHEET SAVE
+  fetch("https://script.google.com/macros/s/AKfycbw-33Qf_qyrQyEjMK2LNROKV98tXEODriQsLfL1CcPjzZ3dAibmy1TacTHS5flrg3Bh0Q/exec", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({
       orderId: orderId,
       name: n,
@@ -591,9 +609,32 @@ function checkout(){
     })
   });
 
-  // 👇 ISKE BAAD YE ALREADY HAI
-  window.open("https://wa.me/...");
-  alert("Order Placed Successfully!");
+  // 👉 WHATSAPP MESSAGE
+  let msg = `AK FASHION HUB
+Order ID: ${orderId}
+Keshav Nagar, Hapur 245101
+
+`;
+
+  cart.forEach(c=>{
+    const price = Math.round(c.price - (c.price * c.discount / 100));
+    msg += `${c.name}
+SKU:${c.id}
+Size:${c.size}
+Color:${c.color}
+₹${price}
+
+`;
+  });
+
+  msg += `Customer: ${n}
+Phone: ${p}
+Address: ${a}
+Note: ${note}`;
+
+  window.open("https://wa.me/919599497909?text=" + encodeURIComponent(msg));
+
+  alert("Order Placed Successfully!\nYour Order ID: " + orderId);
 }
 
 
