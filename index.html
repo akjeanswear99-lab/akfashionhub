@@ -322,7 +322,8 @@ updateCart();
 </body>
 </html>
 <script>
-function openImage(src) {
+<script>
+function openImage(src){
   let modal = document.createElement("div");
   modal.style.position = "fixed";
   modal.style.top = "0";
@@ -330,22 +331,103 @@ function openImage(src) {
   modal.style.width = "100%";
   modal.style.height = "100%";
   modal.style.background = "rgba(0,0,0,0.9)";
+  modal.style.zIndex = "9999";
   modal.style.display = "flex";
   modal.style.alignItems = "center";
   modal.style.justifyContent = "center";
-  modal.style.zIndex = "9999";
+  modal.style.overflow = "hidden";
 
   modal.innerHTML = `
-    <img src="${src}" style="max-width:90%; max-height:90%; border-radius:10px;">
+    <div style="overflow:auto; max-width:100%; max-height:100%;">
+      <img src="${src}"
+        style="
+          max-width:100%;
+          max-height:100%;
+          transform-origin:center center;
+          cursor:zoom-in;
+        "
+        id="zoomImg"
+      >
+    </div>
   `;
 
-  modal.onclick = () => modal.remove();
+  let scale = 1;
+  const img = modal.querySelector("#zoomImg");
+
+  // Mouse wheel zoom (desktop)
+  img.onwheel = (e) => {
+    e.preventDefault();
+    scale += e.deltaY * -0.001;
+    scale = Math.min(Math.max(1, scale), 4);
+    img.style.transform = `scale(${scale})`;
+  };
+
+  // Double tap zoom (mobile friendly)
+  img.ondblclick = () => {
+    scale = scale === 1 ? 2 : 1;
+    img.style.transform = `scale(${scale})`;
+  };
+
+  modal.onclick = (e) => {
+    if(e.target === modal) modal.remove();
+  };
+
   document.body.appendChild(modal);
 }
 </script>
+
 <script>
 function openTerms(){
-  ...
+  let modal = document.createElement("div");
+  modal.style.position="fixed";
+  modal.style.top="0";
+  modal.style.left="0";
+  modal.style.width="100%";
+  modal.style.height="100%";
+  modal.style.background="rgba(0,0,0,0.8)";
+  modal.style.zIndex="9999";
+  modal.style.display="flex";
+  modal.style.alignItems="center";
+  modal.style.justifyContent="center";
+
+  modal.innerHTML = `
+    <div style="background:#fff; padding:20px; max-width:520px; max-height:85%; overflow:auto; border-radius:8px;">
+      <h3>Terms & Conditions – AK FASHION HUB</h3>
+
+      <p style="font-size:14px; line-height:1.6;">
+        • Product delivery ke baad <b>3 din ke andar</b> hi return / replacement request valid hai.<br><br>
+
+        • <b>Video proof aur product receive hone ki clear photo dena compulsory hai.</b><br><br>
+
+        • Dhula hua, ganda, damaged, ya used product accept nahi hoga.<br><br>
+
+        • Original bill / invoice return ke time dena mandatory hai.<br><br>
+
+        • Refund sirf tabhi diya jayega jab product AK FASHION HUB ki taraf se galat ya damaged ho.<br><br>
+
+        • Size / fitting issue me sirf replacement hoga, refund nahi.<br><br>
+
+        • Size / fitting replacement ke case me customer ko <b>ek side ka delivery charge</b> dena hoga.<br><br>
+
+        • Screen lighting ya display ki wajah se colour me thoda difference ho sakta hai.
+      </p>
+
+      <button style="width:100%; margin-top:10px;"
+        onclick="
+          document.getElementById('terms').checked = true;
+          this.closest('div').parentElement.remove();
+        ">
+        I Agree
+      </button>
+    </div>
+  `;
+
+  modal.onclick = (e) => {
+    if(e.target === modal) modal.remove();
+  };
+
+  document.body.appendChild(modal);
 }
 </script>
+
 
