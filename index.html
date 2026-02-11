@@ -108,23 +108,73 @@ footer{
     font-size:13px;
     margin:4px 0;
 }
+    .menu-icon{
+  position:absolute;
+  top:22px;
+  right:20px;
+  cursor:pointer;
+}
+
+.menu-icon span{
+  display:block;
+  width:26px;
+  height:3px;
+  background:#fff;
+  margin:5px 0;
+}
+
+/* Right slide menu */
+#sideMenu{
+  position:fixed;
+  top:0;
+  right:-320px;
+  width:300px;
+  height:100%;
+  background:#fff;
+  padding:20px;
+  box-shadow:-4px 0 10px rgba(0,0,0,0.3);
+  transition:0.3s;
+  z-index:10000;
+}
+
+#sideMenu input,
+#sideMenu button,
+#sideMenu textarea,
+#sideMenu select{
+  width:100%;
+  margin-top:8px;
+}
+
 </style>
 </head>
 
 <body>
-    <!-- Order Tracking Section -->
-<div id="orderTracker" style="margin: 20px 0;">
-  <h2>Track Your Order</h2>
-  <input type="text" id="orderIDInput" placeholder="Enter Order ID" />
-  <button id="trackButton">Track Order</button>
-  <p id="statusDisplay" style="font-weight: bold; margin-top: 10px;"></p>
-</div>
 
-<!-- Review Section (hidden until Delivered) -->
-<div id="reviewSection" style="display:none; margin-top: 20px;">
-  <h3>Leave a Review</h3>
-  <label>
-    Rating: 
+
+
+    <header style="position:relative;">
+    <h1>AK FASHION HUB</h1>
+    <p>Keshav Nagar, Swarg Aashram Road, Hapur</p>
+
+    <!-- 3 Line Menu Icon (RIGHT TOP) -->
+    <div class="menu-icon" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+</header>
+    <div id="sideMenu">
+  <h3>Track Your Order</h3>
+
+  <input type="text" id="orderIDInput" placeholder="Enter Order ID">
+  <button id="trackButton">Track Order</button>
+
+  <p id="statusDisplay" style="font-weight:bold;margin-top:10px;"></p>
+
+  <!-- Review (Delivered ke baad hi dikhega) -->
+  <div id="reviewSection" style="display:none; margin-top:15px;">
+    <h4>Leave a Review</h4>
+
     <select id="rating">
       <option value="1">1 star</option>
       <option value="2">2 stars</option>
@@ -132,20 +182,14 @@ footer{
       <option value="4">4 stars</option>
       <option value="5">5 stars</option>
     </select>
-  </label><br/><br/>
-  <label>
-    Note: <br/>
-    <textarea id="reviewNote" rows="3" cols="30" placeholder="Optional comments"></textarea>
-  </label><br/><br/>
-  <button id="submitReview">Submit Review</button>
-  <p id="reviewMessage" style="color: green; margin-top: 10px;"></p>
-</div>
 
-<header>
-    <h1>AK FASHION HUB</h1>
-    <p>Keshav Nagar, Swarg Aashram Road, Hapur</p>
-    
-</header>
+    <textarea id="reviewNote" rows="3" placeholder="Optional comments"></textarea>
+
+    <button id="submitReview">Submit Review</button>
+    <p id="reviewMessage" style="color:green;"></p>
+  </div>
+
+</div>   <!-- ✅ sideMenu CLOSE -->
 
 <div class="container">
     <h2>Products</h2>
@@ -630,6 +674,14 @@ submitReview.addEventListener('click', function() {
   // (Leave the form visible if you want, or hide it)
   reviewSection.style.display = 'none';
 });
+function toggleMenu(){
+  const menu = document.getElementById("sideMenu");
+  if(menu.style.right === "0px"){
+    menu.style.right = "-320px";
+  }else{
+    menu.style.right = "0px";
+  }
+}
 </script>
 
 </body>
