@@ -177,27 +177,6 @@ footer{
   transform: translateY(0);
 }
 
-/* Right slide menu */
-#sideMenu{
-  position:fixed;
-  top:0;
-  right:-320px;
-  width:300px;
-  height:100%;
-  background:#fff;
-  padding:20px;
-  box-shadow:-4px 0 10px rgba(0,0,0,0.3);
-  transition:0.3s;
-  z-index:10000;
-}
-
-#sideMenu input,
-#sideMenu button,
-#sideMenu textarea,
-#sideMenu select{
-  width:100%;
-  margin-top:8px;
-}
 
 </style>
 </head>
@@ -228,7 +207,8 @@ style="
 
 
   <!-- Menu Icon -->
-  <div class="menu-icon" onclick="toggleMenu()">
+ <div class="menu-icon" onclick="toggleCart()">
+
     <span></span>
     <span></span>
     <span></span>
@@ -260,9 +240,11 @@ style="
   </button>
     <hr>
 
-<h4 style="margin-top:10px;">My Orders</h4>
-<input id="orderPhone" placeholder="Enter phone number">
-<input id="orderIdCheck" placeholder="Enter any Order ID">
+<h4 style="margin-top:10px;">
+My Orders (Enter phone + any ONE Order ID)
+</h4>
+<input id="orderPhone" placeholder="Enter phone number" maxlength="10">
+<input id="orderIdCheck" placeholder="e.g. AKFH-20260213-1234">
 <button onclick="showMyOrders()">View My Orders</button>
 
 
@@ -271,30 +253,7 @@ style="
 </div>
 
     
-<div id="sideMenu">
-  <h3>Track Your Order</h3>
 
-  <input type="text" id="orderIDInput" placeholder="Enter Order ID">
-  <button id="trackButton">Track Order</button>
-
-  <p id="statusDisplay" style="font-weight:bold;margin-top:10px;"></p>
-
-  <div id="reviewSection" style="display:none; margin-top:15px;">
-    <h4>Leave a Review</h4>
-
-    <select id="rating">
-      <option value="1">1 star</option>
-      <option value="2">2 stars</option>
-      <option value="3">3 stars</option>
-      <option value="4">4 stars</option>
-      <option value="5">5 stars</option>
-    </select>
-
-    <textarea id="reviewNote" rows="3"></textarea>
-
-    <button id="submitReview">Submit Review</button>
-    <p id="reviewMessage"></p>
-  </div>
     
 
    <!-- ✅ SIDE MENU YAHAN CLOSE -->
@@ -1010,86 +969,12 @@ function openTerms(){
     <script>
 // Example order data (Order ID -> Status). 
 // You can use localStorage or a backend call instead in a real app.
-const orders = {
-  "ORDER1001": "Order Received (Payment Pending)",
-  "ORDER1002": "Payment Confirmed",
-  "ORDER1003": "Packed",
-  "ORDER1004": "Shipped",
-  "ORDER1005": "Delivered"
-};
 
-const trackButton = document.getElementById('trackButton');
-const statusDisplay = document.getElementById('statusDisplay');
-const reviewSection = document.getElementById('reviewSection');
-const submitReview = document.getElementById('submitReview');
-const reviewMessage = document.getElementById('reviewMessage');
 
-// When "Submit Review" is clicked
-submitReview.addEventListener('click', function() {
-  const orderId = document.getElementById('orderIDInput').value.trim();
-    if (localStorage.getItem("review_" + orderId)) {
-    alert("You have already submitted a review for this order.");
-    return;
-}
-  const rating = document.getElementById('rating').value;
-  const note = document.getElementById('reviewNote').value;
-  if (!orderId) {
-    alert("Please enter Order ID and track first.");
-    return;
-  }
-  // Save review in localStorage (not visible publicly)
-  const reviewData = { rating: rating, note: note };
-  localStorage.setItem("review_" + orderId, JSON.stringify(reviewData));
-  // Show a thank-you message
-  reviewMessage.textContent = "Thank you for your review!";
-  // (Leave the form visible if you want, or hide it)
-  reviewSection.style.display = 'none';
-});
-function toggleMenu(){
-  const menu = document.getElementById("sideMenu");
-  if(menu.style.right === "0px"){
-    menu.style.right = "-320px";
-  }else{
-    menu.style.right = "0px";
-  }
-}
-        
-        trackButton.addEventListener('click', function() {
-  const orderId = document.getElementById('orderIDInput').value.trim();
-  const status = orders[orderId];
 
-  if (!status) {
-    statusDisplay.textContent = "Order ID not found.";
-    reviewSection.style.display = 'none';
-    return;
-  }
 
-  statusDisplay.textContent = "Status: " + status;
-
-  const existingReview = localStorage.getItem("review_" + orderId);
-
-  if (status === "Delivered") {
-    if (existingReview) {
-      reviewSection.style.display = 'none';
-      statusDisplay.textContent += " | Review already submitted ✅";
-    } else {
-      reviewSection.style.display = 'block';
-    }
-  } else {
-    reviewSection.style.display = 'none';
-  }
-});document.addEventListener("click", function(e){
-  const menu = document.getElementById("sideMenu");
-  const icon = document.querySelector(".menu-icon");
-
-  if (
-    menu.style.right === "0px" &&
-    !menu.contains(e.target) &&
-    !icon.contains(e.target)
-  ) {
-    menu.style.right = "-320px";
-  }
-});
+       
+ 
         const noteField = document.getElementById("note");
 
 noteField.addEventListener("input", function () {
@@ -1144,7 +1029,7 @@ function updateBottomBar(total){
 
   if(window.innerWidth < 768 && cart.length > 0){
     bar.style.display = "flex";
-    bar.innerHTML = `🛒 View Cart (${cart.length}) <b>₹${total}</b>`;
+    bar.innerHTML = `🛒 View Cart (${cart.reduce((s,i)=>s+i.qty,0)}) <b>₹${total}</b>`;
   }else{
     bar.style.display = "none";
   }
