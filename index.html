@@ -258,6 +258,16 @@ style="
   <button onclick="checkout()" style="margin-top:10px;">
     Place Order (WhatsApp)
   </button>
+    <hr>
+
+<h4 style="margin-top:10px;">My Orders</h4>
+<input id="orderPhone" placeholder="Enter phone number">
+<input id="orderIdCheck" placeholder="Enter any Order ID">
+<button onclick="showMyOrders()">View My Orders</button>
+
+
+<div id="myOrders" style="margin-top:10px;"></div>
+
 </div>
 
     
@@ -370,10 +380,10 @@ const products = [
  sizes:["28","30","32","34","36"],
  measure:"Waist, Length, Thigh",
     inventory: {
-  "28": { "Black": 2, "Blue": 1 },
-  "30": { "Black": 3, "Blue": 0 },
-  "32": { "Black": 1, "Blue": 2 },
-  "34": { "Black": 0, "Blue": 1 }
+  "28": { "Black": 5, "Blue": 5 },
+  "30": { "Black": 5, "Blue": 5 },
+  "32": { "Black": 5, "Blue": 5 },
+  "34": { "Black": 5, "Blue": 5 }
 }
 },
 {
@@ -387,12 +397,13 @@ const products = [
  colors:["Black","Gray"],
  sizes:["S","M","L","XL"],
  measure:"Waist, Length, Thigh",
-    inventory: {
-  "28": { "Black": 2, "Blue": 1 },
-  "30": { "Black": 3, "Blue": 0 },
-  "32": { "Black": 1, "Blue": 2 },
-  "34": { "Black": 0, "Blue": 1 }
+   inventory:{
+  "S": { "Black": 5, "Gray": 5 },
+  "M": { "Black": 5, "Gray": 5 },
+  "L": { "Black": 5, "Gray": 5 },
+  "XL": { "Black": 5, "Gray": 5 },
 }
+
 },
 {
  id:"AKT003",
@@ -405,12 +416,13 @@ const products = [
  colors:["Red","White","Black"],
  sizes:["S","M","L","XL","XXL"],
  measure:"Chest, Waist, Shoulder",
-    inventory: {
-  "28": { "Black": 2, "Blue": 1 },
-  "30": { "Black": 3, "Blue": 0 },
-  "32": { "Black": 1, "Blue": 2 },
-  "34": { "Black": 0, "Blue": 1 }
+   inventory:{
+  "S": { "Black": 5, "Gray": 5 },
+  "M": { "Black": 5, "Gray": 5 },
+  "L": { "Black": 5, "Gray": 5 },
+  "XL": { "Black": 5, "Gray": 5 },
 }
+
 },
 {
  id:"AKS004",
@@ -423,12 +435,13 @@ const products = [
  colors:["White","Blue"],
  sizes:["M","L","XL"],
  measure:"Chest, Waist, Shoulder",
-    inventory: {
-  "28": { "Black": 2, "Blue": 1 },
-  "30": { "Black": 3, "Blue": 0 },
-  "32": { "Black": 1, "Blue": 2 },
-  "34": { "Black": 0, "Blue": 1 }
+    inventory:{
+  "S": { "Black": 5, "Gray": 5 },
+  "M": { "Black": 5, "Gray": 5 },
+  "L": { "Black": 5, "Gray": 5 },
+  "XL": { "Black": 5, "Gray": 5 },
 }
+
 },
 {
  id:"AKK005",
@@ -441,12 +454,13 @@ const products = [
  colors:["Pink","Green"],
  sizes:["S","M","L"],
  measure:"Chest, Waist, Shoulder, Length",
-    inventory: {
-  "28": { "Black": 2, "Blue": 1 },
-  "30": { "Black": 3, "Blue": 0 },
-  "32": { "Black": 1, "Blue": 2 },
-  "34": { "Black": 0, "Blue": 1 }
+   inventory:{
+  "S": { "Black": 5, "Gray": 5 },
+  "M": { "Black": 5, "Gray": 5 },
+  "L": { "Black": 5, "Gray": 5 },
+  "XL": { "Black": 5, "Gray": 5 },
 }
+
 },
     {
  id:"AKS006",
@@ -503,16 +517,7 @@ const products = [
 }
 },
 ];
-    let inventoryData = JSON.parse(localStorage.getItem("inventoryData")) || {};
-
-products.forEach(p=>{
-  if(!inventoryData[p.id]){
-    inventoryData[p.id] = p.inventory;
-  }
-});
-
-localStorage.setItem("inventoryData", JSON.stringify(inventoryData));
-
+   
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 
@@ -575,23 +580,12 @@ function updateStockMsg(i){
     msg.innerText = "";
     return;
   }
+// ✅ FINAL STOCK CHECK CHECKOUT PE HOGA
+msg.innerText = "Stock confirmed at checkout";
+msg.style.color = "blue";
+btn.disabled = false;
 
-  const p = products[i];
-  const stock = inventoryData[p.id]?.[size]?.[color] ?? 0;
-
-if(stock <= 0){
-  msg.innerText = "Currently not available in stock";
-  msg.style.color = "red";
-  btn.disabled = true;
-}else if(stock <= 2){
-  msg.innerText = `Only ${stock} left`;
-  msg.style.color = "orange";
-  btn.disabled = false;
-}else{
-  msg.innerText = "In stock";
-  msg.style.color = "green";
-  btn.disabled = false;
-   }
+ 
 }
 
 function changeImage(i, dir){
@@ -620,15 +614,9 @@ function addToCart(i){
   }
 
   const p = products[i];
- const stock = inventoryData[p.id]?.[size]?.[color] ?? 0;
-  if(stock <= 0){
-    showToast("Currently not available in stock");
-    return;
-  }
 
   // reduce stock
-  inventoryData[p.id][size][color]--;
-  localStorage.setItem("inventoryData", JSON.stringify(inventoryData));
+ 
 
   let existing = cart.find(
  item => item.id === p.id && item.size === size && item.color === color
@@ -696,17 +684,13 @@ function askRemove(index){
 function confirmYes(){
   const item = cart[removeIndex];
 
-  inventoryData[item.id][item.size][item.color] += item.qty;
-  localStorage.setItem("inventoryData", JSON.stringify(inventoryData));
-
   cart.splice(removeIndex, 1);
   localStorage.setItem("cart", JSON.stringify(cart));
 
   document.getElementById("confirmBox").style.display = "none";
   showToast("Item removed from cart");
-
-  updateCart();
-  renderProducts();
+updateCart();
+    renderProducts();
 }
 
 function confirmNo(){
@@ -726,7 +710,8 @@ function confirmNo(){
   const random = Math.floor(1000 + Math.random() * 9000);
   return `AKFH-${date}-${random}`;
 }
-function checkout(){
+async function checkout(){
+
 
   const termsAccepted = document.getElementById("terms").checked;
   if(!termsAccepted){
@@ -743,19 +728,71 @@ function checkout(){
     showToast("Fill all details and add items to cart");
     return;
   }
+      // 🔒 GOOGLE SHEET STOCK CHECK (FINAL TRUTH)
+  for (let item of cart) {
+
+    const response = await fetch(
+      "https://script.google.com/macros/s/AKfycbzlZcI0BxlKW_Q_L2XUx7AYPrMqYSTjdj2uHDTS3CLunsmXFuZm04Rb7SsCFVXB7Rn4/exec",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "CHECK_STOCK",
+          sku: item.id,
+          size: item.size,
+          color: item.color
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!result.allowed) {
+      alert(
+        `${item.name} (${item.size}, ${item.color}) is OUT OF STOCK`
+      );
+      return; // ⛔ ORDER STOP HERE
+    }
+  }
 
   const orderId = generateOrderId();
-// TOTAL QUANTITY
+    // ✅ TOTAL QUANTITY
 let totalQty = 0;
 cart.forEach(c => {
   totalQty += c.qty;
 });
 
-  // TOTAL CALCULATION
-  let totalAmount = 0;
-  cart.forEach(c => {
-    totalAmount += Math.round(c.price - (c.price * c.discount / 100));
-  });
+// ✅ TOTAL AMOUNT (PEHLE CALCULATE)
+let totalAmount = 0;
+cart.forEach(c => {
+  const price = Math.round(c.price - (c.price * c.discount / 100));
+  totalAmount += price * c.qty;
+});
+
+// ✅ SAVE ORDER HISTORY (PHONE WISE)
+let allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
+
+if (!allOrders[p]) {
+  allOrders[p] = [];
+}
+
+allOrders[p].push({
+  orderId: orderId,
+  date: new Date().toLocaleString(),
+  items: cart.map(c => ({
+    name: c.name,
+    size: c.size,
+    color: c.color,
+    qty: c.qty
+  })),
+  total: totalAmount,
+  status: "Order Received"
+});
+
+localStorage.setItem("ordersByPhone", JSON.stringify(allOrders));
+
 
   // 👉 GOOGLE SHEET SAVE
  fetch("https://script.google.com/macros/s/AKfycbwMWrEhaO4sGqHhUX7nr-zrCtROhYx0krL2Cx6rVbA0pMCenDGP32xDWMrcQb9KgaLi/exec", {
@@ -803,13 +840,19 @@ Phone: ${p}
 Address: ${a}
 Note: ${note}`;
 
-  window.open("https://wa.me/919599497909?text=" + encodeURIComponent(msg));
+ window.open("https://wa.me/919599497909?text=" + encodeURIComponent(msg));
 
-  alert("Order Placed Successfully!\nYour Order ID: " + orderId);
+
+/* ✅ OPTIONAL: inventory refresh */
+
+
+alert("Order Placed Successfully!\nYour Order ID: " + orderId);
+cart = [];
+localStorage.removeItem("cart");
+updateCart();
+renderProducts();
 }
 
-renderProducts();
-updateCart();
  function toggleCart(){
   const cartPanel = document.getElementById("cartPanel");
 
@@ -1071,7 +1114,10 @@ function updateCartBadge(){
     cartIcon.appendChild(badge);
   }
 
-  badge.innerText = cart.length;
+  let totalQty = 0;
+cart.forEach(i => totalQty += i.qty);
+badge.innerText = totalQty;
+
 }
 
 function updateBottomBar(total){
@@ -1103,7 +1149,53 @@ function updateBottomBar(total){
     bar.style.display = "none";
   }
 }
-  
+ function showMyOrders(){
+  const phone = document.getElementById("orderPhone").value.trim();
+  const orderIdInput = document.getElementById("orderIdCheck").value.trim();
+  const box = document.getElementById("myOrders");
+
+  if (!phone || !orderIdInput) {
+    box.innerHTML = "<p>Please enter phone number and Order ID</p>";
+    return;
+  }
+
+  const allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
+  const orders = allOrders[phone];
+
+  if (!orders || orders.length === 0) {
+    box.innerHTML = "<p>No orders found for this phone number.</p>";
+    return;
+  }
+
+  // 🔐 VERIFY: koi bhi ek orderId match kare
+  const matched = orders.some(o => o.orderId === orderIdInput);
+
+  if (!matched) {
+    box.innerHTML = "<p>Invalid Order ID for this phone number.</p>";
+    return;
+  }
+
+  // ✅ SHOW ALL ORDERS
+  let html = "";
+
+  orders.forEach(o => {
+    html += `
+      <div style="border:1px solid #ddd; padding:8px; margin-bottom:8px;">
+        <b>Order ID:</b> ${o.orderId}<br>
+        <b>Date:</b> ${o.date}<br>
+        <b>Status:</b> ${o.status}<br>
+        <b>Total:</b> ₹${o.total}<br>
+        <b>Items:</b><br>
+        ${o.items.map(i =>
+          `• ${i.name} (${i.size}, ${i.color}) × ${i.qty}`
+        ).join("<br>")}
+      </div>
+    `;
+  });
+
+  box.innerHTML = html;
+}
+
 </script>
 <div id="toast"></div>
 
