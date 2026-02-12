@@ -226,15 +226,30 @@ style="
 
   <h4>Checkout</h4>
   <input id="name" placeholder="Name">
-  <input id="phone" placeholder="Phone">
-  <textarea id="address" placeholder="Full Address"></textarea>
+  <input
+  id="phone"
+  placeholder="10 digit mobile number"
+  maxlength="10"
+  inputmode="numeric"
+  oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+/>
+  <textarea
+  id="address"
+  placeholder="House / Shop No, Street / Area, Landmark, City, State - Pincode"
+  rows="4"
+></textarea>
   <textarea id="note" placeholder="Order Note (Optional)"></textarea>
 
-  <div style="margin-top:8px;">
-    <input type="checkbox" id="terms" style="width:auto;">
-    I agree to Terms & Conditions
-  </div>
-
+  <div style="margin-top:10px; font-size:14px;">
+  <input type="checkbox" id="terms" style="width:auto;">
+  I agree to
+  <span
+    style="color:#007bff; cursor:pointer; text-decoration:underline;"
+    onclick="openTermsFromCart()"
+  >
+    Terms & Conditions
+  </span>
+</div>
   <button onclick="checkout()" style="margin-top:10px;">
     Place Order (WhatsApp)
   </button>
@@ -610,7 +625,12 @@ function updateCart(){
       ">
         <b>${c.name}</b><br>
         Size: ${c.size} | Color: ${c.color}<br>
-        Qty: <b>${c.qty}</b><br>
+        Qty:
+<button onclick="changeQty(${index}, -1)">−</button>
+<b>${c.qty}</b>
+<button onclick="changeQty(${index}, 1)">+</button>
+<br>
+
         Amount: ₹${price * c.qty}<br><br>
 
         <button
@@ -628,6 +648,27 @@ function updateCart(){
   updateCartBadge();
   updateBottomBar(total);
 }
+    function changeQty(index, diff){
+  const item = cart[index];
+
+  // minus
+  if(diff === -1){
+    item.qty--;
+    if(item.qty <= 0){
+      cart.splice(index,1);
+    }
+  }
+
+  // plus (stock check GOOGLE SHEET se)
+  if(diff === 1){
+    // yahan frontend se limit nahi badha rahe
+    item.qty++;
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCart();
+}
+
 let removeIndex = null;
 
 function askRemove(index){
@@ -680,7 +721,15 @@ async function checkout(){
 
   const n = document.getElementById("name").value.trim();
   const p = document.getElementById("phone").value.trim();
+    if(p.length !== 10){
+  alert("Enter valid 10 digit mobile number");
+  return;
+}
   const a = document.getElementById("address").value.trim();
+    if(a.length < 20){
+  alert("Please enter complete address with landmark, city, state & pincode");
+  return;
+}
   const note = document.getElementById("note").value.trim();
 
   if(!n || !p || !a || cart.length === 0){
@@ -1080,6 +1129,165 @@ function showMyOrders(){
   box.innerHTML = html;
 }
 renderProducts();
+        function openTermsFromCart(){
+  let modal = document.createElement("div");
+  modal.style.position = "fixed";
+  modal.style.top = "0";
+  modal.style.left = "0";
+  modal.style.width = "100%";
+  modal.style.height = "100%";
+  modal.style.background = "rgba(0,0,0,0.7)";
+  modal.style.zIndex = "10005";
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+
+  modal.innerHTML = `
+    <div style="
+      background:#fff;
+      width:90%;
+      max-width:520px;
+      max-height:80%;
+      border-radius:8px;
+      padding:15px;
+      display:flex;
+      flex-direction:column;
+      position:relative;
+    ">
+      <h3 style="text-align:center;margin:0 0 10px;">
+        Terms & Conditions – AK FASHION HUB
+      </h3>
+
+      <div
+        id="termsScrollBox"
+        style="
+          flex:1;
+          overflow:auto;
+          font-size:14px;
+          line-height:1.6;
+          border:1px solid #ddd;
+          padding:10px;
+        "
+      >
+        • Delivery within 4–6 working days.<br><br>
+        • Cancellation allowed within 12 hours before dispatch.<br><br>
+        • After dispatch, cancellation not allowed.<br><br>
+        • Unboxing video mandatory for return / replacement.<br><br>
+        • Product must be unused and original condition.<br><br>
+        • Size issue: replacement only, no refund.<br><br>
+        • Color variation due to screen not considered defect.<br><br>
+        • By placing order, customer agrees to all terms.<br><br>
+        • AK Fashion Hub reserves right to cancel suspicious orders.
+      </div>
+
+      <!-- SCROLL HINT -->
+      <div
+        id="scrollHint"
+        style="
+          text-align:center;
+          font-size:12px;
+          color:#555;
+          margin-top:6px;
+        "
+      >
+        ⬇️ Scroll down
+      </div>
+
+      <button
+        id="agreeBtn"
+        disabled
+        style="
+          margin-top:10px;
+          padding:10px;
+          background:gray;
+          color:#fff;
+          border:none;
+          cursor:not-allowed;
+          border-radius:4px;
+        "
+      >
+        I Agree
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const scrollBox = document.getElementById("termsScrollBox");
+  const agreeBtn = document.getElementBy
+
+function openTermsFromCart(){
+  let modal = document.createElement("div");
+  modal.style.position = "fixed";
+  modal.style.top = "0";
+  modal.style.left = "0";
+  modal.style.width = "100%";
+  modal.style.height = "100%";
+  modal.style.background = "rgba(0,0,0,0.7)";
+  modal.style.zIndex = "10005";
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+
+  modal.innerHTML = `
+    <div style="
+      background:#fff;
+      width:90%;
+      max-width:520px;
+      max-height:80%;
+      border-radius:8px;
+      padding:15px;
+      display:flex;
+      flex-direction:column;
+    ">
+      <h3 style="margin:0 0 10px; text-align:center;">
+        Terms & Conditions – AK FASHION HUB
+      </h3>
+
+      <div style="
+        flex:1;
+        overflow:auto;
+        font-size:14px;
+        line-height:1.6;
+        border:1px solid #ddd;
+        padding:10px;
+      ">
+        • Delivery within 4–6 working days.<br><br>
+        • Cancellation allowed within 12 hours before dispatch.<br><br>
+        • After dispatch, cancellation not allowed.<br><br>
+        • Unboxing video mandatory for return / replacement.<br><br>
+        • Product must be unused and original condition.<br><br>
+        • Size issue: replacement only, no refund.<br><br>
+        • Color variation due to screen not considered defect.<br><br>
+        • By placing order, customer agrees to all terms.
+      </div>
+
+      <button
+        style="
+          margin-top:12px;
+          padding:10px;
+          background:#000;
+          color:#fff;
+          border:none;
+          cursor:pointer;
+          border-radius:4px;
+        "
+        onclick="
+          document.getElementById('terms').checked = true;
+          this.closest('div').parentElement.remove();
+        "
+      >
+        I Agree
+      </button>
+    </div>
+  `;
+
+  modal.onclick = (e)=>{
+    if(e.target === modal) modal.remove();
+  };
+
+  document.body.appendChild(modal);
+}
 
 </script>
 <div id="toast"></div>
