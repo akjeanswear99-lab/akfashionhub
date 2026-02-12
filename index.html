@@ -147,6 +147,25 @@ footer{
   background:#fff;
   margin:5px 0;
 }
+#toast{
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #000;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 10000;
+}
+
+#toast.show{
+  opacity: 1;
+  transform: translateY(0);
+}
 
 /* Right slide menu */
 #sideMenu{
@@ -221,10 +240,6 @@ footer{
     <p id="reviewMessage"></p>
   </div>
 
-</div>
-
-
-</div>   <!-- ✅ sideMenu CLOSE -->
 
 <div class="container">
     <h2>Products</h2>
@@ -581,14 +596,14 @@ function addToCart(i){
   const size = document.getElementById("size"+i).value;
   const color = document.getElementById("color"+i).value;
   if(!size || !color){
-    alert("Select size & color");
+    showToast("Select size & color");
     return;
   }
 
   const p = products[i];
  const stock = inventoryData[p.id]?.[size]?.[color] ?? 0;
   if(stock <= 0){
-    alert("Currently not available in stock");
+    showToast("Currently not available in stock");
     return;
   }
 
@@ -600,6 +615,8 @@ function addToCart(i){
   localStorage.setItem("cart", JSON.stringify(cart));
 
   updateCart();
+    showToast("Item added to cart successfully");
+
 }
 
 
@@ -647,7 +664,7 @@ function checkout(){
   const note = document.getElementById("note").value.trim();
 
   if(!n || !p || !a || cart.length === 0){
-    alert("Fill all details and add items to cart");
+    showToast("Fill all details and add items to cart");
     return;
   }
 
@@ -673,7 +690,12 @@ function checkout(){
     products: cart.map(c =>
       `${c.name} | SKU:${c.id} | Size:${c.size} | Color:${c.color} | Qty:${c.qty}`
     ).join(" || "),
-    totalQty: totalQty,
+    
+      let totalQty = 0;
+cart.forEach(c => {
+  totalQty += c.qty;
+});
+
     totalAmount: totalAmount
   })
 });
@@ -711,6 +733,16 @@ Note: ${note}`;
 
 renderProducts();
 updateCart();
+    function showToast(message){
+  const toast = document.getElementById("toast");
+  toast.innerText = message;
+  toast.classList.add("show");
+
+  setTimeout(()=>{
+    toast.classList.remove("show");
+  },2000);
+}
+
 </script>
 
 <script>
@@ -948,6 +980,7 @@ noteField.addEventListener("input", function () {
        
 
 </script>
+<div id="toast"></div>
 
 </body>
 </html>
