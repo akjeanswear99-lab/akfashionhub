@@ -290,13 +290,7 @@ style="
     <button id="submitReview">Submit Review</button>
     <p id="reviewMessage"></p>
   </div>
-    <hr>
-
-
-<div style="margin-top:8px;">
-  <input type="checkbox" id="terms" style="width:auto;">
-  I agree to Terms & Conditions
-</div>
+    
 
    <!-- ✅ SIDE MENU YAHAN CLOSE -->
 
@@ -309,22 +303,6 @@ style="
 </div>
 
     <div class="products" id="products"></div>
-
-    
-        <div
-            style="margin-top:10px; font-size:14px; display:flex; align-items:center; gap:6px;">
-  <input type="checkbox" id="terms" style="width:auto; margin:0;">
-  <label for="terms" style="margin:0;">
-    I agree to the 
-    <span style="color:blue; cursor:pointer;" onclick="openTerms()">
-      <b>Terms & Conditions</b>
-    </span>
-  </label>
-</div>
-
-        <button onclick="checkout()">Place Order (WhatsApp)</button>
-    </div>
-</div>
 
 <footer>
    <p>
@@ -1018,17 +996,6 @@ noteField.addEventListener("input", function () {
        
 
 </script>
-<div id="toast"></div>
-    
-function toggleCart(){
-  const cart = document.getElementById("cartPanel");
-  if(cart.style.right === "0px"){
-    cart.style.right = "-360px";
-  }else{
-    cart.style.right = "0px";
-  }
-}
-
 
 </body>
 </html>
