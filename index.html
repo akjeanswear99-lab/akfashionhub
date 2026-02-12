@@ -125,12 +125,7 @@ button{
 button:disabled{
     background:gray;
 }
-.cart{
-    background:#fff;
-    padding:15px;
-    margin-top:30px;
-    border-radius:8px;
-}
+
 footer{
     background:#000;
     color:#fff;
@@ -293,6 +288,7 @@ style="
     
 
    <!-- ✅ SIDE MENU YAHAN CLOSE -->
+</div>
 
 <div class="container">
     <h2>Products</h2>
@@ -634,26 +630,61 @@ function addToCart(i){
   inventoryData[p.id][size][color]--;
   localStorage.setItem("inventoryData", JSON.stringify(inventoryData));
 
-  cart.push({...p,size,color,qty:1});
+  let existing = cart.find(
+ item => item.id === p.id && item.size === size && item.color === color
+);
+
+if(existing){
+ existing.qty++;
+}else{
+ cart.push({...p,size,color,qty:1});
+}
+
   localStorage.setItem("cart", JSON.stringify(cart));
 
   updateCart();
     showToast("Item added to cart successfully");
-
+    toggleCart();
 }
-
-
 function updateCart(){
- let total=0;
- const box=document.getElementById("cartItems");
- box.innerHTML="";
- cart.forEach((c, index)=>{
-  const price=Math.round(c.price-(c.price*c.discount/100));
-  total+=price;
-  box.innerHTML+=`<p>${c.name} (${c.size}, ${c.color}) - ₹${price} <button onclick="removeFromCart(${index})">Remove</button></p>`;
- });
- document.getElementById("total").innerText="Total: ₹"+total;
+  let total = 0;
+  const box = document.getElementById("cartItems");
+  box.innerHTML = "";
+
+  cart.forEach((c, index)=>{
+    const price = Math.round(c.price - (c.price * c.discount / 100));
+    total += price * c.qty;
+
+    box.innerHTML += `
+      <div style="margin-bottom:12px;">
+        <b>${c.name}</b><br>
+        ${c.size}, ${c.color}<br>
+
+        <button onclick="changeQty(${index}, -1)">➖</button>
+        <b style="margin:0 6px;">${c.qty}</b>
+        <button onclick="changeQty(${index}, 1)">➕</button>
+
+        <span style="margin-left:10px;">₹${price * c.qty}</span>
+      </div>
+    `;
+  });
+
+  document.getElementById("total").innerText = "Total: ₹" + total;
+
+  updateCartBadge();
+  updateBottomBar(total);
 }
+function changeQty(index, change){
+  cart[index].qty += change;
+
+  if(cart[index].qty <= 0){
+    cart.splice(index, 1);
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCart();
+}
+
 
 function removeFromCart(index){
  const item = cart.splice(index, 1)[0];
@@ -739,6 +770,8 @@ SKU:${c.id}
 Size:${c.size}
 Color:${c.color}
 ₹${price}
+Qty: ${c.qty}
+
 
 `;
   });
@@ -996,6 +1029,53 @@ noteField.addEventListener("input", function () {
        
 
 </script>
+function updateCartBadge(){
+  let badge = document.getElementById("cartCount");
+
+  if(!badge){
+    const cartIcon = document.querySelector('[onclick="toggleCart()"]');
+    badge = document.createElement("span");
+    badge.id = "cartCount";
+    badge.style.background = "red";
+    badge.style.color = "white";
+    badge.style.borderRadius = "50%";
+    badge.style.padding = "2px 6px";
+    badge.style.fontSize = "12px";
+    badge.style.marginLeft = "6px";
+    cartIcon.appendChild(badge);
+  }
+
+  badge.innerText = cart.length;
+}
+function updateBottomBar(total){
+  let bar = document.getElementById("bottomCartBar");
+
+  if(!bar){
+    bar = document.createElement("div");
+    bar.id = "bottomCartBar";
+    bar.style.position = "fixed";
+    bar.style.bottom = "0";
+    bar.style.left = "0";
+    bar.style.width = "100%";
+    bar.style.background = "#000";
+    bar.style.color = "#fff";
+    bar.style.padding = "12px";
+    bar.style.display = "none";
+    bar.style.justifyContent = "space-between";
+    bar.style.alignItems = "center";
+    bar.style.zIndex = "9999";
+    bar.onclick = toggleCart;
+
+    document.body.appendChild(bar);
+  }
+
+  if(window.innerWidth < 768 && cart.length > 0){
+    bar.style.display = "flex";
+    bar.innerHTML = `🛒 View Cart (${cart.length}) <b>₹${total}</b>`;
+  }else{
+    bar.style.display = "none";
+  }
+}
 
 </body>
 </html>
