@@ -136,7 +136,7 @@ footer{
     .menu-icon{
   position:absolute;
   top:22px;
-  left:20px;
+  right:20px;
   cursor:pointer;
 }
 
@@ -196,7 +196,9 @@ footer{
     
         <div id="sideMenu">
 <!-- CLOSE BUTTON (LEFT – PREMIUM) -->
-<div style="text-align:left; margin-left:-6px; margin-bottom:6px;">
+<div class="close-wrap">
+  <button class="close-btn" onclick="toggleMenu()">✕</button>
+</div>
   <button onclick="toggleMenu()"
     style="
       background:none;
@@ -671,20 +673,24 @@ function checkout(){
   });
 
   // 👉 GOOGLE SHEET SAVE
-  fetch("https://script.google.com/macros/s/AKfycbze5ZqY_CI0i0xtRzzhbU8riec2TC5KAcj7ptoFWqqW3Id4hPw9TqsOd9SJ6slLMv_39Q/exec", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      orderId: orderId,
-      name: n,
-      phone: p,
-      address: a,
-      products: cart.map(c => c.name + " (" + c.size + ", " + c.color + ")").join(" | "),
-      total: totalAmount
-    })
-  });
+ fetch("https://script.google.com/macros/s/AKfycbwMWrEhaO4sGqHhUX7nr-zrCtROhYx0krL2Cx6rVbA0pMCenDGP32xDWMrcQb9KgaLi/exec", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    orderId: orderId,
+    name: n,
+    phone: p,
+    address: a,
+    products: cart.map(c =>
+      `${c.name} | SKU:${c.id} | Size:${c.size} | Color:${c.color} | Qty:${c.qty}`
+    ).join(" || "),
+    totalQty: totalQty,
+    totalAmount: totalAmount
+  })
+});
+
 
   // 👉 WHATSAPP MESSAGE
   let msg = `AK FASHION HUB
