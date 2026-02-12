@@ -194,24 +194,9 @@ footer{
   </div>
 </header>
     
-        <div id="sideMenu">
-<!-- CLOSE BUTTON (LEFT – PREMIUM) -->
-<div class="close-wrap">
-  <button class="close-btn" onclick="toggleMenu()">✕</button>
-</div>
-  <button onclick="toggleMenu()"
-    style="
-      background:none;
-      border:none;
-      font-size:22px;
-      cursor:pointer;
-      color:#000;
-      padding:0;
-    ">
-    ✕
-  </button>
-</div>
+<div id="sideMenu">
 
+ 
   <h3>Track Your Order</h3>
 
   <input type="text" id="orderIDInput" placeholder="Enter Order ID">
@@ -219,7 +204,6 @@ footer{
 
   <p id="statusDisplay" style="font-weight:bold;margin-top:10px;"></p>
 
-  <!-- Review (Delivered ke baad hi dikhega) -->
   <div id="reviewSection" style="display:none; margin-top:15px;">
     <h4>Leave a Review</h4>
 
@@ -231,11 +215,14 @@ footer{
       <option value="5">5 stars</option>
     </select>
 
-    <textarea id="reviewNote" rows="3" placeholder="Optional comments"></textarea>
+    <textarea id="reviewNote" rows="3"></textarea>
 
     <button id="submitReview">Submit Review</button>
-    <p id="reviewMessage" style="color:green;"></p>
+    <p id="reviewMessage"></p>
   </div>
+
+</div>
+
 
 </div>   <!-- ✅ sideMenu CLOSE -->
 
