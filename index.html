@@ -239,7 +239,7 @@ footer{
     <button id="submitReview">Submit Review</button>
     <p id="reviewMessage"></p>
   </div>
-
+</div>   <!-- ✅ SIDE MENU YAHAN CLOSE -->
 
 <div class="container">
     <h2>Products</h2>
@@ -591,6 +591,15 @@ function changeImage(i, dir){
  current = (current + dir + p.img.length) % p.img.length;
  imgEl.src = p.img[current];
 }
+function showToast(message){
+  const toast = document.getElementById("toast");
+  toast.innerText = message;
+  toast.classList.add("show");
+
+  setTimeout(()=>{
+    toast.classList.remove("show");
+  },2000);
+}
 
 function addToCart(i){
   const size = document.getElementById("size"+i).value;
@@ -669,6 +678,11 @@ function checkout(){
   }
 
   const orderId = generateOrderId();
+// TOTAL QUANTITY
+let totalQty = 0;
+cart.forEach(c => {
+  totalQty += c.qty;
+});
 
   // TOTAL CALCULATION
   let totalAmount = 0;
@@ -683,21 +697,17 @@ function checkout(){
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
-    orderId: orderId,
-    name: n,
-    phone: p,
-    address: a,
-    products: cart.map(c =>
-      `${c.name} | SKU:${c.id} | Size:${c.size} | Color:${c.color} | Qty:${c.qty}`
-    ).join(" || "),
-    
-      let totalQty = 0;
-cart.forEach(c => {
-  totalQty += c.qty;
-});
+  orderId: orderId,
+  name: n,
+  phone: p,
+  address: a,
+  products: cart.map(c =>
+    `${c.name} | SKU:${c.id} | Size:${c.size} | Color:${c.color} | Qty:${c.qty}`
+  ).join(" || "),
+  totalQty: totalQty,
+  totalAmount: totalAmount
+})
 
-    totalAmount: totalAmount
-  })
 });
 
 
@@ -733,15 +743,7 @@ Note: ${note}`;
 
 renderProducts();
 updateCart();
-    function showToast(message){
-  const toast = document.getElementById("toast");
-  toast.innerText = message;
-  toast.classList.add("show");
-
-  setTimeout(()=>{
-    toast.classList.remove("show");
-  },2000);
-}
+   
 
 </script>
 
