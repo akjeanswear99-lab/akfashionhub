@@ -6,6 +6,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+    #cartPanel{
+  position:fixed;
+  top:0;
+  right:-360px;
+  width:340px;
+  height:100%;
+  background:#fff;
+  padding:20px;
+  box-shadow:-4px 0 10px rgba(0,0,0,0.3);
+  transition:0.3s;
+  z-index:10002;
+  overflow:auto;
+}
+
 body{
     margin:0;
     font-family:Arial, sans-serif;
@@ -204,7 +218,19 @@ footer{
 
   <div class="address">
    ADDRESS:- KESHAV NAGAR, SWARG AASHRAM ROAD, HAPUR 245101
-  </div>
+  </div> 
+        <div onclick="toggleCart()"
+style="
+ position:absolute;
+ top:22px;
+ left:20px;
+ cursor:pointer;
+ font-size:20px;
+ z-index:10002;
+">
+ 🛒
+</div>
+
 
   <!-- Menu Icon -->
   <div class="menu-icon" onclick="toggleMenu()">
@@ -213,10 +239,34 @@ footer{
     <span></span>
   </div>
 </header>
+    <!-- CART PANEL (SEPARATE) -->
+<div id="cartPanel">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3>Your Cart</h3>
+    <span onclick="toggleCart()" style="cursor:pointer;font-size:22px;">✖</span>
+  </div>
+
+  <div id="cartItems"></div>
+  <h3 id="total"></h3>
+
+  <h4>Checkout</h4>
+  <input id="name" placeholder="Name">
+  <input id="phone" placeholder="Phone">
+  <textarea id="address" placeholder="Full Address"></textarea>
+  <textarea id="note" placeholder="Order Note (Optional)"></textarea>
+
+  <div style="margin-top:8px;">
+    <input type="checkbox" id="terms" style="width:auto;">
+    I agree to Terms & Conditions
+  </div>
+
+  <button onclick="checkout()" style="margin-top:10px;">
+    Place Order (WhatsApp)
+  </button>
+</div>
+
     
 <div id="sideMenu">
-
- 
   <h3>Track Your Order</h3>
 
   <input type="text" id="orderIDInput" placeholder="Enter Order ID">
@@ -240,7 +290,15 @@ footer{
     <button id="submitReview">Submit Review</button>
     <p id="reviewMessage"></p>
   </div>
-</div>   <!-- ✅ SIDE MENU YAHAN CLOSE -->
+    <hr>
+
+
+<div style="margin-top:8px;">
+  <input type="checkbox" id="terms" style="width:auto;">
+  I agree to Terms & Conditions
+</div>
+
+   <!-- ✅ SIDE MENU YAHAN CLOSE -->
 
 <div class="container">
     <h2>Products</h2>
@@ -252,32 +310,9 @@ footer{
 
     <div class="products" id="products"></div>
 
-    <div class="cart">
-        <h2>Cart</h2>
-        <div id="cartItems"></div>
-        <h3 id="total"></h3>
-
-        <h3>Checkout</h3>
-        <input id="name" placeholder="Name" type="text">
-        <input id="phone" placeholder="Phone" type="tel">
-        <!-- CUSTOMER ADDRESS DETAILS -->
-<textarea
-  id="address"
-  rows="4"
-  placeholder="House No. / Flat No., Street / Area, Landmark, City, State, Pincode"
-></textarea>
-
-<!-- OPTIONAL NOTE -->
-<textarea
-  id="note"
-  rows="2"
-  placeholder="Order Note (Optional – max 30 words)"
-></textarea>
-
-<p style="font-size:12px; color:#666; margin-top:4px;">
-  * Please provide complete and accurate address for smooth delivery.
-</p>
-        <div style="margin-top:10px; font-size:14px; display:flex; align-items:center; gap:6px;">
+    
+        <div
+            style="margin-top:10px; font-size:14px; display:flex; align-items:center; gap:6px;">
   <input type="checkbox" id="terms" style="width:auto; margin:0;">
   <label for="terms" style="margin:0;">
     I agree to the 
@@ -984,6 +1019,16 @@ noteField.addEventListener("input", function () {
 
 </script>
 <div id="toast"></div>
+    
+function toggleCart(){
+  const cart = document.getElementById("cartPanel");
+  if(cart.style.right === "0px"){
+    cart.style.right = "-360px";
+  }else{
+    cart.style.right = "0px";
+  }
+}
+
 
 </body>
 </html>
