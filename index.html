@@ -786,11 +786,18 @@ Note: ${note}`;
   alert("Order Placed Successfully!\nYour Order ID: " + orderId);
 }
 
-
-
 renderProducts();
 updateCart();
-   
+ function toggleCart(){
+  const cartPanel = document.getElementById("cartPanel");
+
+  if(cartPanel.style.right === "0px"){
+    cartPanel.style.right = "-360px";
+  }else{
+    cartPanel.style.right = "0px";
+  }
+}
+  
 
 </script>
 
@@ -1074,7 +1081,8 @@ function updateBottomBar(total){
     bar.style.display = "none";
   }
 }
-       
+  <div id="toast"></div>
+     
 
 </script>
 
