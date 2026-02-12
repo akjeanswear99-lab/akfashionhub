@@ -136,7 +136,7 @@ footer{
     .menu-icon{
   position:absolute;
   top:22px;
-  right:20px;
+  left:20px;
   cursor:pointer;
 }
 
@@ -351,11 +351,16 @@ const products = [
  category:"Jeans",
  price:1999,
  discount:20,
- stock:4,
  img:["girls-jeans.jpg"],
  colors:["Blue","Black"],
  sizes:["28","30","32","34","36"],
- measure:"Waist, Length, Thigh"
+ measure:"Waist, Length, Thigh",
+    inventory: {
+  "28": { "Black": 2, "Blue": 1 },
+  "30": { "Black": 3, "Blue": 0 },
+  "32": { "Black": 1, "Blue": 2 },
+  "34": { "Black": 0, "Blue": 1 }
+}
 },
 {
  id:"AKL002",
@@ -364,11 +369,16 @@ const products = [
  category:"Lower",
  price:1499,
  discount:15,
- stock:4,
  img:[img3, img4],
  colors:["Black","Gray"],
  sizes:["S","M","L","XL"],
- measure:"Waist, Length, Thigh"
+ measure:"Waist, Length, Thigh",
+    inventory: {
+  "28": { "Black": 2, "Blue": 1 },
+  "30": { "Black": 3, "Blue": 0 },
+  "32": { "Black": 1, "Blue": 2 },
+  "34": { "Black": 0, "Blue": 1 }
+}
 },
 {
  id:"AKT003",
@@ -377,11 +387,16 @@ const products = [
  category:"T-Shirt",
  price:999,
  discount:30,
- stock:4,
  img:[img2, img3],
  colors:["Red","White","Black"],
  sizes:["S","M","L","XL","XXL"],
- measure:"Chest, Waist, Shoulder"
+ measure:"Chest, Waist, Shoulder",
+    inventory: {
+  "28": { "Black": 2, "Blue": 1 },
+  "30": { "Black": 3, "Blue": 0 },
+  "32": { "Black": 1, "Blue": 2 },
+  "34": { "Black": 0, "Blue": 1 }
+}
 },
 {
  id:"AKS004",
@@ -390,11 +405,16 @@ const products = [
  category:"Shirt",
  price:1299,
  discount:25,
- stock:4,
  img:[img4, img1],
  colors:["White","Blue"],
  sizes:["M","L","XL"],
- measure:"Chest, Waist, Shoulder"
+ measure:"Chest, Waist, Shoulder",
+    inventory: {
+  "28": { "Black": 2, "Blue": 1 },
+  "30": { "Black": 3, "Blue": 0 },
+  "32": { "Black": 1, "Blue": 2 },
+  "34": { "Black": 0, "Blue": 1 }
+}
 },
 {
  id:"AKK005",
@@ -403,11 +423,16 @@ const products = [
  category:"Kurti",
  price:1799,
  discount:20,
- stock:4,
  img:[img3, img2],
  colors:["Pink","Green"],
  sizes:["S","M","L"],
- measure:"Chest, Waist, Shoulder, Length"
+ measure:"Chest, Waist, Shoulder, Length",
+    inventory: {
+  "28": { "Black": 2, "Blue": 1 },
+  "30": { "Black": 3, "Blue": 0 },
+  "32": { "Black": 1, "Blue": 2 },
+  "34": { "Black": 0, "Blue": 1 }
+}
 },
     {
  id:"AKS006",
@@ -416,11 +441,16 @@ const products = [
  category:"Shirt",
  price:1299,
  discount:25,
- stock:4,
  img:[img4, img1],
  colors:["White","Blue"],
  sizes:["M","L","XL"],
- measure:"Chest, Waist, Shoulder"
+ measure:"Chest, Waist, Shoulder",
+        inventory: {
+  "28": { "Black": 2, "Blue": 1 },
+  "30": { "Black": 3, "Blue": 0 },
+  "32": { "Black": 1, "Blue": 2 },
+  "34": { "Black": 0, "Blue": 2}
+}
 },
     {
  id:"AKS007",
@@ -429,11 +459,16 @@ const products = [
  category:"Shirt",
  price:1299,
  discount:25,
- stock:4,
  img:[img4, img1],
  colors:["White","Blue"],
  sizes:["M","L","XL"],
- measure:"Chest, Waist, Shoulder"
+ measure:"Chest, Waist, Shoulder",
+        inventory: {
+  "28": { "Black": 2, "Blue": 1 },
+  "30": { "Black": 3, "Blue": 0 },
+  "32": { "Black": 1, "Blue": 2 },
+  "34": { "Black": 0, "Blue": 1 }
+}
 },
         {
  id:"AKS008",
@@ -442,44 +477,45 @@ const products = [
  category:"Shirt",
  price:1299,
  discount:25,
- stock:4,
  img:[img4, img1],
  colors:["White","Blue"],
  sizes:["M","L","XL"],
- measure:"Chest, Waist, Shoulder"
+ measure:"Chest, Waist, Shoulder",
+            inventory: {
+  "28": { "Black": 2, "Blue": 1 },
+  "30": { "Black": 3, "Blue": 0 },
+  "32": { "Black": 1, "Blue": 2 },
+  "34": { "Black": 0, "Blue": 1 }
+}
 },
 ];
+    let inventoryData = JSON.parse(localStorage.getItem("inventoryData")) || {};
+
+products.forEach(p=>{
+  if(!inventoryData[p.id]){
+    inventoryData[p.id] = p.inventory;
+  }
+});
+
+localStorage.setItem("inventoryData", JSON.stringify(inventoryData));
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
-let stocks = JSON.parse(localStorage.getItem('stocks')) || {};
-products.forEach(p => {
-    if (!stocks[p.id]) stocks[p.id] = p.stock;
-});
+
+
     let currentFilter = "All";
 
 function filterProducts(type){
   currentFilter = type;
   renderProducts();
 }
-function getStockText(stock){
-  if(stock <= 0)
-    return '<p style="color:red; font-size:12px; font-weight:bold;">Currently Out of Stock</p>';
 
-  if(stock === 1)
-    return '<p style="color:red; font-size:12px; font-weight:bold;">Only 1 left!</p>';
-
-  if(stock <= 3)
-    return `<p style="color:orange; font-size:12px;">Only ${stock} left</p>`;
-
-  return `<p style="color:green; font-size:12px;">${stock} in stock</p>`;
-}
 function renderProducts(){
  const box=document.getElementById("products");
  box.innerHTML="";
  products.forEach((p,i)=>{
      if(currentFilter !== "All" && p.gender !== currentFilter) return;
   const final=Math.round(p.price-(p.price*p.discount/100));
-  const currentStock = stocks[p.id];
+  
   box.innerHTML+=`
   <div class="card">
    <div class="slider">
@@ -495,23 +531,53 @@ function renderProducts(){
   <p>MRP ₹${p.price} | ${p.discount}% OFF</p>
 <p><b>₹${final}</b></p>
 
-${getStockText(currentStock)}
 
 <p>Measurements: ${p.measure}</p>
-   <select id="size${i}">
-     <option value="">Select Size</option>
-     ${p.sizes.map(s=>`<option>${s}</option>`).join("")}
-   </select>
-   <select id="color${i}">
-     <option value="">Select Color</option>
-     ${p.colors.map(c=>`<option>${c}</option>`).join("")}
-   </select>
-  <button onclick="addToCart(${i})" ${currentStock==0?"disabled":""}>
-  ${currentStock==0?"CURRENTLY OUT OF STOCK":"Add to Cart"}
+<select id="size${i}" onchange="updateStockMsg(${i})">
+  <option value="">Select Size</option>
+  ${p.sizes.map(s=>`<option>${s}</option>`).join("")}
+</select>
+
+<select id="color${i}" onchange="updateStockMsg(${i})">
+  <option value="">Select Color</option>
+  ${p.colors.map(c=>`<option>${c}</option>`).join("")}
+</select>
+
+<p id="stockMsg${i}" style="font-size:12px;font-weight:bold;"></p>
+<button id="btn${i}" onclick="addToCart(${i})">
+  Add to Cart
 </button>
 
   </div>`;
  });
+}
+function updateStockMsg(i){
+  const size = document.getElementById("size"+i).value;
+  const color = document.getElementById("color"+i).value;
+  const msg = document.getElementById("stockMsg"+i);
+  const btn = document.getElementById("btn"+i);
+
+  if(!size || !color){
+    msg.innerText = "";
+    return;
+  }
+
+  const p = products[i];
+  const stock = inventoryData[p.id]?.[size]?.[color] ?? 0;
+
+if(stock <= 0){
+  msg.innerText = "Currently not available in stock";
+  msg.style.color = "red";
+  btn.disabled = true;
+}else if(stock <= 2){
+  msg.innerText = `Only ${stock} left`;
+  msg.style.color = "orange";
+  btn.disabled = false;
+}else{
+  msg.innerText = "In stock";
+  msg.style.color = "green";
+  btn.disabled = false;
+   }
 }
 
 function changeImage(i, dir){
@@ -523,19 +589,30 @@ function changeImage(i, dir){
 }
 
 function addToCart(i){
- const size=document.getElementById("size"+i).value;
- const color=document.getElementById("color"+i).value;
- if(!size || !color){alert("Select size & color");return;}
-    
- const p=products[i];
- if(stocks[p.id]<=0){alert("Out of stock");return;}
- stocks[p.id]--;
- localStorage.setItem('stocks', JSON.stringify(stocks));
- cart.push({...p,size,color,qty:1});
- localStorage.setItem('cart', JSON.stringify(cart));
- updateCart();
- renderProducts();
+  const size = document.getElementById("size"+i).value;
+  const color = document.getElementById("color"+i).value;
+  if(!size || !color){
+    alert("Select size & color");
+    return;
+  }
+
+  const p = products[i];
+ const stock = inventoryData[p.id]?.[size]?.[color] ?? 0;
+  if(stock <= 0){
+    alert("Currently not available in stock");
+    return;
+  }
+
+  // reduce stock
+  inventoryData[p.id][size][color]--;
+  localStorage.setItem("inventoryData", JSON.stringify(inventoryData));
+
+  cart.push({...p,size,color,qty:1});
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  updateCart();
 }
+
 
 function updateCart(){
  let total=0;
@@ -551,9 +628,9 @@ function updateCart(){
 
 function removeFromCart(index){
  const item = cart.splice(index, 1)[0];
- stocks[item.id]++;
- localStorage.setItem('stocks', JSON.stringify(stocks));
- localStorage.setItem('cart', JSON.stringify(cart));
+ 
+inventoryData[item.id][item.size][item.color]++;
+localStorage.setItem("inventoryData", JSON.stringify(inventoryData));
  updateCart();
  renderProducts();
 }
@@ -875,6 +952,7 @@ noteField.addEventListener("input", function () {
     this.value = words.slice(0, 30).join(" ");
   }
 });
+       
 
 </script>
 
