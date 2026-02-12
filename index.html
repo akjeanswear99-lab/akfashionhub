@@ -1034,33 +1034,32 @@ function updateBottomBar(total){
     bar.style.display = "none";
   }
 }
- function showMyOrders(){
+function showMyOrders(){
   const phone = document.getElementById("orderPhone").value.trim();
   const orderIdInput = document.getElementById("orderIdCheck").value.trim();
   const box = document.getElementById("myOrders");
 
-  if (!phone || !orderIdInput) {
-    box.innerHTML = "<p>Please enter phone number and Order ID</p>";
-    return;
-  }
+  // basic validation
+
 
   const allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
   const orders = allOrders[phone];
 
-  if (!orders || orders.length === 0) {
-    box.innerHTML = "<p>No orders found for this phone number.</p>";
+  // phone number galat
+  if (!orders) {
+    box.innerHTML = "<p>Invalid phone number or Order ID</p>";
     return;
   }
 
-  // 🔐 VERIFY: koi bhi ek orderId match kare
+  // check: is phone ke kisi order me ye orderId hai?
   const matched = orders.some(o => o.orderId === orderIdInput);
 
   if (!matched) {
-    box.innerHTML = "<p>Invalid Order ID for this phone number.</p>";
+    box.innerHTML = "<p>Invalid phone number or Order ID</p>";
     return;
   }
 
-  // ✅ SHOW ALL ORDERS
+  // ✅ dono match ho gaye → saare orders dikhao
   let html = "";
 
   orders.forEach(o => {
@@ -1080,6 +1079,7 @@ function updateBottomBar(total){
 
   box.innerHTML = html;
 }
+renderProducts();
 
 </script>
 <div id="toast"></div>
