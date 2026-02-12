@@ -656,15 +656,22 @@ function updateCart(){
     total += price * c.qty;
 
     box.innerHTML += `
-      <div style="margin-bottom:12px;">
+      <div style="
+        border-bottom:1px solid #ddd;
+        padding:10px 0;
+        margin-bottom:10px;
+      ">
         <b>${c.name}</b><br>
-        ${c.size}, ${c.color}<br>
+        Size: ${c.size} | Color: ${c.color}<br>
+        Qty: <b>${c.qty}</b><br>
+        Amount: ₹${price * c.qty}<br><br>
 
-        <button onclick="changeQty(${index}, -1)">➖</button>
-        <b style="margin:0 6px;">${c.qty}</b>
-        <button onclick="changeQty(${index}, 1)">➕</button>
-
-        <span style="margin-left:10px;">₹${price * c.qty}</span>
+        <button
+          style="background:red;"
+          onclick="askRemove(${index})"
+        >
+          Remove Item
+        </button>
       </div>
     `;
   });
@@ -674,26 +681,41 @@ function updateCart(){
   updateCartBadge();
   updateBottomBar(total);
 }
-function changeQty(index, change){
-  cart[index].qty += change;
+let removeIndex = null;
 
-  if(cart[index].qty <= 0){
-    cart.splice(index, 1);
-  }
+function askRemove(index){
+  removeIndex = index;
+  const item = cart[index];
 
+  document.getElementById("confirmText").innerText =
+    `Are you sure you want to remove "${item.name}" from cart?`;
+
+  document.getElementById("confirmBox").style.display = "flex";
+}
+
+function confirmYes(){
+  const item = cart[removeIndex];
+
+  inventoryData[item.id][item.size][item.color] += item.qty;
+  localStorage.setItem("inventoryData", JSON.stringify(inventoryData));
+
+  cart.splice(removeIndex, 1);
   localStorage.setItem("cart", JSON.stringify(cart));
+
+  document.getElementById("confirmBox").style.display = "none";
+  showToast("Item removed from cart");
+
   updateCart();
+  renderProducts();
+}
+
+function confirmNo(){
+  document.getElementById("confirmBox").style.display = "none";
 }
 
 
-function removeFromCart(index){
- const item = cart.splice(index, 1)[0];
- 
-inventoryData[item.id][item.size][item.color]++;
-localStorage.setItem("inventoryData", JSON.stringify(inventoryData));
- updateCart();
- renderProducts();
-}
+
+
     function generateOrderId(){
   const now = new Date();
   const date =
@@ -1081,10 +1103,33 @@ function updateBottomBar(total){
     bar.style.display = "none";
   }
 }
-  <div id="toast"></div>
-     
-
+  
 </script>
+<div id="toast"></div>
+
+<div id="confirmBox" style="
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:10000;
+">
+  <div style="
+    background:#fff;
+    padding:20px;
+    width:90%;
+    max-width:320px;
+    border-radius:8px;
+    text-align:center;
+  ">
+    <p id="confirmText" style="margin-bottom:15px;font-weight:bold;"></p>
+    <button onclick="confirmYes()" style="width:45%;margin-right:5%;">OK</button>
+    <button onclick="confirmNo()" style="width:45%;background:#ccc;color:#000;">Cancel</button>
+  </div>
+</div>
 
 </body>
 </html>
