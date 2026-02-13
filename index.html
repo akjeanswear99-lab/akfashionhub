@@ -818,7 +818,7 @@ async function checkout(){
     showToast("Fill all details and add items to cart");
     return;
   }
-      // 🔒 GOOGLE SHEET STOCK CHECK (FINAL TRUTH)
+      
   for (let item of cart) {
 
     const response = await fetch(
@@ -843,25 +843,25 @@ async function checkout(){
       alert(
         `${item.name} (${item.size}, ${item.color}) is OUT OF STOCK`
       );
-      return; // ⛔ ORDER STOP HERE
+      return; 
     }
   }
 
   const orderId = generateOrderId();
-    // ✅ TOTAL QUANTITY
+   
 let totalQty = 0;
 cart.forEach(c => {
   totalQty += c.qty;
 });
 
-// ✅ TOTAL AMOUNT (PEHLE CALCULATE)
+
 let totalAmount = 0;
 cart.forEach(c => {
   const price = Math.round(c.price - (c.price * c.discount / 100));
   totalAmount += price * c.qty;
 });
 
-// ✅ SAVE ORDER HISTORY (PHONE WISE)
+
 let allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
 
 if (!allOrders[p]) {
@@ -933,9 +933,6 @@ Note: ${note}`;
  window.open("https://wa.me/919599497909?text=" + encodeURIComponent(msg));
 
 
-/* ✅ OPTIONAL: inventory refresh */
-
-
 alert("Order Placed Successfully!\nYour Order ID: " + orderId);
 cart = [];
 localStorage.removeItem("cart");
@@ -991,7 +988,7 @@ function openImage(src){
   let scale = 1;
   const img = modal.querySelector("#zoomImg");
 
-  // Mouse wheel zoom (desktop)
+ 
   img.onwheel = (e) => {
     e.preventDefault();
     scale += e.deltaY * -0.001;
@@ -999,7 +996,7 @@ function openImage(src){
     img.style.transform = `scale(${scale})`;
   };
 
-  // Double tap zoom (mobile friendly)
+ 
   img.ondblclick = () => {
     scale = scale === 1 ? 2 : 1;
     img.style.transform = `scale(${scale})`;
@@ -1025,7 +1022,7 @@ function openTerms(){
   modal.style.width = "100%";
   modal.style.height = "100%";
   modal.style.background = "rgba(0,0,0,0.8)";
-  modal.style.zIndex = "50000"; // 🔥 cart se upar
+  modal.style.zIndex = "50000";
   modal.style.display = "flex";
   modal.style.alignItems = "center";
   modal.style.justifyContent = "center";
@@ -1120,7 +1117,7 @@ function openTerms(){
     document.body.style.overflow = "";
   };
 
-  // ❌ outside click
+
   modal.onclick = (e) => {
     if (e.target === modal) {
       modal.remove();
