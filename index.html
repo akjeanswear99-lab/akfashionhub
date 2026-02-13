@@ -104,15 +104,7 @@
       </div>
       <button id="placeOrderBtn" onclick="checkout()" style="margin-top:10px;">Place Order (WhatsApp)</button>
 
-      <div id="myOrdersSection" style="display:none; margin-top:12px;">
-        <input id="orderPhone" placeholder="Enter phone number" maxlength="10" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-        <input id="orderIdCheck" placeholder="Enter Order ID">
-        <button onclick="showMyOrders()">VIEW ORDERS</button>
-        <div id="myOrders" style="margin-top:10px;"></div>
-      </div>
-
-      <button onclick="openMyOrders()" style="margin-top:12px; background:#fff; color:#000; border:1px solid #000; font-weight:bold; letter-spacing:1px;">MY ORDERS</button>
-      <hr>
+      
     </div>
   </div>
 
@@ -368,17 +360,7 @@
       let totalQty = 0, totalAmount = 0;
       cart.forEach(c => { totalQty += c.qty; totalAmount += Math.round(c.price - (c.price*c.discount/100)) * c.qty; });
 
-      // Save order for "My Orders"
-      let allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
-      if(!allOrders[p]) allOrders[p] = [];
-      allOrders[p].push({
-        orderId: orderId,
-        date: new Date().toLocaleString(),
-        items: cart.map(c => ({ name:c.name, size:c.size, color:c.color, qty:c.qty })),
-        total: totalAmount,
-        status: "Order Received"
-      });
-      localStorage.setItem("ordersByPhone", JSON.stringify(allOrders));
+     
 
       // Send order to Google Sheets (non-blocking)
       fetch(ORDER_SHEET_URL, {
@@ -541,62 +523,6 @@
       modal.onclick = e => { if(e.target === modal) modal.remove(); };
     }
 
-    function openMyOrders(){
-      document.getElementById("checkoutSection").style.display = "none";
-      document.getElementById("myOrdersSection").style.display = "block";
-      // Insert "Back to Checkout" button if not already present
-      if(!document.getElementById("backToCheckoutBtn")){
-        const mySection = document.getElementById("myOrdersSection");
-        const backBtn = document.createElement("button");
-        backBtn.id = "backToCheckoutBtn";
-        backBtn.textContent = "← Back to Checkout";
-        backBtn.style.marginTop = "6px";
-        backBtn.style.background = "#000";
-        backBtn.style.color = "#fff";
-        backBtn.onclick = backToCheckout;
-        mySection.insertBefore(backBtn, mySection.firstChild);
-      }
-    }
-    function backToCheckout(){
-      document.getElementById("myOrdersSection").style.display = "none";
-      document.getElementById("checkoutSection").style.display = "block";
-    }
-
-    function showMyOrders(){
-      const phone = document.getElementById("orderPhone").value.trim();
-      const orderIdInput = document.getElementById("orderIdCheck").value.trim();
-      const box = document.getElementById("myOrders");
-      const allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
-      const orders = allOrders[phone];
-      if(!orders){
-        box.innerHTML = "<p>Invalid phone number or Order ID</p>"; return;
-      }
-      const matched = orders.some(o => o.orderId === orderIdInput);
-      if(!matched){
-        box.innerHTML = "<p>Invalid phone number or Order ID</p>"; return;
-      }
-      let html = "";
-      orders.forEach(o => {
-        html += `
-          <div style="border:1px solid #ddd; padding:8px; margin-bottom:8px;">
-            <b>Order ID:</b> ${o.orderId}<br>
-            <b>Date:</b> ${o.date}<br>
-            <b>Status:</b> ${o.status}<br>
-            <b>Total:</b> ₹${o.total}<br>
-            <b>Items:</b><br>
-            ${o.items.map(i => `• ${i.name} (${i.size}, ${i.color}) × ${i.qty}`).join("<br>")}
-          </div>`;
-      });
-      box.innerHTML = html;
-    }
-
-    // Limit note to 30 words
-    document.getElementById("note").addEventListener("input", function(){
-      const words = this.value.trim().split(/\s+/);
-      if(words.length > 30){
-        this.value = words.slice(0,30).join(" ");
-      }
-    });
 
     // Initialize
     renderProducts();
