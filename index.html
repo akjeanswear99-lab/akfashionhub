@@ -218,15 +218,11 @@ style="
 
 
   <!-- Menu Icon -->
- <div class="menu-icon" onclick="toggleCart()">
 
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
 </header>
-    <!-- CART PANEL (SEPARATE) -->
+<!-- CART PANEL -->
 <div id="cartPanel">
+
   <div style="display:flex; justify-content:space-between; align-items:center;">
     <h3>Your Cart</h3>
     <span onclick="toggleCart()" style="cursor:pointer;font-size:22px;">✖</span>
@@ -234,84 +230,80 @@ style="
 
   <div id="cartItems"></div>
   <h3 id="total"></h3>
-    
-<div id="checkoutSection">
-  <h4>Checkout</h4>
-  <input id="name" placeholder="Name">
-  <input
-  id="phone"
-  placeholder="10 digit mobile number"
-  maxlength="10"
-  inputmode="numeric"
-  oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-/>
-  <textarea
-  id="address"
-  placeholder="House / Shop No, Street / Area, Landmark, City, State - Pincode"
-  rows="4"
-></textarea>
-  <textarea id="note" placeholder="Order Note (Optional)"></textarea>
 
-  <div style="margin-top:10px; font-size:14px;">
-  <input type="checkbox" id="terms" style="width:auto;">
-  I agree to
-  <span
-    style="color:#007bff; cursor:pointer; text-decoration:underline;"
-    onclick="openTermsFromCart()"
-  >
-    Terms & Conditions
-  </span>
-</div>
-  <button onclick="checkout()" style="margin-top:10px;">
-    Place Order (WhatsApp)
-  </button>
-    <div
-  id="myOrdersSection"
-  style="display:none; margin-top:12px;"
->
-  <input
-    id="orderPhone"
-    placeholder="Enter phone number"
-    maxlength="10"
-    inputmode="numeric"
-    oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-  >
+  <div id="checkoutSection">
+    <h4>Checkout</h4>
 
-  <input
-    id="orderIdCheck"
-    placeholder="Enter Order ID"
-  >
+    <input id="name" placeholder="Name">
 
-  <button onclick="showMyOrders()">
-    VIEW ORDERS
-  </button>
+    <input
+      id="phone"
+      placeholder="10 digit mobile number"
+      maxlength="10"
+      inputmode="numeric"
+      oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+    >
 
-  <div id="myOrders" style="margin-top:10px;"></div>
-</div>
+    <textarea
+      id="address"
+      placeholder="House / Shop No, Street / Area, Landmark, City, State - Pincode"
+      rows="4"
+    ></textarea>
+
+    <textarea id="note" placeholder="Order Note (Optional)"></textarea>
+
+    <div style="margin-top:10px; font-size:14px;">
+      <input type="checkbox" id="terms" style="width:auto;">
+      I agree to
+      <span
+        style="color:#007bff; cursor:pointer; text-decoration:underline;"
+        onclick="openTermsFromCart()"
+      >
+        Terms & Conditions
+      </span>
+    </div>
+
+    <button onclick="checkout()" style="margin-top:10px;">
+      Place Order (WhatsApp)
+    </button>
+  </div>
+
+  <!-- MY ORDERS -->
+  <div id="myOrdersSection" style="display:none; margin-top:12px;">
+    <input id="orderPhone" placeholder="Enter phone number" maxlength="10">
+    <input id="orderIdCheck" placeholder="Enter Order ID">
+
+    <button onclick="showMyOrders()">VIEW ORDERS</button>
+
+    <div id="myOrders" style="margin-top:10px;"></div>
 
     <button
-  onclick="openMyOrders()"
-  style="
-    margin-top:12px;
-    background:#fff;
-    color:#000;
-    border:1px solid #000;
-    font-weight:bold;
-    letter-spacing:1px;
-  "
->
-  MY ORDERS
-</button>
+      style="margin-top:12px;background:#000;color:#fff;"
+      onclick="
+        document.getElementById('myOrdersSection').style.display='none';
+        document.getElementById('checkoutSection').style.display='block';
+      "
+    >
+      ← BACK TO CHECKOUT
+    </button>
+  </div>
 
-    <hr>
+  <button
+    onclick="openMyOrders()"
+    style="
+      margin-top:12px;
+      background:#fff;
+      color:#000;
+      border:1px solid #000;
+      font-weight:bold;
+    "
+  >
+    MY ORDERS
+  </button>
 
-
-    
-
-    
-
-   <!-- ✅ SIDE MENU YAHAN CLOSE -->
 </div>
+<!-- ✅ CART PANEL END -->
+
 
 <div class="container">
     <h2>Products</h2>
@@ -551,7 +543,13 @@ function renderProducts(){
   box.innerHTML+=`
   <div class="card">
    <div class="slider">
-   <img src="${p.img[0]}" class="product-img" onclick="openImage('${p.img[0]}')">
+ <img
+  id="img${i}"
+  src="${p.img[0]}"
+  class="product-img"
+  onclick="openImage('${p.img[0]}')"
+/>
+
    </div>
    <p style="font-size:12px; font-weight:bold; color:#555;">
   ${p.gender === "Men" ? "Men’s Product" : "Women’s Product"}
@@ -1289,6 +1287,11 @@ function openMyOrders(){
   document.getElementById("myOrdersSection").style.display = "block";
 }
    
+
+
+    </script>
+
+
         <div id="toast"></div>
 
 <div id="confirmBox" style="
@@ -1314,11 +1317,6 @@ function openMyOrders(){
     <button onclick="confirmNo()" style="width:45%;background:#ccc;color:#000;">Cancel</button>
   </div>
 </div>
-
-
-    </script>
-
-
 
 
 </body>
