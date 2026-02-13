@@ -257,7 +257,7 @@ style="
       I agree to
       <span
         style="color:#007bff; cursor:pointer; text-decoration:underline;"
-        onclick="openTermsFromCart()"
+        onclick="openTerms()"
       >
         Terms & Conditions
       </span>
@@ -279,16 +279,18 @@ style="
 
     <button
       style="margin-top:12px;background:#000;color:#fff;"
-      onclick="
-        document.getElementById('myOrdersSection').style.display='none';
-        document.getElementById('checkoutSection').style.display='block';
-      "
+     onclick="
+  document.getElementById('myOrdersSection').style.display='none';
+  document.getElementById('checkoutSection').style.display='block';
+  document.getElementById('myOrdersBtn').style.display='block';
+"
     >
       ← BACK TO CHECKOUT
     </button>
   </div>
 
   <button
+      id="myOrdersBtn"
     onclick="openMyOrders()"
     style="
       margin-top:12px;
@@ -1038,14 +1040,32 @@ function openTerms(){
 • <b>Agreement:</b> By placing an order, the customer confirms that they have <b>read, understood, and agreed</b> to all the above Terms & Conditions.
 
       </p>
+<div id="scrollHint" style="
+  font-size:12px;
+  text-align:center;
+  color:#666;
+  margin-top:6px;
+">
+  ⬇️ Scroll to accept
+</div>
 
-      <button style="width:100%; margin-top:10px;"
-        onclick="
-          document.getElementById('terms').checked = true;
-          this.closest('div').parentElement.remove();
-        ">
-        I Agree
-      </button>
+<button
+  id="agreeBtn"
+  disabled
+  style="
+    width:100%;
+    margin-top:10px;
+    padding:10px;
+    background:gray;
+    color:#fff;
+    border:none;
+    cursor:not-allowed;
+  "
+>
+  I Agree
+</button>
+
+    
     </div>
   `;
 
@@ -1193,102 +1213,15 @@ function showMyOrders(){
 }
 renderProducts();
 
-function openTermsFromCart(){
-  const modal = document.createElement("div");
-  modal.style.cssText = `
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.7);
-    z-index:20000;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  `;
 
-  modal.innerHTML = `
-    <div style="
-      background:#fff;
-      width:90%;
-      max-width:520px;
-      max-height:80%;
-      border-radius:8px;
-      padding:15px;
-      display:flex;
-      flex-direction:column;
-    ">
-      <h3 style="text-align:center;margin:0 0 8px;">
-        Terms & Conditions – AK FASHION HUB
-      </h3>
-
-      <div id="termsBox" style="
-        flex:1;
-        overflow:auto;
-        border:1px solid #ddd;
-        padding:10px;
-        font-size:14px;
-        line-height:1.6;
-      ">
-        • Delivery 4–6 working days.<br><br>
-        • Cancellation within 12 hours only.<br><br>
-        • After dispatch no cancellation.<br><br>
-        • Unboxing video mandatory.<br><br>
-        • Replacement only for size issue.<br><br>
-        • Color variation not defect.<br><br>
-        • Order confirms acceptance of all terms.
-      </div>
-
-      <div id="scrollHint" style="font-size:12px;text-align:center;color:#666;">
-        ⬇️ Scroll down
-      </div>
-
-      <button id="agreeBtn" disabled style="
-        margin-top:10px;
-        padding:10px;
-        background:gray;
-        color:#fff;
-        border:none;
-        border-radius:4px;
-        cursor:not-allowed;
-      ">
-        I Agree
-      </button>
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-  const box = modal.querySelector("#termsBox");
-  const btn = modal.querySelector("#agreeBtn");
-  const hint = modal.querySelector("#scrollHint");
-
-  box.addEventListener("scroll", ()=>{
-    if(box.scrollTop + box.clientHeight >= box.scrollHeight - 5){
-      btn.disabled = false;
-      btn.style.background = "#000";
-      btn.style.cursor = "pointer";
-      hint.style.display = "none";
-    }
-  });
-
-  btn.onclick = ()=>{
-    document.getElementById("terms").checked = true;
-    modal.remove();
-  };
-
-  modal.onclick = e=>{
-    if(e.target === modal) modal.remove();
-  };
-}
         document.getElementById("cartOverlay").addEventListener("click", function(){
   toggleCart();
 });
 function openMyOrders(){
   document.getElementById("checkoutSection").style.display = "none";
   document.getElementById("myOrdersSection").style.display = "block";
+  document.getElementById("myOrdersBtn").style.display = "none";
 }
-   
-
-
     </script>
 
 
