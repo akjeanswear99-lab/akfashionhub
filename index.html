@@ -19,17 +19,6 @@ html, body {
   width: 100%;
 }
 
-    * {
-  box-sizing: border-box;
-  max-width: 100%;
-}
-
-   
-
-* {
-  box-sizing: border-box;
-}
-
 html, body, header {
   margin: 0 !important;
   padding: 0;
@@ -166,17 +155,12 @@ footer{
     text-align:center;
     padding:15px;
     margin-top:40px;
-    /* ✅ STEP 3: footer full width fix */
-footer{
-  width:100vw;
-  margin-left:0;
-  margin-right:0;
-  padding-left:0;
-  padding-right:0;
-width:100vw;
+    width:100vw;
     margin-left:0;
     margin-right:0;
-}
+    padding-left:0;
+    padding-right:0;
+    padding-bottom:120px; 
 
 }
     .card h3{
@@ -353,6 +337,23 @@ style="
 
   <div id="cartItems"></div>
   <h3 id="total"></h3>
+   
+<div style="margin:12px 0;">
+  <input
+    id="couponInput"
+    placeholder="Enter offer code"
+    style="text-transform:uppercase;"
+  >
+  <button onclick="applyCoupon()" style="margin-top:6px;">
+    Apply Offer
+  </button>
+
+  <p id="couponMsg" style="font-size:13px; margin-top:6px;"></p>
+</div>
+
+
+<div id="priceBreakup" style="font-size:14px; margin-top:10px;"></div>
+
 
   <div id="checkoutSection">
     <h4>Checkout</h4>
@@ -505,6 +506,7 @@ const products = [
  category:"Jeans",
  price:1999,
  discount:20,
+ weight: 550, 
  img:["girls-jeans.jpg"],
  colors:["Blue","Black"],
  sizes:["28","30","32","34","36"],
@@ -523,6 +525,7 @@ const products = [
  category:"Lower",
  price:1499,
  discount:15,
+ weight: 200,
  img:[img3, img4],
  colors:["Black","Gray"],
  sizes:["S","M","L","XL"],
@@ -542,6 +545,8 @@ const products = [
  category:"T-Shirt",
  price:999,
  discount:30,
+     weight: 180,
+
  img:[img2, img3],
  colors:["Red","White","Black"],
  sizes:["S","M","L","XL","XXL"],
@@ -561,6 +566,8 @@ const products = [
  category:"Shirt",
  price:1299,
  discount:25,
+     weight: 250,
+
  img:[img4, img1],
  colors:["White","Blue"],
  sizes:["M","L","XL"],
@@ -580,6 +587,8 @@ const products = [
  category:"Kurti",
  price:1799,
  discount:20,
+     weight: 220,
+
  img:[img3, img2],
  colors:["Pink","Green"],
  sizes:["S","M","L"],
@@ -599,6 +608,8 @@ const products = [
  category:"Shirt",
  price:1299,
  discount:25,
+         weight: 250,
+
  img:[img4, img1],
  colors:["White","Blue"],
  sizes:["M","L","XL"],
@@ -617,6 +628,8 @@ const products = [
  category:"Shirt",
  price:1299,
  discount:25,
+  weight: 250,
+
  img:[img4, img1],
  colors:["White","Blue"],
  sizes:["M","L","XL"],
@@ -635,6 +648,8 @@ const products = [
  category:"Shirt",
  price:1299,
  discount:25,
+  weight: 250,
+
  img:[img4, img1],
  colors:["White","Blue"],
  sizes:["M","L","XL"],
@@ -649,6 +664,30 @@ const products = [
 ];
    
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+
+  const AUTO_OFFER = {
+  minAmount: 1499,  
+  discount: 100    
+};
+  
+const COUPONS = {
+  "FREEDEL": {
+    type: "FREE_DELIVERY"
+  },
+
+  "SAVE30": {
+    type: "FLAT",
+    value: 30
+  },
+
+  "SAVE50": {
+    type: "FLAT",
+    value: 50
+  }
+};
+
+let appliedCoupon = null;
 
 
     let currentFilter = "All";
@@ -779,7 +818,7 @@ if(existing){
     size,
     color,
     qty: 1,
-    maxStock: maxStock   // ⭐ MOST IMPORTANT
+    maxStock: maxStock  
   });
 }
 
@@ -791,50 +830,117 @@ if(existing){
     showToast("Item added to cart successfully");
     toggleCart();
 }
+
 function updateCart(){
-  let total = 0;
+  let subtotal = 0;
   const box = document.getElementById("cartItems");
   box.innerHTML = "";
 
   cart.forEach((c, index)=>{
     const price = Math.round(c.price - (c.price * c.discount / 100));
-    total += price * c.qty;
+    subtotal += price * c.qty;
 
     box.innerHTML += `
-      <div style="
-        border-bottom:1px solid #ddd;
-        padding:10px 0;
-        margin-bottom:10px;
-      ">
+      <div style="border-bottom:1px solid #ddd;padding:10px 0;">
         <b>${c.name}</b><br>
         Size: ${c.size} | Color: ${c.color}<br>
         Qty:
-<button onclick="changeQty(${index}, -1)">−</button>
-<b>${c.qty}</b>
-<button onclick="changeQty(${index}, 1)">+</button>
-<br>
-
+        <button onclick="changeQty(${index},-1)">−</button>
+        <b>${c.qty}</b>
+        <button onclick="changeQty(${index},1)">+</button><br>
         Amount: ₹${price * c.qty}<br><br>
-
-        <button
-          style="background:red;"
-          onclick="askRemove(${index})"
-        >
+        <button style="background:red;" onclick="askRemove(${index})">
           Remove Item
         </button>
       </div>
     `;
   });
 
-  document.getElementById("total").innerText = "Total: ₹" + total;
+  const totalWeight = calculateTotalWeight();
+  let delivery = calculateDeliveryCharge(totalWeight);
+
+  let discount = 0;
+  let offerMsg = "";
+
+  // AUTO OFFER
+  if(subtotal >= AUTO_OFFER.minAmount){
+    if(subtotal < 3000 && appliedCoupon){
+      offerMsg = "Only one offer applicable below ₹3000";
+    }else{
+      discount += AUTO_OFFER.discount;
+      offerMsg = `🎉 ₹${AUTO_OFFER.discount} OFF applied`;
+    }
+  }else{
+    offerMsg = `Add ₹${AUTO_OFFER.minAmount - subtotal} more to get ₹${AUTO_OFFER.discount} OFF`;
+  }
+
+  // COUPON
+  if(appliedCoupon){
+    const rule = COUPONS[appliedCoupon];
+
+    if(subtotal < 999){
+      if(rule.type === "FLAT"){
+        discount += Math.min(rule.value, 50);
+      }
+    }else{
+      if(rule.type === "FREE_DELIVERY"){
+        delivery = 0;
+      }
+      if(rule.type === "FLAT"){
+        discount += rule.value;
+      }
+    }
+  }
+
+  const finalTotal = Math.max(subtotal + delivery - discount, 0);
+
+  document.getElementById("priceBreakup").innerText = offerMsg;
+
+  document.getElementById("total").innerHTML = `
+    <div>Subtotal: ₹${subtotal}</div>
+    <div>Delivery: ₹${delivery}</div>
+    <div>Discount: −₹${discount}</div>
+    <hr>
+    <b>Total Payable: ₹${finalTotal}</b>
+  `;
 
   updateCartBadge();
-  updateBottomBar(total);
+  updateBottomBar(finalTotal);
 }
+
+ 
+    
+
+
+    
+    function calculateTotalWeight(){
+  let totalWeight = 0;
+
+  cart.forEach(item => {
+    const itemWeight = item.weight || 500; 
+    totalWeight += itemWeight * item.qty;
+  });
+
+  return totalWeight; 
+}
+function calculateDeliveryCharge(totalWeight){
+  // base rule
+  let charge = 99; // 500g tak
+
+  if(totalWeight > 500){
+    const extraWeight = totalWeight - 500;
+    const slabs = Math.ceil(extraWeight / 20); // har 20g
+    charge += slabs * 10; // har 20g = ₹10
+  }
+
+  return charge;
+}
+
+
     function changeQty(index, diff){
   const item = cart[index];
 
-  // minus
+ 
   if(diff === -1){
     item.qty--;
     if(item.qty <= 0){
@@ -842,7 +948,7 @@ function updateCart(){
     }
   }
 
-  // plus (stock check GOOGLE SHEET se)
+  
   if(diff === 1){
   if(item.qty < item.maxStock){
     item.qty++;
@@ -987,7 +1093,7 @@ allOrders[p].push({
 localStorage.setItem("ordersByPhone", JSON.stringify(allOrders));
 
 
-  // 👉 GOOGLE SHEET SAVE
+  
  fetch("https://script.google.com/macros/s/AKfycbwMWrEhaO4sGqHhUX7nr-zrCtROhYx0krL2Cx6rVbA0pMCenDGP32xDWMrcQb9KgaLi/exec", {
   method: "POST",
   headers: {
@@ -1008,7 +1114,7 @@ localStorage.setItem("ordersByPhone", JSON.stringify(allOrders));
 });
 
 
-  // 👉 WHATSAPP MESSAGE
+  
   let msg = `AK FASHION HUB
 Order ID: ${orderId}
 Keshav Nagar, Hapur 245101
@@ -1056,6 +1162,29 @@ renderProducts();
   }
 }
 
+function applyCoupon(){
+  const code = document
+    .getElementById("couponInput")
+    .value
+    .trim()
+    .toUpperCase();
+
+  const msg = document.getElementById("couponMsg");
+
+  if(!COUPONS[code]){
+    msg.innerText = "❌ Invalid offer code";
+    msg.style.color = "red";
+    appliedCoupon = null;
+    updateCart();
+    return;
+  }
+
+  appliedCoupon = COUPONS[code];
+  msg.innerText = "✅ Offer applied successfully";
+  msg.style.color = "green";
+
+  updateCart();
+}
 
 
 </script>
@@ -1116,7 +1245,7 @@ function openImage(src){
 <script>
 function openTerms(){
 
-  // body scroll band
+ 
   document.body.style.overflow = "hidden";
 
   let modal = document.createElement("div");
@@ -1214,7 +1343,7 @@ function openTerms(){
     }
   });
 
-  // ✅ agree
+ 
   btn.onclick = () => {
     document.getElementById("terms").checked = true;
     modal.remove();
@@ -1234,12 +1363,12 @@ function openTerms(){
 
 </script>
     
-    <a href="https://wa.me/919599497909"
+   <a href="https://wa.me/919599497909?text=Hello%20AK%20FASHION%20HUB%20%F0%9F%91%8B%0A%0AI%20am%20interested%20in%20your%20products.%0APlease%20share%20product%20details,%20price,%20size%20availability,%20and%20delivery%20information.%0A%0AThank%20you."
    target="_blank"
    style="
      position:fixed;
-     bottom:20px;
-     right:20px;
+     bottom:100px;
+     right:16px;
      background:#25D366;
      color:white;
      padding:14px 20px;
@@ -1253,17 +1382,13 @@ function openTerms(){
      align-items:center;
      gap:8px;
    ">
-  💬 Chat Now
+ 💬 Help & Support
 </a>
+
     <script>
-// Example order data (Order ID -> Status). 
-// You can use localStorage or a backend call instead in a real app.
 
+        
 
-
-
-       
- 
         const noteField = document.getElementById("note");
 
 noteField.addEventListener("input", function () {
@@ -1271,7 +1396,10 @@ noteField.addEventListener("input", function () {
   if (words.length > 30) {
     this.value = words.slice(0, 30).join(" ");
   }
-});
+});    
+
+
+  
 function updateCartBadge(){
   let badge = document.getElementById("cartCount");
 
@@ -1328,19 +1456,18 @@ function showMyOrders(){
   const orderIdInput = document.getElementById("orderIdCheck").value.trim();
   const box = document.getElementById("myOrders");
 
-  // basic validation
-
+  
 
   const allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
   const orders = allOrders[phone];
 
-  // phone number galat
+
   if (!orders) {
     box.innerHTML = "<p>Invalid phone number or Order ID</p>";
     return;
   }
 
-  // check: is phone ke kisi order me ye orderId hai?
+  
   const matched = orders.some(o => o.orderId === orderIdInput);
 
   if (!matched) {
