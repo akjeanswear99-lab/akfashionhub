@@ -1000,9 +1000,11 @@ function openImage(src){
   document.body.appendChild(modal);
 }
 </script>
-
 <script>
 function openTerms(){
+
+  // body scroll band
+  document.body.style.overflow = "hidden";
 
   let modal = document.createElement("div");
   modal.style.position = "fixed";
@@ -1011,7 +1013,7 @@ function openTerms(){
   modal.style.width = "100%";
   modal.style.height = "100%";
   modal.style.background = "rgba(0,0,0,0.8)";
-  modal.style.zIndex = "9999";
+  modal.style.zIndex = "50000"; // 🔥 cart se upar
   modal.style.display = "flex";
   modal.style.alignItems = "center";
   modal.style.justifyContent = "center";
@@ -1083,7 +1085,6 @@ function openTerms(){
     </div>
   `;
 
-  // ✅ add modal to page
   document.body.appendChild(modal);
 
   const box = modal.querySelector("#termsBox");
@@ -1100,17 +1101,22 @@ function openTerms(){
     }
   });
 
-  // ✅ agree button
+  // ✅ agree
   btn.onclick = () => {
     document.getElementById("terms").checked = true;
     modal.remove();
+    document.body.style.overflow = "";
   };
 
-  // ❌ outside click close
+  // ❌ outside click
   modal.onclick = (e) => {
-    if (e.target === modal) modal.remove();
+    if (e.target === modal) {
+      modal.remove();
+      document.body.style.overflow = "";
+    }
   };
 }
+</script>
 
 
 </script>
