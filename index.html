@@ -859,6 +859,14 @@ function updateCart(){
   const totalWeight = calculateTotalWeight();
   let delivery = calculateDeliveryCharge(totalWeight);
 
+if(cart.length === 0){
+  document.getElementById("total").innerHTML = "Your cart is empty";
+  document.getElementById("priceBreakup").innerText = "";
+  updateCartBadge();
+  updateBottomBar(0);
+  return;
+}
+
   let discount = 0;
   let offerMsg = "";
 
