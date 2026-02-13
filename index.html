@@ -995,20 +995,32 @@ function openImage(src){
 
 <script>
 function openTerms(){
+
   let modal = document.createElement("div");
-  modal.style.position="fixed";
-  modal.style.top="0";
-  modal.style.left="0";
-  modal.style.width="100%";
-  modal.style.height="100%";
-  modal.style.background="rgba(0,0,0,0.8)";
-  modal.style.zIndex="9999";
-  modal.style.display="flex";
-  modal.style.alignItems="center";
-  modal.style.justifyContent="center";
+  modal.style.position = "fixed";
+  modal.style.top = "0";
+  modal.style.left = "0";
+  modal.style.width = "100%";
+  modal.style.height = "100%";
+  modal.style.background = "rgba(0,0,0,0.8)";
+  modal.style.zIndex = "9999";
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
 
   modal.innerHTML = `
-    <div style="background:#fff; padding:20px; max-width:520px; max-height:85%; overflow:auto; border-radius:8px;">
+    <div
+      id="termsBox"
+      style="
+        background:#fff;
+        padding:20px;
+        width:90%;
+        max-width:520px;
+        max-height:85%;
+        overflow:auto;
+        border-radius:8px;
+      "
+    >
       <h3>Terms & Conditions – AK FASHION HUB</h3>
 
       <p style="font-size:14px; line-height:1.6;">
@@ -1040,41 +1052,59 @@ function openTerms(){
 • <b>Agreement:</b> By placing an order, the customer confirms that they have <b>read, understood, and agreed</b> to all the above Terms & Conditions.
 
       </p>
-<div id="scrollHint" style="
-  font-size:12px;
-  text-align:center;
-  color:#666;
-  margin-top:6px;
-">
-  ⬇️ Scroll to accept
-</div>
 
-<button
-  id="agreeBtn"
-  disabled
-  style="
-    width:100%;
-    margin-top:10px;
-    padding:10px;
-    background:gray;
-    color:#fff;
-    border:none;
-    cursor:not-allowed;
-  "
->
-  I Agree
-</button>
+      <div id="scrollHint" style="font-size:12px;text-align:center;color:#666;">
+        ⬇️ Scroll down to enable button
+      </div>
 
-    
+      <button
+        id="agreeBtn"
+        disabled
+        style="
+          width:100%;
+          margin-top:10px;
+          padding:10px;
+          background:gray;
+          color:#fff;
+          border:none;
+          cursor:not-allowed;
+        "
+      >
+        I Agree
+      </button>
     </div>
   `;
 
-  modal.onclick = (e) => {
-    if(e.target === modal) modal.remove();
+  // ✅ add modal to page
+  document.body.appendChild(modal);
+
+  const box = modal.querySelector("#termsBox");
+  const btn = modal.querySelector("#agreeBtn");
+  const hint = modal.querySelector("#scrollHint");
+
+  // 🔒 scroll compulsory
+  box.addEventListener("scroll", () => {
+    if (box.scrollTop + box.clientHeight >= box.scrollHeight - 5) {
+      btn.disabled = false;
+      btn.style.background = "#000";
+      btn.style.cursor = "pointer";
+      hint.style.display = "none";
+    }
+  });
+
+  // ✅ agree button
+  btn.onclick = () => {
+    document.getElementById("terms").checked = true;
+    modal.remove();
   };
 
-  document.body.appendChild(modal);
+  // ❌ outside click close
+  modal.onclick = (e) => {
+    if (e.target === modal) modal.remove();
+  };
 }
+
+
 </script>
     
     <a href="https://wa.me/919599497909"
