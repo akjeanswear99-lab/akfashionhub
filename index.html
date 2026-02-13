@@ -25,7 +25,7 @@ html, body {
 }
 
    
-/* 🔴 FORCE REMOVE SIDE LINE */
+
 * {
   box-sizing: border-box;
 }
@@ -166,6 +166,18 @@ footer{
     text-align:center;
     padding:15px;
     margin-top:40px;
+    /* ✅ STEP 3: footer full width fix */
+footer{
+  width:100vw;
+  margin-left:0;
+  margin-right:0;
+  padding-left:0;
+  padding-right:0;
+width:100vw;
+    margin-left:0;
+    margin-right:0;
+}
+
 }
     .card h3{
     font-size:16px;
@@ -221,7 +233,7 @@ footer{
   z-index:10001;
   display:none;
 }
-/* 📱 MOBILE RESPONSIVE FIX */
+
 @media (max-width: 768px){
 
   header h1{
@@ -242,10 +254,6 @@ footer{
     padding: 12px;
   }
 
-  .products{
-    grid-template-columns: 1fr;
-  }
-
   .card img{
     height: 260px;
   }
@@ -259,7 +267,48 @@ footer{
     width: 100%;
     right: -100%;
   }
+}
+    
+@media (max-width: 768px){
 
+  .products{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 10px;
+  }
+
+  .card{
+    padding: 10px;
+  }
+
+  .card img{
+    height: 200px;
+  }
+
+  .card h3{
+    font-size: 14px;
+  }
+
+  .card p{
+    font-size: 12px;
+  }
+
+  select, button{
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 768px){
+
+  .card img,
+  .product-img{
+    width: 100%;
+    height: auto;          
+    aspect-ratio: 3 / 4;  
+    object-fit: contain;   
+    background: #f7f7f7;
+  }
 }
 
 </style>
@@ -378,7 +427,7 @@ style="
   </button>
 
 </div>
-<!-- ✅ CART PANEL END -->
+
 
 
 <div class="container">
@@ -390,7 +439,7 @@ style="
 </div>
 
     <div class="products" id="products"></div>
-
+</div>
 <footer>
    <p>
   Return Policy:
@@ -438,7 +487,7 @@ style="
 
 </div>
        
-</div>
+
 </footer>
 
 <script>
