@@ -6,11 +6,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style> 
-    html, body {
+    
+* {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  width: 100%;
 }
+
+    * {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+   
 /* 🔴 FORCE REMOVE SIDE LINE */
 * {
   box-sizing: border-box;
@@ -206,6 +220,46 @@ footer{
   background: rgba(0,0,0,0.3);
   z-index:10001;
   display:none;
+}
+/* 📱 MOBILE RESPONSIVE FIX */
+@media (max-width: 768px){
+
+  header h1{
+    font-size: 24px;
+    letter-spacing: 1px;
+  }
+
+  header .tagline{
+    font-size: 11px;
+  }
+
+  header .address{
+    font-size: 9px;
+    line-height: 1.4;
+  }
+
+  .container{
+    padding: 12px;
+  }
+
+  .products{
+    grid-template-columns: 1fr;
+  }
+
+  .card img{
+    height: 260px;
+  }
+
+  button{
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  #cartPanel{
+    width: 100%;
+    right: -100%;
+  }
+
 }
 
 </style>
@@ -945,13 +999,14 @@ renderProducts();
   const overlay = document.getElementById("cartOverlay");
 
   if(cartPanel.style.right === "0px"){
-    cartPanel.style.right = "-360px";
+    cartPanel.style.right = window.innerWidth < 768 ? "-100%" : "-360px";
     overlay.style.display = "none";
   }else{
     cartPanel.style.right = "0px";
     overlay.style.display = "block";
   }
 }
+
 
 
 </script>
