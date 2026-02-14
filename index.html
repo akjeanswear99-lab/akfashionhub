@@ -1122,126 +1122,48 @@ function confirmNo(){
 }
 async function checkout(){
 
-
   const termsAccepted = document.getElementById("terms").checked;
   if(!termsAccepted){
-    alert("Please accept Terms & Conditions to place order");
+    alert("Please accept Terms & Conditions");
     return;
   }
 
   const n = document.getElementById("name").value.trim();
   const p = document.getElementById("phone").value.trim();
-    if(p.length !== 10){
-  alert("Enter valid 10 digit mobile number");
-  return;
-}
   const a = document.getElementById("address").value.trim();
-    if(a.length < 20){
-  alert("Please enter complete address with landmark, city, state & pincode");
-  return;
-}
   const note = document.getElementById("note").value.trim();
 
-  if(!n || !p || !a || cart.length === 0){
-    showToast("Fill all details and add items to cart");
+  if(p.length !== 10 || !n || a.length < 20 || cart.length === 0){
+    alert("Fill all details correctly");
     return;
   }
-      
-  for (let item of cart) {
 
-    const response = await fetch(
-      "https://script.google.com/macros/s/AKfycbzlZcI0BxlKW_Q_L2XUx7AYPrMqYSTjdj2uHDTS3CLunsmXFuZm04Rb7SsCFVXB7Rn4/exec",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          action: "CHECK_STOCK",
-          sku: item.id,
-          size: item.size,
-          color: item.color
-        })
-      }
-    );
+  /* ================= TOTAL CALCULATION (FIRST) ================= */
 
-    const result = await response.json();
+  const subtotal = cart.reduce((sum, c) => {
+    const price = Math.round(c.price - (c.price * c.discount / 100));
+    return sum + price * c.qty;
+  }, 0);
 
-    if (!result.allowed) {
-      alert(
-        `${item.name} (${item.size}, ${item.color}) is OUT OF STOCK`
-      );
-      return; 
-    }
+  const totalWeight = calculateTotalWeight();
+  const delivery = calculateDeliveryCharge(totalWeight, subtotal);
+
+  let discount = 0;
+  if(subtotal >= AUTO_OFFER.minAmount){
+    discount += AUTO_OFFER.discount;
   }
+  if(appliedCoupon){
+    const rule = COUPONS[appliedCoupon];
+    if(rule?.type === "FLAT") discount += rule.value;
+    if(rule?.type === "FREE_DELIVERY") discount += delivery;
+  }
+
+  const finalTotal = Math.max(subtotal + delivery - discount, 0);
+
+  /* ================= WHATSAPP MESSAGE ================= */
 
   const orderId = generateOrderId();
-   
-let totalQty = 0;
-cart.forEach(c => {
-  totalQty += c.qty;
-});
 
-
-let totalAmount = 0;
-cart.forEach(c => {
-  const price = Math.round(c.price - (c.price * c.discount / 100));
-  totalAmount += price * c.qty;
-});
-
-
-let allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
-
-if (!allOrders[p]) {
-  allOrders[p] = [];
-}
-
-allOrders[p].push({
-  orderId: orderId,
-  date: new Date().toLocaleString(),
-  items: cart.map(c => ({
-    name: c.name,
-    size: c.size,
-    color: c.color,
-    qty: c.qty
-  })),
-  total: totalAmount,
-  status: "Order Received"
-});
-
-localStorage.setItem("ordersByPhone", JSON.stringify(allOrders));
-
-
-  await fetch(
-  "https://script.google.com/macros/s/AKfycbwMWrEhaO4sGqHhUX7nr-zrCtROhYx0krL2Cx6rVbA0pMCenDGP32xDWMrcQb9KgaLi/exec",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      orderId: orderId,
-      date: new Date().toLocaleString(),
-      name: n,
-      phone: p,
-      address: a,
-      products: cart.map(c =>
-        `${c.name} | SKU:${c.id} | Size:${c.size} | Color:${c.color} | Qty:${c.qty}`
-      ).join(" || "),
-      totalQty: totalQty,
-      subtotal: subtotal,
-      delivery: delivery,
-      discount: discount,
-      finalTotal: finalTotal,
-      status: "Order Received"
-    })
-  }
-);
-
- 
-
-
-  
   let msg = `AK FASHION HUB
 Order ID: ${orderId}
 Keshav Nagar, Hapur 245101
@@ -1257,34 +1179,10 @@ Color:${c.color}
 ₹${price}
 Qty: ${c.qty}
 
-
 `;
   });
-// ===== TOTAL CALCULATION =====
-const subtotal = cart.reduce((sum, c) => {
-  const price = Math.round(c.price - (c.price * c.discount / 100));
-  return sum + price * c.qty;
-}, 0);
 
-const totalWeight = calculateTotalWeight();
-const delivery = calculateDeliveryCharge(totalWeight, subtotal);
-
-let discount = 0;
-
-// auto offer
-if(subtotal >= AUTO_OFFER.minAmount){
-  discount += AUTO_OFFER.discount;
-}
-
-// coupon
-if(appliedCoupon){
-  const rule = COUPONS[appliedCoupon];
-  if(rule?.type === "FLAT") discount += rule.value;
-  if(rule?.type === "FREE_DELIVERY") discount += delivery;
-}
-
-const finalTotal = Math.max(subtotal + delivery - discount, 0);
-msg += `
+  msg += `
 ------------------------
 Subtotal: ₹${subtotal}
 Delivery: ₹${delivery}
@@ -1293,21 +1191,50 @@ Discount: −₹${discount}
 TOTAL PAYABLE: ₹${finalTotal}
 ------------------------
 
-`;
-  msg += `Customer: ${n}
+Customer: ${n}
 Phone: ${p}
 Address: ${a}
-Note: ${note}`;
+Note: ${note}
+`;
 
- window.open("https://wa.me/919599497909?text=" + encodeURIComponent(msg));
+  /* ================= WHATSAPP OPEN (IMMEDIATE) ================= */
 
+  window.open(
+    "https://wa.me/919599497909?text=" + encodeURIComponent(msg),
+    "_blank"
+  );
 
-alert("Order Placed Successfully!\nYour Order ID: " + orderId);
-cart = [];
-localStorage.removeItem("cart");
-updateCart();
-renderProducts();
+  /* ================= BACKGROUND WORK ================= */
+
+  try{
+    await fetch("https://script.google.com/macros/s/AKfycbwMWrEhaO4sGqHhUX7nr-zrCtROhYx0krL2Cx6rVbA0pMCenDGP32xDWMrcQb9KgaLi/exec", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({
+        orderId,
+        name:n,
+        phone:p,
+        address:a,
+        products: cart.map(c =>
+          `${c.name} | SKU:${c.id} | Size:${c.size} | Color:${c.color} | Qty:${c.qty}`
+        ).join(" || "),
+        totalQty: cart.reduce((s,i)=>s+i.qty,0),
+        totalAmount: finalTotal,
+        status:"Order Received"
+      })
+    });
+  }catch(e){
+    console.log("Sheet error", e);
+  }
+
+  alert("Order Placed Successfully!\nOrder ID: " + orderId);
+
+  cart = [];
+  localStorage.removeItem("cart");
+  updateCart();
+  renderProducts();
 }
+
 
 function toggleCart(){
   const cartPanel = document.getElementById("cartPanel");
