@@ -189,22 +189,25 @@ footer{
 }
 #toast{
   position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: rgba(0,0,0,0.9);
   color: #fff;
-  padding: 12px 18px;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 14px 22px;
+  border-radius: 10px;
+  font-size: 15px;
   opacity: 0;
-  transform: translateY(-10px);
   transition: all 0.3s ease;
   z-index: 10000;
+  text-align: center;
+  max-width: 90%;
 }
 
 #toast.show{
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(-50%, -50%) scale(1);
+
 }
 
 #cartOverlay{
@@ -309,69 +312,27 @@ footer{
   background:#f6f6f6;
 }
 
-
-
-#searchBox{
-  position:absolute;
-  top:22px;
-  right:70px;  
-  width:220px;
-  z-index:10003;
-}
-
-#searchInput{
-  width:100%;
-  padding:6px 10px;
-  font-size:13px;
-  border-radius:4px;
-  border:none;
-  outline:none;
-}
-
-#searchResults{
-  position:absolute;
-  top:34px;
-  left:0;
-  width:100%;
-  background:#fff;
-  color:#000;
-  box-shadow:0 4px 10px rgba(0,0,0,0.2);
-  display:none;
-  max-height:260px;
-  overflow:auto;
-}
-
-.search-item{
-  padding:8px;
-  font-size:13px;
-  cursor:pointer;
-  border-bottom:1px solid #eee;
-}
-
-.search-item:hover{
-  background:#f2f2f2;
-}
-
-/* MOBILE SEARCH */
 @media(max-width:768px){
-  #searchBox{
-    width:160px;
-    right:60px;
+  .card{
+    box-shadow:none;
+    border:1px solid #eee;
+  }
+
+  .hm-img{
+    background:#fafafa;
+  }
+
+  button{
+    padding:12px;
+    font-size:14px;
+  }
+
+  select{
+    font-size:13px;
   }
 }
-.card h3{
-  font-size:14px;
-  margin:6px 0 2px;
-}
 
-.card p{
-  font-size:13px;
-  margin:0;
-}
-#searchBox input{
-  display:none;
-  margin-top:6px;
-}
+    
 
 </style>
 </head>
@@ -389,8 +350,7 @@ footer{
   <div class="address">
    ADDRESS:- KESHAV NAGAR, SWARG AASHRAM ROAD, HAPUR 245101
   </div> 
-        <div onclick="toggleCart()"
-style="
+    <div onclick="toggleCart()" id="cartIcon" style="
  position:absolute;
  top:22px;
  left:20px;
@@ -398,29 +358,9 @@ style="
  font-size:20px;
  z-index:10002;
 ">
- 🛒
+ 🛒 <span id="cartCount">0</span>
 </div>
-<!-- SEARCH BOX -->
-<div id="searchBox">
-  <span onclick="toggleSearch()" style="cursor:pointer;font-size:18px;">
- 🔍
-</span>
-<input
-  type="text"
-  id="searchInput"
-  placeholder="Search products..."
-  onkeyup="handleSearch(this.value)"
->
-
-  <div id="searchResults"></div>
-    <input
-  type="text"
-  id="searchInput"
-  placeholder="Search products..."
-  onkeyup="handleSearch(this.value)"
-/>
-
-</div>
+    
 
 
   <!-- Menu Icon -->
@@ -795,57 +735,53 @@ function filterProducts(type){
   currentFilter = type;
   renderProducts();
 }
-
 function renderProducts(){
- const box=document.getElementById("products");
- box.innerHTML="";
- products.forEach((p,i)=>{
-     if(currentFilter !== "All" && p.gender !== currentFilter) return;
-  const final=Math.round(p.price-(p.price*p.discount/100));
-  
- box.innerHTML += `
-<div class="card hm-style" data-sku="${p.id}">
+  const box = document.getElementById("products");
+  let html = "";
 
+  products.forEach((p,i)=>{
+    if(currentFilter !== "All" && p.gender !== currentFilter) return;
 
-  <img
-    src="${p.img[0]}"
-    class="hm-img"
-    onclick="openImage('${p.img[0]}')"
-  />
+    const final = Math.round(p.price - (p.price * p.discount / 100));
 
-  <p style="font-size:12px; font-weight:bold; color:#555;">
-    ${p.gender === "Men" ? "Men’s Product" : "Women’s Product"}
-  </p>
+    html += `
+    <div class="card hm-style">
 
-  <h3>${p.name}</h3>
-  <p>SKU: ${p.id}</p>
-  <p>${p.category}</p>
-  <p>MRP ₹${p.price} | ${p.discount}% OFF</p>
-  <p><b>₹${final}</b></p>
+      <img
+        src="${p.img[0]}"
+        class="hm-img"
+        loading="lazy"
+        decoding="async"
+      />
 
-  <p>Measurements: ${p.measure}</p>
+      <p style="font-size:11px;font-weight:600;color:#666;">
+        ${p.gender}
+      </p>
 
-  <select id="size${i}" onchange="updateStockMsg(${i})">
-    <option value="">Select Size</option>
-    ${p.sizes.map(s => `<option>${s}</option>`).join("")}
-  </select>
+      <h3>${p.name}</h3>
+      <p><b>₹${final}</b></p>
 
-  <select id="color${i}" onchange="updateStockMsg(${i})">
-    <option value="">Select Color</option>
-    ${p.colors.map(c => `<option>${c}</option>`).join("")}
-  </select>
+      <select id="size${i}">
+        <option value="">Size</option>
+        ${p.sizes.map(s=>`<option>${s}</option>`).join("")}
+      </select>
 
-  <p id="stockMsg${i}" style="font-size:12px;font-weight:bold;"></p>
+      <select id="color${i}">
+        <option value="">Color</option>
+        ${p.colors.map(c=>`<option>${c}</option>`).join("")}
+      </select>
 
-  <button id="btn${i}" onclick="addToCart(${i})">
-    Add to Cart
-  </button>
+      <button onclick="addToCart(${i})">
+        Add to Cart
+      </button>
 
-</div>
-`;
+    </div>`;
+  });
 
- });
+  box.innerHTML = html;
 }
+
+
 function updateStockMsg(i){
   const size = document.getElementById("size"+i).value;
   const color = document.getElementById("color"+i).value;
@@ -864,13 +800,7 @@ btn.disabled = false;
  
 }
 
-function changeImage(i, dir){
- const p = products[i];
- const imgEl = document.getElementById("img"+i);
- let current = p.img.indexOf(imgEl.src);
- current = (current + dir + p.img.length) % p.img.length;
- imgEl.src = p.img[current];
-}
+
 function showToast(message){
   const toast = document.getElementById("toast");
   toast.innerText = message;
@@ -1266,23 +1196,16 @@ renderProducts();
 function toggleCart(){
   const cartPanel = document.getElementById("cartPanel");
   const overlay = document.getElementById("cartOverlay");
-  const searchBox = document.getElementById("searchBox");
+
+  document.body.style.willChange = "transform";
 
   if(cartPanel.style.right === "0px"){
-    // CART CLOSE
     cartPanel.style.right = window.innerWidth < 768 ? "-100%" : "-360px";
     overlay.style.display = "none";
-
-    // ✅ search wapas dikhe
-    searchBox.style.display = "block";
-
+    document.body.style.willChange = "auto";
   }else{
-    // CART OPEN
     cartPanel.style.right = "0px";
     overlay.style.display = "block";
-
-    // ❌ search hide
-    searchBox.style.display = "none";
   }
 }
 
@@ -1620,90 +1543,6 @@ function showMyOrders(){
   box.innerHTML = html;
 }
 renderProducts();
-        function scrollToProduct(id){
-  document.getElementById("searchResults").style.display = "none";
-  document.getElementById("searchInput").value = "";
-
-  const card = document.querySelector(`[data-sku="${id}"]`);
-  if(card){
-    card.scrollIntoView({
-      behavior:"smooth",
-      block:"start"
-    });
-  }
-}
-
-function toggleSearch(){
-  const input = document.getElementById("searchInput");
-  input.style.display =
-    input.style.display === "block" ? "none" : "block";
-  input.focus();
-}
-// 🔍 SEARCH MAIN FUNCTION
-function handleSearch(input){
-  const resultBox = document.getElementById("searchResults");
-  resultBox.innerHTML = "";
-
-  if(input.trim() === ""){
-    resultBox.style.display = "none";
-    return;
-  }
-
-  const matched = products.filter(p =>
-    p.name.toLowerCase().includes(input.toLowerCase()) ||
-    p.category.toLowerCase().includes(input.toLowerCase()) ||
-    p.id.toLowerCase().includes(input.toLowerCase())
-  );
-
-  if(matched.length === 0){
-    resultBox.innerHTML =
-      "<div class='search-item'>No result found</div>";
-    resultBox.style.display = "block";
-    return;
-  }
-
-  matched.forEach(p=>{
-    resultBox.innerHTML += `
-      <div class="search-item" onclick="scrollToProduct('${p.id}')">
-        ${p.name} (${p.category})
-      </div>
-    `;
-  });
-
-  resultBox.style.display = "block";
-}
-
-
-  if(matched.length === 0){
-    resultBox.innerHTML =
-      "<div class='search-item'>No result found</div>";
-    resultBox.style.display = "block";
-    return;
-  }
-
-  matched.forEach(p=>{
-    resultBox.innerHTML += `
-      <div class="search-item" onclick="scrollToProduct('${p.id}')">
-        ${p.name} (${p.category})
-      </div>
-    `;
-  });
-
-  resultBox.style.display = "block";
-}
-
-function scrollToProduct(id){
-  document.getElementById("searchResults").style.display="none";
-  document.getElementById("searchInput").value="";
-
-  const cards = document.querySelectorAll(".card");
-  cards.forEach(card=>{
-    if(card.innerText.includes(id)){
-      card.scrollIntoView({behavior:"smooth", block:"start"});
-    }
-  });
-}
-
 
 
         document.getElementById("cartOverlay").addEventListener("click", function(){
