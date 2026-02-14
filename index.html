@@ -116,6 +116,9 @@ header .address{
     padding:5px;
     cursor:pointer;
 }
+   
+}
+
     .slider {
   width: 100%;
   height: auto;
@@ -192,19 +195,9 @@ button:disabled{
 }
 
 footer{
-    background:#000;
-    color:#fff;
-    text-align:center;
-    padding:15px;
-    margin-top:40px;
-    width:100vw;
-    margin-left:0;
-    margin-right:0;
-    padding-left:0;
-    padding-right:0;
-    padding-bottom:120px; 
-
+  padding-bottom:20px;
 }
+
     .card h3{
     font-size:16px;
     margin:6px 0;
@@ -260,7 +253,6 @@ footer{
   display:none;
 }
 
-@media (max-width: 768px){
 
   header h1{
     font-size: 24px;
@@ -325,7 +317,6 @@ footer{
   }
 }
 
-@media (max-width: 768px){
 
   .card img,
   .product-img{
@@ -395,6 +386,9 @@ style="
 
 
 <div id="priceBreakup" style="font-size:14px; margin-top:10px;"></div>
+<div id="deliveryHint"
+     style="font-size:13px; margin-top:6px; color:#444;">
+</div>
 
 
   <div id="checkoutSection">
@@ -529,7 +523,25 @@ style="
   </a>
 
 </div>
-       
+  <div style="margin-top:16px;">
+  <a href="https://wa.me/919599497909?text=Hello%20AK%20FASHION%20HUB"
+   target="_blank"
+   style="
+     background:#25D366;
+     color:white;
+     padding:10px 18px;
+     border-radius:20px;
+     text-decoration:none;
+     font-weight:600;
+     font-size:14px;
+     display:inline-block;
+     margin-top:12px;
+   ">
+  💬 Help & Support
+</a>
+
+</div>
+     
 
 </footer>
 
@@ -929,6 +941,27 @@ if(existing){
     showToast("Item added to cart successfully");
     toggleCart();
 }
+function updateDeliveryHint(weight, orderValue) {
+  const hint = document.getElementById("deliveryHint");
+  if (!hint) return;
+
+  if (orderValue < 999) {
+    hint.innerText = `💡 Add ₹${999 - orderValue} more to get ₹50 off on delivery`;
+    return;
+  }
+
+  if (orderValue < 1200) {
+    hint.innerText = `💡 Add ₹${1200 - orderValue} more to get ₹70 off on delivery`;
+    return;
+  }
+
+  if (weight < 1000) {
+    hint.innerText = `💡 Add 500g more items to save ₹35 on delivery`;
+    return;
+  }
+
+  hint.innerText = `🎉 You are getting the best delivery price`;
+}
 
 function updateCart(){
   let subtotal = 0;
@@ -955,6 +988,7 @@ function updateCart(){
 
   const totalWeight = calculateTotalWeight();
   let delivery = calculateDeliveryCharge(totalWeight);
+updateDeliveryHint(totalWeight, subtotal);
 
 if(cart.length === 0){
   document.getElementById("total").innerHTML = "Your cart is empty";
@@ -1028,17 +1062,36 @@ if(cart.length === 0){
 
   return totalWeight; 
 }
-function calculateDeliveryCharge(totalWeight){
+function calculateDelivery(weight, orderValue) {
 
-  if(totalWeight <= 500) return 99;
+  if (weight <= 0 || orderValue < 0) return 0;
+  if (weight > 5000) return 0;
 
-  if(totalWeight <= 1000) return 149;
+  // 50g slab, ₹7 per slab
+  const roundedWeight = Math.ceil(weight / 50) * 50;
+  const baseDelivery = (roundedWeight / 50) * 7;
 
-  if(totalWeight <= 2000) return 199;
+  let finalDelivery = 0;
 
-  return 249; // max cap
+  // Order value discount
+  if (orderValue >= 1200) {
+    finalDelivery = baseDelivery - 70;
+  }
+  else if (orderValue >= 999) {
+    finalDelivery = baseDelivery - 50;
+  }
+  else {
+    // ❗ first 500g no discount
+    const extraWeight = Math.max(0, weight - 500);
+    const weightDiscount = Math.floor(extraWeight / 500) * 35;
+    finalDelivery = baseDelivery - weightDiscount;
+  }
+
+  // Minimum delivery ₹70
+  finalDelivery = Math.max(70, finalDelivery);
+
+  return finalDelivery;
 }
-
 
     function changeQty(index, diff){
   const item = cart[index];
@@ -1243,7 +1296,7 @@ const subtotal = cart.reduce((sum, c) => {
 }, 0);
 
 const totalWeight = calculateTotalWeight();
-const delivery = calculateDeliveryCharge(totalWeight);
+let delivery = calculateDelivery(totalWeight, subtotal);
 
 let discount = 0;
 
@@ -1359,27 +1412,7 @@ function openImage(src){
  </script>
 
         
-   <a href="https://wa.me/919599497909?text=Hello%20AK%20FASHION%20HUB%20%F0%9F%91%8B%0A%0AI%20am%20interested%20in%20your%20products.%0APlease%20share%20product%20details,%20price,%20size%20availability,%20and%20delivery%20information.%0A%0AThank%20you."
-   target="_blank"
-   style="
-     position:fixed;
-     bottom:100px;
-     right:16px;
-     background:#25D366;
-     color:white;
-     padding:14px 20px;
-     border-radius:30px;
-     text-decoration:none;
-     font-weight:bold;
-     font-size:15px;
-     box-shadow:0 4px 10px rgba(0,0,0,0.3);
-     z-index:9999;
-     display:flex;
-     align-items:center;
-     gap:8px;
-   ">
- 💬 Help & Support
-</a>
+  
 
     <script>
 
@@ -1399,7 +1432,8 @@ function updateCartBadge(){
   let badge = document.getElementById("cartCount");
 
   if(!badge){
-    const cartIcon = document.querySelector('[onclick="toggleCart()"]');
+    const cartIcon =<div id="cartIcon" onclick="toggleCart()">🛒</div>
+
     badge = document.createElement("span");
     badge.id = "cartCount";
     badge.style.background = "red";
@@ -1434,7 +1468,7 @@ function updateBottomBar(total){
     bar.style.justifyContent = "space-between";
     bar.style.alignItems = "center";
     bar.style.zIndex = "9999";
-    bar.onclick = toggleCart;
+    bar.addEventListener("click", toggleCart, { passive:true });
 
     document.body.appendChild(bar);
   }
@@ -1533,8 +1567,7 @@ function openMyOrders(){
 </div>
 
 <script>
-window.openTerms = function(){
-
+function openTerms(){
   document.body.style.overflow = "hidden";
 
   let modal = document.createElement("div");
