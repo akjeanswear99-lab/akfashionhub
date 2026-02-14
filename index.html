@@ -1326,7 +1326,6 @@ function toggleCart(){
   }
 }
 
-
 function applyCoupon(){
   const code = document
     .getElementById("couponInput")
@@ -1529,8 +1528,9 @@ function showMyOrders(){
 renderProducts();
 
 
-        const cartOverlay = document.getElementById("cartOverlay");
+const cartOverlay = document.getElementById("cartOverlay");
 cartOverlay.onclick = toggleCart;
+
 
 function openMyOrders(){
   document.getElementById("checkoutSection").style.display = "none";
