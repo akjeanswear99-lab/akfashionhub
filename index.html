@@ -331,14 +331,48 @@ footer{
     font-size:13px;
   }
 }
+#confirmBox{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:30000;
+}
 
-    
+.confirmInner{
+  background:#fff;
+  padding:20px;
+  width:90%;
+  max-width:300px;
+  border-radius:8px;
+  text-align:center;
+}
+
+ #addressBox{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:#fff;
+  z-index:40000;
+  padding:20px;
+  display:none;
+  overflow:auto;
+}
+   
 
 </style>
 </head>
 
 <body>
 <div id="cartOverlay"></div>
+
 
     <header style="position:relative;">
   <h1>AK FASHION HUB</h1>
@@ -376,6 +410,9 @@ footer{
 
   <div id="cartItems"></div>
   <h3 id="total"></h3>
+    <button onclick="openAddressBox()" style="margin-top:10px;">
+  Add Delivery Address
+</button>
    
 <div style="margin:12px 0;">
   <input
@@ -394,29 +431,12 @@ footer{
 <div id="priceBreakup" style="font-size:14px; margin-top:10px;"></div>
 
 
-  <div id="checkoutSection">
+ <div id="checkoutSection" style="display:none;">
     <h4>Checkout</h4>
 
-    <input id="name" placeholder="Name">
-
-    <input
-      id="phone"
-      placeholder="10 digit mobile number"
-      maxlength="10"
-      inputmode="numeric"
-      oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-    >
-
-    <textarea
-      id="address"
-      placeholder="House / Shop No, Street / Area, Landmark, City, State - Pincode"
-      rows="4"
-    ></textarea>
-
-    <textarea id="note" placeholder="Order Note (Optional)"></textarea>
-
     <div style="margin-top:10px; font-size:14px;">
-      <input type="checkbox" id="terms" style="width:auto;">
+      <input type="checkbox" id="terms" onchange="openCartTerms()">
+
       I agree to
       <span
         style="color:#007bff; cursor:pointer; text-decoration:underline;"
@@ -429,6 +449,7 @@ footer{
     <button onclick="checkout()" style="margin-top:10px;">
       Place Order (WhatsApp)
     </button>
+ 
   </div>
 
   <!-- MY ORDERS -->
@@ -465,6 +486,48 @@ footer{
   >
     MY ORDERS
   </button>
+ <!-- ADDRESS POPUP START -->
+<div id="addressBox">
+
+  <h3>Delivery Details</h3>
+
+  <input
+    id="name"
+    placeholder="Full Name"
+  >
+
+  <input
+    id="phone"
+    placeholder="10 digit mobile number"
+    maxlength="10"
+    inputmode="numeric"
+    oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+  >
+
+  <textarea
+    id="address"
+    placeholder="House / Street / Area / City / Pincode"
+    rows="4"
+  ></textarea>
+
+  <textarea
+    id="note"
+    placeholder="Order Note (Optional)"
+  ></textarea>
+
+  <button onclick="checkout()">
+    Place Order
+  </button>
+
+  <button
+    onclick="closeAddressBox()"
+    style="background:#ccc;color:#000;"
+  >
+    Cancel
+  </button>
+
+</div>
+<!-- ADDRESS POPUP END -->
 
 </div>
 
@@ -480,6 +543,18 @@ footer{
 
     <div class="products" id="products"></div>
 </div>
+    <div id="confirmBox">
+  <div class="confirmInner">
+    <p id="confirmText"></p>
+
+    <button onclick="confirmYes()">YES</button>
+
+    <button onclick="confirmNo()" style="background:#ccc;color:#000;">
+      NO
+    </button>
+  </div>
+</div>
+
 <footer>
    <p>
   Return Policy:
@@ -915,7 +990,7 @@ if(cart.length === 0){
 
   // COUPON
   if(appliedCoupon){
-    const rule = COUPONS[appliedCoupon];
+   const rule = COUPONS[appliedCouponCode];
 
     if(subtotal < 999){
       if(rule.type === "FLAT"){
@@ -1222,11 +1297,14 @@ function applyCoupon(){
     msg.innerText = "❌ Invalid offer code";
     msg.style.color = "red";
     appliedCoupon = null;
+    appliedCouponCode = null;
     updateCart();
     return;
   }
 
   appliedCoupon = COUPONS[code];
+  appliedCouponCode = code;
+
   msg.innerText = "✅ Offer applied successfully";
   msg.style.color = "green";
 
@@ -1287,6 +1365,26 @@ function openImage(src){
   };
 
   document.body.appendChild(modal);
+}
+    function openCartTerms(){
+  openTerms();
+
+  setTimeout(()=>{
+    const modals = document.querySelectorAll("body > div");
+    modals.forEach(m=>{
+      if(m.style.zIndex === "50000"){
+        m.remove();
+        document.body.style.overflow = "";
+      }
+    });
+  },3000);
+}
+function openAddressBox(){
+  document.getElementById("addressBox").style.display = "block";
+}
+
+function closeAddressBox(){
+  document.getElementById("addressBox").style.display = "none";
 }
 </script>
 <script>
@@ -1392,7 +1490,6 @@ function openTerms(){
 
  
   btn.onclick = () => {
-    document.getElementById("terms").checked = true;
     modal.remove();
     document.body.style.overflow = "";
   };
@@ -1559,30 +1656,6 @@ function openMyOrders(){
 
         <div id="toast"></div>
 
-<div id="confirmBox" onclick="event.stopPropagation()" style="
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,0.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:10000;
-">
- <div onclick="event.stopPropagation()" style="
-  background:#fff;
-  padding:20px;
-  width:90%;
-  max-width:320px;
-  border-radius:8px;
-  text-align:center;
-">
-
-    <p id="confirmText" style="margin-bottom:15px;font-weight:bold;"></p>
-    <button onclick="confirmYes()" style="width:45%;margin-right:5%;">OK</button>
-    <button onclick="confirmNo()" style="width:45%;background:#ccc;color:#000;">Cancel</button>
-  </div>
-</div>
 
 
 </body>
