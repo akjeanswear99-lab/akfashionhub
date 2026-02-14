@@ -1212,25 +1212,33 @@ allOrders[p].push({
 localStorage.setItem("ordersByPhone", JSON.stringify(allOrders));
 
 
-  
- fetch("https://script.google.com/macros/s/AKfycbwMWrEhaO4sGqHhUX7nr-zrCtROhYx0krL2Cx6rVbA0pMCenDGP32xDWMrcQb9KgaLi/exec", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-  orderId: orderId,
-  name: n,
-  phone: p,
-  address: a,
-  products: cart.map(c =>
-    `${c.name} | SKU:${c.id} | Size:${c.size} | Color:${c.color} | Qty:${c.qty}`
-  ).join(" || "),
-  totalQty: totalQty,
-  totalAmount: totalAmount
-})
+  await fetch(
+  "https://script.google.com/macros/s/AKfycbwMWrEhaO4sGqHhUX7nr-zrCtROhYx0krL2Cx6rVbA0pMCenDGP32xDWMrcQb9KgaLi/exec",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      orderId: orderId,
+      date: new Date().toLocaleString(),
+      name: n,
+      phone: p,
+      address: a,
+      products: cart.map(c =>
+        `${c.name} | SKU:${c.id} | Size:${c.size} | Color:${c.color} | Qty:${c.qty}`
+      ).join(" || "),
+      totalQty: totalQty,
+      subtotal: subtotal,
+      delivery: delivery,
+      discount: discount,
+      finalTotal: finalTotal,
+      status: "Order Received"
+    })
+  }
+);
 
-});
+ 
 
 
   
@@ -1301,18 +1309,23 @@ updateCart();
 renderProducts();
 }
 
- function toggleCart(){
+function toggleCart(){
   const cartPanel = document.getElementById("cartPanel");
   const overlay = document.getElementById("cartOverlay");
 
-  if(cartPanel.style.right === "0px"){
+  const isOpen = cartPanel.style.right === "0px";
+
+  if(isOpen){
     cartPanel.style.right = window.innerWidth < 768 ? "-100%" : "-360px";
     overlay.style.display = "none";
+    document.body.style.overflow = "";
   }else{
     cartPanel.style.right = "0px";
     overlay.style.display = "block";
+    document.body.style.overflow = "hidden";
   }
 }
+
 
 function applyCoupon(){
   const code = document
