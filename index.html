@@ -1325,7 +1325,6 @@ function applyCoupon(){
 let imageModal = null;
 
 function openImage(src){
-
   if(!imageModal){
     imageModal = document.createElement("div");
     imageModal.style.position = "fixed";
@@ -1334,14 +1333,13 @@ function openImage(src){
     imageModal.style.width = "100%";
     imageModal.style.height = "100%";
     imageModal.style.background = "rgba(0,0,0,0.9)";
-    imageModal.style.zIndex = "9999";
+    imageModal.style.zIndex = "99999";
     imageModal.style.display = "flex";
     imageModal.style.alignItems = "center";
     imageModal.style.justifyContent = "center";
 
     imageModal.innerHTML = `
-      <img id="zoomImg"
-        style="max-width:100%; max-height:100%; cursor:zoom-in;">
+      <img id="zoomImg" style="max-width:100%;max-height:100%;">
     `;
 
     imageModal.onclick = () => imageModal.style.display = "none";
@@ -1351,40 +1349,7 @@ function openImage(src){
   document.getElementById("zoomImg").src = src;
   imageModal.style.display = "flex";
 }
-
-  modal.onclick = (e) => {
-    if(e.target === modal) modal.remove();
-  };
-
-  document.body.appendChild(modal);
-}
 </script>
-
-</script>
-    
-   <a href="https://wa.me/919599497909?text=Hello%20AK%20FASHION%20HUB%20%F0%9F%91%8B%0A%0AI%20am%20interested%20in%20your%20products.%0APlease%20share%20product%20details,%20price,%20size%20availability,%20and%20delivery%20information.%0A%0AThank%20you."
-   target="_blank"
-   style="
-     position:fixed;
-     bottom:100px;
-     right:16px;
-     background:#25D366;
-     color:white;
-     padding:14px 20px;
-     border-radius:30px;
-     text-decoration:none;
-     font-weight:bold;
-     font-size:15px;
-     box-shadow:0 4px 10px rgba(0,0,0,0.3);
-     z-index:9999;
-     display:flex;
-     align-items:center;
-     gap:8px;
-   ">
- 💬 Help & Support
-</a>
-
-    <script>
 
         
 
