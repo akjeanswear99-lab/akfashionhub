@@ -812,7 +812,8 @@ function renderProducts(){
         <p>MRP ₹${p.price} | ${p.discount}% OFF</p>
         <p><b>₹${final}</b></p>
 
-        <p>Measurements: ${p.measure}</p>
+        <p>Measurements: ${p.measure || "Standard Fit"}</p>
+
 
         <select id="size${i}" onchange="updateStockMsg(${i})">
           <option value="">Select Size</option>
@@ -843,9 +844,12 @@ function updateStockMsg(i){
   const btn = document.getElementById("btn"+i);
 
   if(!size || !color){
-    msg.innerText = "";
-    return;
-  }
+  msg.innerText = "Please select size & color";
+  msg.style.color = "red";
+  btn.disabled = true;
+  return;
+}
+
 // ✅ FINAL STOCK CHECK CHECKOUT PE HOGA
 msg.innerText = "Stock confirmed at checkout";
 msg.style.color = "blue";
@@ -1352,16 +1356,9 @@ function openImage(src){
   imageModal.style.display = "flex";
 }
 
-  modal.onclick = (e) => {
-    if(e.target === modal) modal.remove();
-  };
+ </script>
 
-  document.body.appendChild(modal);
-}
-</script>
-
-</script>
-    
+        
    <a href="https://wa.me/919599497909?text=Hello%20AK%20FASHION%20HUB%20%F0%9F%91%8B%0A%0AI%20am%20interested%20in%20your%20products.%0APlease%20share%20product%20details,%20price,%20size%20availability,%20and%20delivery%20information.%0A%0AThank%20you."
    target="_blank"
    style="
@@ -1641,13 +1638,7 @@ window.openTerms = function(){
     document.body.style.overflow = "";
   };
 
-  modal.onclick = (e) => {
-    if (e.target === modal) {
-      modal.remove();
-      document.body.style.overflow = "";
-    }
-  };
-};
+
 </script>
 
 </body>
