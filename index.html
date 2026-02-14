@@ -1,4 +1,3 @@
-<!-- ✅ CORRECTED VERSION – ONLY ERRORS FIXED -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,48 +5,230 @@
 <title>AK FASHION HUB</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-/* ===== SAME CSS (UNCHANGED) ===== */
-*{box-sizing:border-box;max-width:100%}
-html,body{margin:0;padding:0;overflow-x:hidden;width:100%}
-html,body,header{margin:0!important;padding:0;border:0!important;outline:0!important;box-shadow:none!important}
-
-#cartPanel{
- position:fixed;top:0;right:-360px;width:340px;height:100%;
- background:#fff;padding:20px;
- box-shadow:-4px 0 10px rgba(0,0,0,0.3);
- transition:.3s;z-index:10002;overflow:auto
+<style> 
+    
+* {
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
-body{font-family:Arial,sans-serif;background:#f4f4f4;color:#333}
-header{background:linear-gradient(135deg,#000,#1a1a1a);color:#fff;
-padding:28px 20px 24px;text-align:center;position:relative}
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
+}
 
-header h1{margin:0;font-size:38px;letter-spacing:3px;font-weight:800}
-header .tagline{margin:8px 0 4px;font-size:13px;letter-spacing:1.2px;opacity:.85}
-header .address{margin-top:6px;font-size:10px;opacity:.6}
+html, body, header {
+  margin: 0 !important;
+  padding: 0;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
 
-.container{max-width:1200px;margin:auto;padding:20px}
-.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+#cartPanel{
+  position:fixed;
+  top:0;
+  right:-360px;
+  width:340px;
+  height:100%;
+  background:#fff;
+  padding:20px;
+  box-shadow:-4px 0 10px rgba(0,0,0,0.3);
+  transition:0.3s;
+  z-index:10002;
+  overflow:auto;
+}
 
-.card{background:#fff;border-radius:8px;padding:15px;box-shadow:0 4px 8px rgba(0,0,0,.1)}
-.card img{width:100%;height:320px;object-fit:contain;background:#f7f7f7}
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f4f4f4;
+    color:#333;
+}
 
-button{width:100%;padding:8px;background:#000;color:#fff;border:none;cursor:pointer}
-button:disabled{background:gray}
+header{
+    background: linear-gradient(135deg, #000000, #1a1a1a);
+    color:#fff;
+    padding:28px 20px 24px;
+    text-align:center;
+    position:relative;
+}
 
-footer{background:#000;color:#fff;text-align:center;padding:15px;margin-top:40px;padding-bottom:120px}
-.hm-style{box-shadow:none;border-radius:0}
-.hm-img{width:100%;aspect-ratio:3/4;object-fit:contain;background:#f6f6f6}
+header h1{
+    margin:0;
+    font-size:38px;      
+    letter-spacing:3px; 
+    font-weight:800;    
+}
 
-#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-background:rgba(0,0,0,.9);color:#fff;padding:14px 22px;border-radius:10px;
-opacity:0;transition:.3s;z-index:10000}
-#toast.show{opacity:1}
+header .tagline{
+    margin:8px 0 4px;
+    font-size:13px;
+    letter-spacing:1.2px;
+    font-weight:500;
+    opacity:0.85;
+}
+
+header .address{
+    margin-top:6px;
+    font-size:10px;     
+    letter-spacing:0.6px;
+    opacity:0.6;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+.products{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:18px;
+}
+
+.card{
+    background:#fff;
+    border-radius:8px;
+    padding:15px;
+    box-shadow:0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card img{
+    width:100%;
+    height:320px;
+    object-fit:contain;
+    border-radius:6px;
+    background:#f7f7f7;
+}
+
+.slider{
+    position:relative;
+}
+
+.slider button{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    background:rgba(0,0,0,0.5);
+    color:#fff;
+    border:none;
+    padding:5px;
+    cursor:pointer;
+}
+
+.slider {
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.product-img {
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  display: block;
+}
+
+.slider .prev{
+    left:0;
+}
+
+.slider .next{
+    right:0;
+}
+
+select, input, textarea, button{
+    width:100%;
+    padding:8px;
+    margin-top:6px;
+}
+
+button{
+    background:#000;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+}
+
+button:disabled{
+    background:gray;
+}
+
+footer{
+    background:#000;
+    color:#fff;
+    text-align:center;
+    padding:15px;
+    margin-top:40px;
+    width:100vw;
+    margin-left:0;
+    margin-right:0;
+    padding-left:0;
+    padding-right:0;
+    padding-bottom:120px; 
+}
+
+.card h3{
+    font-size:16px;
+    margin:6px 0;
+}
+
+.card p{
+    font-size:13px;
+    margin:4px 0;
+}
+
+.menu-icon{
+  position:absolute;
+  top:22px;
+  right:20px;
+  cursor:pointer;
+  z-index:10001;
+}
+
+.menu-icon span{
+  display:block;
+  width:26px;
+  height:3px;
+  background:#fff;
+  margin:5px 0;
+}
+
+#toast{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: rgba(0,0,0,0.9);
+  color: #fff;
+  padding: 14px 22px;
+  border-radius: 10px;
+  font-size: 15px;
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10000;
+  text-align: center;
+  max-width: 90%;
+}
+
+#toast.show{
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
 
 #cartOverlay{
- position:fixed;top:0;left:0;width:100%;height:100%;
- background:rgba(0,0,0,.3);z-index:10001;display:none
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: rgba(0,0,0,0.3);
+  z-index:10001;
+  display:none;
 }
 </style>
 </head>
@@ -55,104 +236,665 @@ opacity:0;transition:.3s;z-index:10000}
 <body>
 <div id="cartOverlay"></div>
 
-<header>
-<h1>AK FASHION HUB</h1>
-<div class="tagline">PREMIUM MEN & WOMEN FASHION WEAR</div>
-<div class="address">ADDRESS:- KESHAV NAGAR, SWARG AASHRAM ROAD, HAPUR 245101</div>
+<header style="position:relative;">
+  <h1>AK FASHION HUB</h1>
 
-<div onclick="toggleCart()" style="position:absolute;top:22px;left:20px;cursor:pointer">
-🛒 <span id="cartCount">0</span>
+  <div class="tagline">
+    PREMIUM MEN & WOMEN FASHION WEAR
+  </div>
+
+  <div class="address">
+   ADDRESS:- KESHAV NAGAR, SWARG AASHRAM ROAD, HAPUR 245101
+  </div> 
+
+  <div onclick="toggleCart()" id="cartIcon" style="
+ position:absolute;
+ top:22px;
+ left:20px;
+ cursor:pointer;
+ font-size:20px;
+ z-index:10002;
+">
+ 🛒 <span id="cartCount">0</span>
 </div>
 </header>
 
+<!-- CART PANEL -->
 <div id="cartPanel">
-<h3>Your Cart</h3>
-<div id="cartItems"></div>
-<h3 id="total"></h3>
-<button onclick="openAddressBox()">Add Delivery Address</button>
-<div id="priceBreakup"></div>
-</div>
 
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3>Your Cart</h3>
+    <span onclick="toggleCart()" style="cursor:pointer;font-size:22px;">✖</span>
+  </div>
+
+  <div id="cartItems"></div>
+  <h3 id="total"></h3>
+
+  <button onclick="openAddressBox()" style="margin-top:10px;">
+    Add Delivery Address
+  </button>
+
+  <div style="margin:12px 0;">
+    <input
+      id="couponInput"
+      placeholder="Enter offer code"
+      style="text-transform:uppercase;"
+    >
+    <button onclick="applyCoupon()" style="margin-top:6px;">
+      Apply Offer
+    </button>
+
+    <p id="couponMsg" style="font-size:13px; margin-top:6px;"></p>
+  </div>
+
+  <div id="priceBreakup" style="font-size:14px; margin-top:10px;"></div>
+
+  <div id="checkoutSection" style="display:none;">
+    <h4>Checkout</h4>
+
+    <div style="margin-top:10px; font-size:14px;">
+      <input type="checkbox" id="terms" onchange="openCartTerms()">
+      I agree to
+      <span
+        style="color:#007bff; cursor:pointer; text-decoration:underline;"
+        onclick="openTerms()"
+      >
+        Terms & Conditions
+      </span>
+    </div>
+
+    <button onclick="checkout()" style="margin-top:10px;">
+      Place Order (WhatsApp)
+    </button>
+ 
+  </div>
+
+  <!-- MY ORDERS -->
+  <div id="myOrdersSection" style="display:none; margin-top:12px;">
+    <input id="orderPhone" placeholder="Enter phone number" maxlength="10">
+    <input id="orderIdCheck" placeholder="Enter Order ID">
+
+    <button onclick="showMyOrders()">VIEW ORDERS</button>
+
+    <div id="myOrders" style="margin-top:10px;"></div>
+
+    <button
+      style="margin-top:12px;background:#000;color:#fff;"
+     onclick="
+  document.getElementById('myOrdersSection').style.display='none';
+  document.getElementById('checkoutSection').style.display='block';
+  document.getElementById('myOrdersBtn').style.display='block';
+"
+    >
+      ← BACK TO CHECKOUT
+    </button>
+  </div>
+
+  <button
+      id="myOrdersBtn"
+    onclick="openMyOrders()"
+    style="
+      margin-top:12px;
+      background:#fff;
+      color:#000;
+      border:1px solid #000;
+      font-weight:bold;
+    "
+  >
+    MY ORDERS
+  </button>
+
+ <!-- ADDRESS POPUP START -->
+<div id="addressBox">
+
+  <h3>Delivery Details</h3>
+
+  <input
+    id="name"
+    placeholder="Full Name"
+  >
+
+  <input
+    id="phone"
+    placeholder="10 digit mobile number"
+    maxlength="10"
+    inputmode="numeric"
+    oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+  >
+
+  <textarea
+    id="address"
+    placeholder="House / Street / Area / City / Pincode"
+    rows="4"
+  ></textarea>
+
+  <textarea
+    id="note"
+    placeholder="Order Note (Optional)"
+  ></textarea>
+
+  <button onclick="checkout()">
+    Place Order
+  </button>
+
+  <button
+    onclick="closeAddressBox()"
+    style="background:#ccc;color:#000;"
+  >
+    Cancel
+  </button>
+
+</div>
+<!-- ADDRESS POPUP END -->
+
+</div>
 <div class="container">
-<h2>Products</h2>
-<div id="products"></div>
+    <h2>Products</h2>
+
+    <div style="margin-bottom:20px; display:flex; gap:10px;">
+      <button onclick="filterProducts('All')">All</button>
+      <button onclick="filterProducts('Men')">Men</button>
+      <button onclick="filterProducts('Women')">Women</button>
+    </div>
+
+    <div class="products" id="products"></div>
 </div>
 
-<div id="toast"></div>
+<div id="confirmBox">
+  <div class="confirmInner">
+    <p id="confirmText"></p>
+
+    <button onclick="confirmYes()">YES</button>
+
+    <button onclick="confirmNo()" style="background:#ccc;color:#000;">
+      NO
+    </button>
+  </div>
+</div>
+
+<footer>
+  <p>
+    Return Policy:
+    <span
+      style="color:#4da3ff; cursor:pointer; text-decoration:underline;"
+      onclick="openTerms()"
+    >
+      (Terms and Conditions Apply)
+    </span>
+  </p>
+    
+  <p style="margin-bottom:10px; font-size:14px;">
+    <b>Follow us on</b>
+  </p>
+
+  <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+
+    <a href="https://www.instagram.com/a_k_fashion_hub_/"
+       target="_blank"
+       style="
+         background:#E1306C;
+         color:#fff;
+         padding:10px 18px;
+         border-radius:25px;
+         text-decoration:none;
+         font-size:14px;
+         font-weight:bold;
+       ">
+      Instagram
+    </a>
+
+    <a href="https://share.google/1K75n4058QJ60W7RZ"
+       target="_blank"
+       style="
+         background:#4285F4;
+         color:#fff;
+         padding:10px 18px;
+         border-radius:25px;
+         text-decoration:none;
+         font-size:14px;
+         font-weight:bold;
+       ">
+      Google Review
+    </a>
+
+  </div>
+</footer>
 
 <script>
-/* ===== ONLY JS ERRORS FIXED ===== */
-
-let appliedCouponCode = null; // ✅ FIXED
+// Base64 encoded small colored images for offline use
+const img1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="; // Transparent
+const img2 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="; // Blue
+const img3 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="; // Red
+const img4 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="; // Black
 
 const products = [
- {id:"AKJ001",gender:"Men",name:"Blue Denim Jeans",price:1999,discount:20,
- img:["girls-jeans.jpg"],colors:["Blue","Black"],sizes:["28","30","32","34"]}
+{
+ id:"AKJ001",
+ gender:"Men",  
+ name:"Blue Denim Jeans",
+ category:"Jeans",
+ price:1999,
+ discount:20,
+ weight: 550, 
+ img:["girls-jeans.jpg"],
+ colors:["Blue","Black"],
+ sizes:["28","30","32","34","36"],
+ measure:"Waist, Length, Thigh",
+ inventory: {
+  "28": { "Black": 5, "Blue": 5 },
+  "30": { "Black": 5, "Blue": 5 },
+  "32": { "Black": 5, "Blue": 5 },
+  "34": { "Black": 5, "Blue": 5 }
+ }
+},
+{
+ id:"AKL002",
+ gender:"Men",
+ name:"Black Lower",
+ category:"Lower",
+ price:1499,
+ discount:15,
+ weight: 200,
+ img:[img3, img4],
+ colors:["Black","Gray"],
+ sizes:["S","M","L","XL"],
+ measure:"Waist, Length, Thigh",
+ inventory:{
+  "S": { "Black": 5, "Gray": 5 },
+  "M": { "Black": 5, "Gray": 5 },
+  "L": { "Black": 5, "Gray": 5 },
+  "XL": { "Black": 5, "Gray": 5 }
+ }
+},
+{
+ id:"AKT003",
+ gender:"Men",
+ name:"Cotton T-Shirt",
+ category:"T-Shirt",
+ price:999,
+ discount:30,
+ weight: 180,
+ img:[img2, img3],
+ colors:["Red","White","Black"],
+ sizes:["S","M","L","XL","XXL"],
+ measure:"Chest, Waist, Shoulder",
+ inventory:{
+  "S": { "Black": 5, "Gray": 5 },
+  "M": { "Black": 5, "Gray": 5 },
+  "L": { "Black": 5, "Gray": 5 },
+  "XL": { "Black": 5, "Gray": 5 }
+ }
+},
+{
+ id:"AKS004",
+ gender:"Men",
+ name:"Formal Shirt",
+ category:"Shirt",
+ price:1299,
+ discount:25,
+ weight: 250,
+ img:[img4, img1],
+ colors:["White","Blue"],
+ sizes:["M","L","XL"],
+ measure:"Chest, Waist, Shoulder",
+ inventory:{
+  "S": { "Black": 5, "Gray": 5 },
+  "M": { "Black": 5, "Gray": 5 },
+  "L": { "Black": 5, "Gray": 5 },
+  "XL": { "Black": 5, "Gray": 5 }
+ }
+},
+{
+ id:"AKK005",
+ gender:"Women",
+ name:"Embroidered Kurti",
+ category:"Kurti",
+ price:1799,
+ discount:20,
+ weight: 220,
+ img:[img3, img2],
+ colors:["Pink","Green"],
+ sizes:["S","M","L"],
+ measure:"Chest, Waist, Shoulder, Length",
+ inventory:{
+  "S": { "Black": 5, "Gray": 5 },
+  "M": { "Black": 5, "Gray": 5 },
+  "L": { "Black": 5, "Gray": 5 },
+  "XL": { "Black": 5, "Gray": 5 }
+ }
+},
+{
+ id:"AKS006",
+ gender:"Men",
+ name:"Formal Shirt",
+ category:"Shirt",
+ price:1299,
+ discount:25,
+ weight: 250,
+ img:[img4, img1],
+ colors:["White","Blue"],
+ sizes:["M","L","XL"],
+ measure:"Chest, Waist, Shoulder",
+ inventory: {
+  "28": { "Black": 2, "Blue": 1 },
+  "30": { "Black": 3, "Blue": 0 },
+  "32": { "Black": 1, "Blue": 2 },
+  "34": { "Black": 0, "Blue": 2 }
+ }
+},
+{
+ id:"AKS007",
+ gender:"Men",
+ name:"Formal Shirt",
+ category:"Shirt",
+ price:1299,
+ discount:25,
+ weight: 250,
+ img:[img4, img1],
+ colors:["White","Blue"],
+ sizes:["M","L","XL"],
+ measure:"Chest, Waist, Shoulder",
+ inventory: {
+  "28": { "Black": 2, "Blue": 1 },
+  "30": { "Black": 3, "Blue": 0 },
+  "32": { "Black": 1, "Blue": 2 },
+  "34": { "Black": 0, "Blue": 1 }
+ }
+},
+{
+ id:"AKS008",
+ gender:"Men",
+ name:"Formal Shirt",
+ category:"Shirt",
+ price:1299,
+ discount:25,
+ weight: 250,
+ img:[img4, img1],
+ colors:["White","Blue"],
+ sizes:["M","L","XL"],
+ measure:"Chest, Waist, Shoulder",
+ inventory: {
+  "28": { "Black": 2, "Blue": 1 },
+  "30": { "Black": 3, "Blue": 0 },
+  "32": { "Black": 1, "Blue": 2 },
+  "34": { "Black": 0, "Blue": 1 }
+ }
+}
 ];
+<script>
+/* ===================== FIX #1 ===================== */
+let appliedCouponCode = null;
+/* ================================================= */
 
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+const AUTO_OFFER = {
+  minAmount: 1499,  
+  discount: 100    
+};
+
+const COUPONS = {
+  "FREEDEL": { type: "FREE_DELIVERY" },
+  "SAVE30": { type: "FLAT", value: 30 },
+  "SAVE50": { type: "FLAT", value: 50 }
+};
+
+let appliedCoupon = null;
+let currentFilter = "All";
+
+function filterProducts(type){
+  currentFilter = type;
+  renderProducts();
+}
 
 function renderProducts(){
- const box=document.getElementById("products");
- box.innerHTML=products.map((p,i)=>`
- <div class="card hm-style">
- <img src="${p.img[0]}" class="hm-img">
- <h3>${p.name}</h3>
- <p><b>₹${Math.round(p.price-(p.price*p.discount/100))}</b></p>
- <select id="size${i}"><option value="">Size</option>${p.sizes.map(s=>`<option>${s}</option>`).join("")}</select>
- <select id="color${i}"><option value="">Color</option>${p.colors.map(c=>`<option>${c}</option>`).join("")}</select>
- <button onclick="addToCart(${i})">Add to Cart</button>
- </div>`).join("");
+  const box = document.getElementById("products");
+  let html = "";
+
+  products.forEach((p,i)=>{
+    if(currentFilter !== "All" && p.gender !== currentFilter) return;
+
+    const final = Math.round(p.price - (p.price * p.discount / 100));
+
+    html += `
+    <div class="card hm-style">
+      <img src="${p.img[0]}" class="hm-img" loading="lazy">
+      <p style="font-size:11px;font-weight:600;color:#666;">${p.gender}</p>
+      <h3>${p.name}</h3>
+      <p><b>₹${final}</b></p>
+
+      <select id="size${i}">
+        <option value="">Size</option>
+        ${p.sizes.map(s=>`<option>${s}</option>`).join("")}
+      </select>
+
+      <select id="color${i}">
+        <option value="">Color</option>
+        ${p.colors.map(c=>`<option>${c}</option>`).join("")}
+      </select>
+
+      <button onclick="addToCart(${i})">Add to Cart</button>
+    </div>`;
+  });
+
+  box.innerHTML = html;
+}
+
+function showToast(message){
+  const toast = document.getElementById("toast");
+  toast.innerText = message;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),2000);
 }
 
 function addToCart(i){
- const s=document.getElementById("size"+i).value;
- const c=document.getElementById("color"+i).value;
- if(!s||!c){showToast("Select size & color");return}
- cart.push({...products[i],size:s,color:c,qty:1});
- localStorage.setItem("cart",JSON.stringify(cart));
- updateCart();toggleCart();
+  const size = document.getElementById("size"+i).value;
+  const color = document.getElementById("color"+i).value;
+
+  if(!size || !color){
+    showToast("Select size & color");
+    return;
+  }
+
+  const p = products[i];
+
+  let existing = cart.find(
+    item => item.id === p.id && item.size === size && item.color === color
+  );
+
+  if(existing){
+    if(existing.qty < existing.maxStock){
+      existing.qty++;
+    }else{
+      showToast("Stock limit reached");
+      return;
+    }
+  }else{
+    const maxStock = p.inventory?.[size]?.[color] ?? 0;
+    if(maxStock <= 0){
+      showToast("Out of stock");
+      return;
+    }
+    cart.push({...p,size,color,qty:1,maxStock});
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCart();
+  toggleCart();
 }
 
 function updateCart(){
- const box=document.getElementById("cartItems");
- let total=0;
- box.innerHTML="";
- cart.forEach(c=>{
-  const p=Math.round(c.price-(c.price*c.discount/100));
-  total+=p*c.qty;
-  box.innerHTML+=`${c.name} (${c.size},${c.color}) ₹${p}<br>`;
- });
- document.getElementById("total").innerText="Total: ₹"+total;
- document.getElementById("cartCount").innerText=cart.length;
+  let subtotal = 0;
+  const box = document.getElementById("cartItems");
+  box.innerHTML = "";
+
+  cart.forEach((c,index)=>{
+    const price = Math.round(c.price - (c.price * c.discount / 100));
+    subtotal += price * c.qty;
+
+    box.innerHTML += `
+      <div style="border-bottom:1px solid #ddd;padding:10px 0;">
+        <b>${c.name}</b><br>
+        Size: ${c.size} | Color: ${c.color}<br>
+        Qty:
+        <button onclick="changeQty(${index},-1)">−</button>
+        <b>${c.qty}</b>
+        <button onclick="changeQty(${index},1)">+</button><br>
+        Amount: ₹${price * c.qty}
+      </div>
+    `;
+  });
+
+  document.getElementById("total").innerText =
+    cart.length ? "Total: ₹"+subtotal : "Your cart is empty";
+
+  updateCartBadge();
+}
+
+function changeQty(index,diff){
+  const item = cart[index];
+
+  if(diff === -1){
+    item.qty--;
+    if(item.qty <= 0) cart.splice(index,1);
+  }
+
+  if(diff === 1){
+    if(item.qty < item.maxStock){
+      item.qty++;
+    }else{
+      showToast("Maximum stock limit reached");
+      return;
+    }
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCart();
 }
 
 function toggleCart(){
- const p=document.getElementById("cartPanel");
- const o=document.getElementById("cartOverlay");
- if(p.style.right==="0px"){
-  p.style.right="-360px";o.style.display="none";
- }else{
-  p.style.right="0px";o.style.display="block";
- }
+  const cartPanel = document.getElementById("cartPanel");
+  const overlay = document.getElementById("cartOverlay");
+
+  if(cartPanel.style.right === "0px"){
+    cartPanel.style.right = "-360px";
+    overlay.style.display = "none";
+  }else{
+    cartPanel.style.right = "0px";
+    overlay.style.display = "block";
+  }
 }
 
-function showToast(t){
- const toast=document.getElementById("toast");
- toast.innerText=t;toast.classList.add("show");
- setTimeout(()=>toast.classList.remove("show"),2000);
+function applyCoupon(){
+  const code = document.getElementById("couponInput").value.trim().toUpperCase();
+  const msg = document.getElementById("couponMsg");
+
+  if(!COUPONS[code]){
+    msg.innerText = "❌ Invalid offer code";
+    msg.style.color = "red";
+    appliedCoupon = null;
+    appliedCouponCode = null;
+    updateCart();
+    return;
+  }
+
+  appliedCoupon = COUPONS[code];
+  appliedCouponCode = code;
+
+  msg.innerText = "✅ Offer applied successfully";
+  msg.style.color = "green";
+
+  updateCart();
 }
 
 renderProducts();
-document.getElementById("cartOverlay").onclick=toggleCart;
+document.getElementById("cartOverlay").addEventListener("click", toggleCart);
+</script>
+<a href="https://wa.me/919599497909?text=Hello%20AK%20FASHION%20HUB%20%F0%9F%91%8B%0A%0AI%20am%20interested%20in%20your%20products.%0APlease%20share%20product%20details,%20price,%20size%20availability,%20and%20delivery%20information.%0A%0AThank%20you."
+   target="_blank"
+   style="
+     position:fixed;
+     bottom:100px;
+     right:16px;
+     background:#25D366;
+     color:white;
+     padding:14px 20px;
+     border-radius:30px;
+     text-decoration:none;
+     font-weight:bold;
+     font-size:15px;
+     box-shadow:0 4px 10px rgba(0,0,0,0.3);
+     z-index:9000;
+     display:flex;
+     align-items:center;
+     gap:8px;
+   ">
+ 💬 Help & Support
+</a>
+
+<script>
+const noteField = document.getElementById("note");
+
+noteField.addEventListener("input", function () {
+  const words = this.value.trim().split(/\s+/);
+  if (words.length > 30) {
+    this.value = words.slice(0, 30).join(" ");
+  }
+});
+
+function updateCartBadge(){
+  let badge = document.getElementById("cartCount");
+  let totalQty = 0;
+  cart.forEach(i => totalQty += i.qty);
+  badge.innerText = totalQty;
+}
+
+function showMyOrders(){
+  const phone = document.getElementById("orderPhone").value.trim();
+  const orderIdInput = document.getElementById("orderIdCheck").value.trim();
+  const box = document.getElementById("myOrders");
+
+  const allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
+  const orders = allOrders[phone];
+
+  if (!orders) {
+    box.innerHTML = "<p>Invalid phone number or Order ID</p>";
+    return;
+  }
+
+  const matched = orders.some(o => o.orderId === orderIdInput);
+  if (!matched) {
+    box.innerHTML = "<p>Invalid phone number or Order ID</p>";
+    return;
+  }
+
+  let html = "";
+  orders.forEach(o => {
+    html += `
+      <div style="border:1px solid #ddd; padding:8px; margin-bottom:8px;">
+        <b>Order ID:</b> ${o.orderId}<br>
+        <b>Date:</b> ${o.date}<br>
+        <b>Status:</b> ${o.status}<br>
+        <b>Total:</b> ₹${o.total}<br>
+        <b>Items:</b><br>
+        ${o.items.map(i =>
+          `• ${i.name} (${i.size}, ${i.color}) × ${i.qty}`
+        ).join("<br>")}
+      </div>
+    `;
+  });
+
+  box.innerHTML = html;
+}
+
+function openMyOrders(){
+  document.getElementById("checkoutSection").style.display = "none";
+  document.getElementById("myOrdersSection").style.display = "block";
+  document.getElementById("myOrdersBtn").style.display = "none";
+}
 </script>
 
-<!-- ✅ EXTRA </script> REMOVED — WHATSAPP LINK SAFE -->
-<a href="https://wa.me/919599497909" target="_blank"
-style="position:fixed;bottom:100px;right:16px;background:#25D366;color:#fff;
-padding:14px 20px;border-radius:30px;text-decoration:none;font-weight:bold">
-💬 Help & Support
-</a>
+<div id="toast"></div>
 
 </body>
 </html>
