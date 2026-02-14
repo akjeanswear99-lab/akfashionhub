@@ -950,7 +950,7 @@ function updateCart(){
   });
 
   const totalWeight = calculateTotalWeight();
-  let delivery = calculateDeliveryCharge(totalWeight);
+  let delivery = calculateDeliveryCharge(totalWeight, subtotal);
 
 if(cart.length === 0){
   document.getElementById("total").innerHTML = "Your cart is empty";
@@ -1024,15 +1024,35 @@ if(cart.length === 0){
 
   return totalWeight; 
 }
-function calculateDeliveryCharge(totalWeight){
+function calculateDeliveryCharge(weight, orderValue){
 
-  if(totalWeight <= 500) return 99;
+  if(weight <= 0) return 0;
+  if(weight > 5000) return 0;
 
-  if(totalWeight <= 1000) return 149;
+  // 🔹 50g slab = ₹7
+  const roundedWeight = Math.ceil(weight / 50) * 50;
+  const baseDelivery = (roundedWeight / 50) * 7;
 
-  if(totalWeight <= 2000) return 199;
+  let delivery = baseDelivery;
 
-  return 249; // max cap
+  // 🔹 Order value based discount
+  if(orderValue >= 1200){
+    delivery -= 70;
+  }
+  else if(orderValue >= 999){
+    delivery -= 50;
+  }
+  else{
+    // 🔹 First 500g NO discount
+    const extraWeight = Math.max(0, weight - 500);
+    const weightDiscount = Math.floor(extraWeight / 500) * 35;
+    delivery -= weightDiscount;
+  }
+
+  // 🔒 Minimum delivery ₹70
+  delivery = Math.max(70, delivery);
+
+  return delivery;
 }
 
 
@@ -1239,7 +1259,7 @@ const subtotal = cart.reduce((sum, c) => {
 }, 0);
 
 const totalWeight = calculateTotalWeight();
-const delivery = calculateDeliveryCharge(totalWeight);
+const delivery = calculateDeliveryCharge(totalWeight, subtotal);
 
 let discount = 0;
 
