@@ -703,7 +703,7 @@ img:[
   "images/jeans2.jpg",
   "images/jeans3.jpg",
   "images/jeans4.jpg"
-],,
+],
  colors:["White","Blue"],
  sizes:["28","30","32","34"],
 
@@ -855,12 +855,16 @@ btn.disabled = false;
 }
 
 function changeImage(i, dir){
- const p = products[i];
- const imgEl = document.getElementById("img"+i);
- let current = p.img.indexOf(imgEl.src);
- current = (current + dir + p.img.length) % p.img.length;
- imgEl.src = p.img[current];
+  const p = products[i];
+  const imgEl = document.getElementById("img"+i);
+
+  let current = p.img.findIndex(src => imgEl.src.includes(src));
+  if(current === -1) current = 0;
+
+  current = (current + dir + p.img.length) % p.img.length;
+  imgEl.src = p.img[current];
 }
+
 function showToast(message){
   const toast = document.getElementById("toast");
   toast.innerText = message;
@@ -1530,7 +1534,7 @@ function openMyOrders(){
     <button onclick="confirmNo()" style="width:45%;background:#ccc;color:#000;">Cancel</button>
   </div>
 </div>
-<script>
+
 <script>
 window.openTerms = function(){
 
