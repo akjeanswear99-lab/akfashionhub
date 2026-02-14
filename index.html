@@ -570,13 +570,13 @@ const products = [
 
  img:[img4, img1],
  colors:["White","Blue"],
- sizes:["M","L","XL"],
- measure:"Chest, Waist, Shoulder",
-    inventory:{
-  "S": { "Black": 5, "Gray": 5 },
-  "M": { "Black": 5, "Gray": 5 },
-  "L": { "Black": 5, "Gray": 5 },
-  "XL": { "Black": 5, "Gray": 5 },
+sizes:["S","M","L","XL"],
+
+inventory:{
+  "S": { "Black": 5, "White": 5 },
+  "M": { "Black": 5, "White": 5 },
+  "L": { "Black": 5, "White": 5 },
+  "XL": { "Black": 5, "White": 5 }
 }
 
 },
@@ -612,14 +612,15 @@ const products = [
 
  img:[img4, img1],
  colors:["White","Blue"],
- sizes:["M","L","XL"],
- measure:"Chest, Waist, Shoulder",
-        inventory: {
-  "28": { "Black": 2, "Blue": 1 },
-  "30": { "Black": 3, "Blue": 0 },
-  "32": { "Black": 1, "Blue": 2 },
-  "34": { "Black": 0, "Blue": 2}
+sizes:["28","30","32","34"],
+
+inventory:{
+  "28": { "Black": 5, "Blue": 5 },
+  "30": { "Black": 5, "Blue": 5 },
+  "32": { "Black": 5, "Blue": 5 },
+  "34": { "Black": 5, "Blue": 5 }
 }
+
 },
     {
  id:"AKS007",
@@ -632,14 +633,15 @@ const products = [
 
  img:[img4, img1],
  colors:["White","Blue"],
- sizes:["M","L","XL"],
- measure:"Chest, Waist, Shoulder",
-        inventory: {
-  "28": { "Black": 2, "Blue": 1 },
-  "30": { "Black": 3, "Blue": 0 },
-  "32": { "Black": 1, "Blue": 2 },
-  "34": { "Black": 0, "Blue": 1 }
+ sizes:["28","30","32","34"],
+
+inventory:{
+  "28": { "Black": 5, "Blue": 5 },
+  "30": { "Black": 5, "Blue": 5 },
+  "32": { "Black": 5, "Blue": 5 },
+  "34": { "Black": 5, "Blue": 5 }
 }
+
 },
         {
  id:"AKS008",
@@ -652,14 +654,15 @@ const products = [
 
  img:[img4, img1],
  colors:["White","Blue"],
- sizes:["M","L","XL"],
- measure:"Chest, Waist, Shoulder",
-            inventory: {
-  "28": { "Black": 2, "Blue": 1 },
-  "30": { "Black": 3, "Blue": 0 },
-  "32": { "Black": 1, "Blue": 2 },
-  "34": { "Black": 0, "Blue": 1 }
+sizes:["28","30","32","34"],
+
+inventory:{
+  "28": { "Black": 5, "Blue": 5 },
+  "30": { "Black": 5, "Blue": 5 },
+  "32": { "Black": 5, "Blue": 5 },
+  "34": { "Black": 5, "Blue": 5 }
 }
+
 },
 ];
    
@@ -698,53 +701,65 @@ function filterProducts(type){
 }
 
 function renderProducts(){
- const box=document.getElementById("products");
- box.innerHTML="";
- products.forEach((p,i)=>{
-     if(currentFilter !== "All" && p.gender !== currentFilter) return;
-  const final=Math.round(p.price-(p.price*p.discount/100));
-  
-  box.innerHTML+=`
-  <div class="card">
-   <div class="slider">
- <img
-  id="img${i}"
-  src="${p.img[0]}"
-  class="product-img"
-  onclick="openImage('${p.img[0]}')"
-/>
+  const box = document.getElementById("products");
+  let html = ""; // ✅ buffer
 
-   </div>
-   <p style="font-size:12px; font-weight:bold; color:#555;">
-  ${p.gender === "Men" ? "Men’s Product" : "Women’s Product"}
-</p>
+  products.forEach((p,i)=>{
+    if(currentFilter !== "All" && p.gender !== currentFilter) return;
 
-   <h3>${p.name}</h3>
-   <p>SKU: ${p.id}</p>
-   <p>${p.category}</p>
-  <p>MRP ₹${p.price} | ${p.discount}% OFF</p>
-<p><b>₹${final}</b></p>
+    const final = Math.round(p.price - (p.price * p.discount / 100));
 
+    html += `
+      <div class="card">
+        <div class="slider">
 
-<p>Measurements: ${p.measure}</p>
-<select id="size${i}" onchange="updateStockMsg(${i})">
-  <option value="">Select Size</option>
-  ${p.sizes.map(s=>`<option>${s}</option>`).join("")}
-</select>
+          <button class="prev" onclick="changeImage(${i}, -1)">‹</button>
 
-<select id="color${i}" onchange="updateStockMsg(${i})">
-  <option value="">Select Color</option>
-  ${p.colors.map(c=>`<option>${c}</option>`).join("")}
-</select>
+          <img
+            id="img${i}"
+            src="${p.img[0]}"
+            class="product-img"
+            onclick="openImage(document.getElementById('img${i}').src)"
+          />
 
-<p id="stockMsg${i}" style="font-size:12px;font-weight:bold;"></p>
-<button id="btn${i}" onclick="addToCart(${i})">
-  Add to Cart
-</button>
+          <button class="next" onclick="changeImage(${i}, 1)">›</button>
 
-  </div>`;
- });
+        </div>
+
+        <p style="font-size:12px; font-weight:bold; color:#555;">
+          ${p.gender === "Men" ? "Men’s Product" : "Women’s Product"}
+        </p>
+
+        <h3>${p.name}</h3>
+        <p>SKU: ${p.id}</p>
+        <p>${p.category}</p>
+        <p>MRP ₹${p.price} | ${p.discount}% OFF</p>
+        <p><b>₹${final}</b></p>
+
+        <p>Measurements: ${p.measure}</p>
+
+        <select id="size${i}" onchange="updateStockMsg(${i})">
+          <option value="">Select Size</option>
+          ${p.sizes.map(s=>`<option>${s}</option>`).join("")}
+        </select>
+
+        <select id="color${i}" onchange="updateStockMsg(${i})">
+          <option value="">Select Color</option>
+          ${p.colors.map(c=>`<option>${c}</option>`).join("")}
+        </select>
+
+        <p id="stockMsg${i}" style="font-size:12px;font-weight:bold;"></p>
+
+        <button id="btn${i}" onclick="addToCart(${i})">
+          Add to Cart
+        </button>
+      </div>
+    `;
+  });
+
+  box.innerHTML = html; // ✅ single DOM update
 }
+
 function updateStockMsg(i){
   const size = document.getElementById("size"+i).value;
   const color = document.getElementById("color"+i).value;
@@ -932,16 +947,14 @@ if(cart.length === 0){
   return totalWeight; 
 }
 function calculateDeliveryCharge(totalWeight){
-  // base rule
-  let charge = 99; // 500g tak
 
-  if(totalWeight > 500){
-    const extraWeight = totalWeight - 500;
-    const slabs = Math.ceil(extraWeight / 20); // har 20g
-    charge += slabs * 10; // har 20g = ₹10
-  }
+  if(totalWeight <= 500) return 99;
 
-  return charge;
+  if(totalWeight <= 1000) return 149;
+
+  if(totalWeight <= 2000) return 199;
+
+  return 249; // max cap
 }
 
 
@@ -1141,7 +1154,40 @@ Qty: ${c.qty}
 
 `;
   });
+// ===== TOTAL CALCULATION =====
+const subtotal = cart.reduce((sum, c) => {
+  const price = Math.round(c.price - (c.price * c.discount / 100));
+  return sum + price * c.qty;
+}, 0);
 
+const totalWeight = calculateTotalWeight();
+const delivery = calculateDeliveryCharge(totalWeight);
+
+let discount = 0;
+
+// auto offer
+if(subtotal >= AUTO_OFFER.minAmount){
+  discount += AUTO_OFFER.discount;
+}
+
+// coupon
+if(appliedCoupon){
+  const rule = COUPONS[appliedCoupon];
+  if(rule?.type === "FLAT") discount += rule.value;
+  if(rule?.type === "FREE_DELIVERY") discount += delivery;
+}
+
+const finalTotal = Math.max(subtotal + delivery - discount, 0);
+msg += `
+------------------------
+Subtotal: ₹${subtotal}
+Delivery: ₹${delivery}
+Discount: −₹${discount}
+------------------------
+TOTAL PAYABLE: ₹${finalTotal}
+------------------------
+
+`;
   msg += `Customer: ${n}
 Phone: ${p}
 Address: ${a}
@@ -1187,7 +1233,7 @@ function applyCoupon(){
     return;
   }
 
-  appliedCoupon = COUPONS[code];
+ appliedCoupon = code;
   msg.innerText = "✅ Offer applied successfully";
   msg.style.color = "green";
 
@@ -1198,50 +1244,35 @@ function applyCoupon(){
 </script>
 
 <script>
+let imageModal = null;
+
 function openImage(src){
-  let modal = document.createElement("div");
-  modal.style.position = "fixed";
-  modal.style.top = "0";
-  modal.style.left = "0";
-  modal.style.width = "100%";
-  modal.style.height = "100%";
-  modal.style.background = "rgba(0,0,0,0.9)";
-  modal.style.zIndex = "9999";
-  modal.style.display = "flex";
-  modal.style.alignItems = "center";
-  modal.style.justifyContent = "center";
-  modal.style.overflow = "hidden";
 
-  modal.innerHTML = `
-    <div style="overflow:auto; max-width:100%; max-height:100%;">
-      <img src="${src}"
-        style="
-          max-width:100%;
-          max-height:100%;
-          transform-origin:center center;
-          cursor:zoom-in;
-        "
-        id="zoomImg"
-      >
-    </div>
-  `;
+  if(!imageModal){
+    imageModal = document.createElement("div");
+    imageModal.style.position = "fixed";
+    imageModal.style.top = "0";
+    imageModal.style.left = "0";
+    imageModal.style.width = "100%";
+    imageModal.style.height = "100%";
+    imageModal.style.background = "rgba(0,0,0,0.9)";
+    imageModal.style.zIndex = "9999";
+    imageModal.style.display = "flex";
+    imageModal.style.alignItems = "center";
+    imageModal.style.justifyContent = "center";
 
-  let scale = 1;
-  const img = modal.querySelector("#zoomImg");
+    imageModal.innerHTML = `
+      <img id="zoomImg"
+        style="max-width:100%; max-height:100%; cursor:zoom-in;">
+    `;
 
- 
-  img.onwheel = (e) => {
-    e.preventDefault();
-    scale += e.deltaY * -0.001;
-    scale = Math.min(Math.max(1, scale), 4);
-    img.style.transform = `scale(${scale})`;
-  };
+    imageModal.onclick = () => imageModal.style.display = "none";
+    document.body.appendChild(imageModal);
+  }
 
- 
-  img.ondblclick = () => {
-    scale = scale === 1 ? 2 : 1;
-    img.style.transform = `scale(${scale})`;
-  };
+  document.getElementById("zoomImg").src = src;
+  imageModal.style.display = "flex";
+}
 
   modal.onclick = (e) => {
     if(e.target === modal) modal.remove();
@@ -1343,7 +1374,7 @@ function openTerms(){
 
   // 🔒 scroll compulsory
   box.addEventListener("scroll", () => {
-    if (box.scrollTop + box.clientHeight >= box.scrollHeight - 5) {
+  box.scrollTop + box.clientHeight >= box.scrollHeight - 20) {
       btn.disabled = false;
       btn.style.background = "#000";
       btn.style.cursor = "pointer";
@@ -1397,15 +1428,14 @@ function openTerms(){
 
         
 
-        const noteField = document.getElementById("note");
+       const noteField = document.getElementById("note");
 
-noteField.addEventListener("input", function () {
+noteField.oninput = function () {
   const words = this.value.trim().split(/\s+/);
   if (words.length > 30) {
     this.value = words.slice(0, 30).join(" ");
   }
-});    
-
+};
 
   
 function updateCartBadge(){
@@ -1506,9 +1536,9 @@ function showMyOrders(){
 renderProducts();
 
 
-        document.getElementById("cartOverlay").addEventListener("click", function(){
-  toggleCart();
-});
+        const cartOverlay = document.getElementById("cartOverlay");
+cartOverlay.onclick = toggleCart;
+
 function openMyOrders(){
   document.getElementById("checkoutSection").style.display = "none";
   document.getElementById("myOrdersSection").style.display = "block";
