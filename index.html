@@ -368,6 +368,10 @@ footer{
   font-size:13px;
   margin:0;
 }
+#searchBox input{
+  display:none;
+  margin-top:6px;
+}
 
 </style>
 </head>
@@ -398,12 +402,10 @@ style="
 </div>
 <!-- SEARCH BOX -->
 <div id="searchBox">
-  <input
-    type="text"
-    id="searchInput"
-    placeholder="Search jeans, t-shirt..."
-    onkeyup="liveSearch()"
-  >
+  <span onclick="toggleSearch()" style="cursor:pointer;font-size:18px;">
+ 🔍
+</span>
+
   <div id="searchResults"></div>
 </div>
 
@@ -1244,16 +1246,26 @@ updateCart();
 renderProducts();
 }
 
- function toggleCart(){
+function toggleCart(){
   const cartPanel = document.getElementById("cartPanel");
   const overlay = document.getElementById("cartOverlay");
+  const searchBox = document.getElementById("searchBox");
 
   if(cartPanel.style.right === "0px"){
+    // CART CLOSE
     cartPanel.style.right = window.innerWidth < 768 ? "-100%" : "-360px";
     overlay.style.display = "none";
+
+    // ✅ search wapas dikhe
+    searchBox.style.display = "block";
+
   }else{
+    // CART OPEN
     cartPanel.style.right = "0px";
     overlay.style.display = "block";
+
+    // ❌ search hide
+    searchBox.style.display = "none";
   }
 }
 
@@ -1472,7 +1484,7 @@ function openTerms(){
      font-weight:bold;
      font-size:15px;
      box-shadow:0 4px 10px rgba(0,0,0,0.3);
-     z-index:9999;
+     z-index:9000;
      display:flex;
      align-items:center;
      gap:8px;
@@ -1591,16 +1603,13 @@ function showMyOrders(){
   box.innerHTML = html;
 }
 renderProducts();
-<script>
-function liveSearch(){
-  const input = document.getElementById("searchInput").value.toLowerCase();
-  const resultBox = document.getElementById("searchResults");
-  resultBox.innerHTML = "";
+function toggleSearch(){
+  const input = document.getElementById("searchInput");
+  input.style.display =
+    input.style.display === "block" ? "none" : "block";
+  input.focus();
+}
 
-  if(input.length < 2){
-    resultBox.style.display = "none";
-    return;
-  }
 
   const matched = products.filter(p =>
     p.name.toLowerCase().includes(input) ||
@@ -1636,7 +1645,7 @@ function scrollToProduct(id){
     }
   });
 }
-</script>
+
 
 
         document.getElementById("cartOverlay").addEventListener("click", function(){
@@ -1663,14 +1672,15 @@ function openMyOrders(){
   justify-content:center;
   z-index:10000;
 ">
-  <div style="onclick="event.stopPropagation()"
-    background:#fff;
-    padding:20px;
-    width:90%;
-    max-width:320px;
-    border-radius:8px;
-    text-align:center;
-  ">
+ <div onclick="event.stopPropagation()" style="
+  background:#fff;
+  padding:20px;
+  width:90%;
+  max-width:320px;
+  border-radius:8px;
+  text-align:center;
+">
+
     <p id="confirmText" style="margin-bottom:15px;font-weight:bold;"></p>
     <button onclick="confirmYes()" style="width:45%;margin-right:5%;">OK</button>
     <button onclick="confirmNo()" style="width:45%;background:#ccc;color:#000;">Cancel</button>
