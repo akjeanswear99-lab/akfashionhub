@@ -651,206 +651,10 @@ oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 
 <script>
 
+let products = [];
+const PRODUCT_API = "https://script.google.com/macros/s/AKfycbx0QbQF5Ke7iMWQlXM1zi2POB7TPdUZ3rxONGdmBMZurZB_nejaA5ggQ_ZGXbT9GDYgcg/exec";
 
 
-const products = [
-{
- id:"AKJ001",
- gender:"Men",  
- name:"Blue Denim Jeans",
- category:"Jeans",
- price:500,
- discount:20,
- weight: 550, 
-img:[
-  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
-  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
-  "https://dummyimage.com/600x800/666/fff&text=DENIM",
-  "https://dummyimage.com/600x800/999/fff&text=JEANS"
-],
- colors:["Blue","Black"],
- sizes:["28","30","32","34","36"],
- measure:"Waist, Length, Thigh",
-    inventory: {
-  "28": { "Black": 5, "Blue": 5 },
-  "30": { "Black": 5, "Blue": 5 },
-  "32": { "Black": 5, "Blue": 5 },
-  "34": { "Black": 5, "Blue": 5 }
-}
-},
-{
- id:"AKL002",
- gender:"Men",
- name:"Black Lower",
- category:"Lower",
- price:550,
- discount:15,
- weight: 200,
-img:[
-  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
-  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
-  "https://dummyimage.com/600x800/666/fff&text=DENIM",
-  "https://dummyimage.com/600x800/999/fff&text=JEANS"
-],
- colors:["Black","Gray"],
- sizes:["S","M","L","XL"],
- measure:"Waist, Length, Thigh",
-   inventory:{
-  "S": { "Black": 5, "Gray": 5 },
-  "M": { "Black": 5, "Gray": 5 },
-  "L": { "Black": 5, "Gray": 5 },
-  "XL": { "Black": 5, "Gray": 5 },
-}
-
-},
-{
- id:"AKT003",
- gender:"Men",
- name:"Cotton T-Shirt",
- category:"T-Shirt",
- price:400,
- discount:30,
-     weight: 180,
-img:[
-  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
-  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
-  "https://dummyimage.com/600x800/666/fff&text=DENIM",
-  "https://dummyimage.com/600x800/999/fff&text=JEANS"
-],
-colors:["Red","White","Black"],
- sizes:["S","M","L","XL"],
-inventory:{
-  "S": { "Red":5,"White":5,"Black":5 },
-  "M": { "Red":5,"White":5,"Black":5 },
-  "L": { "Red":5,"White":5,"Black":5 },
-  "XL": { "Red":5,"White":5,"Black":5 },
-}
-
-},
-{
- id:"AKS004",
- gender:"Men",
- name:"Formal Shirt",
- category:"Shirt",
- price:800,
- discount:25,
-     weight: 250,
-img:[
-  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
-  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
-  "https://dummyimage.com/600x800/666/fff&text=DENIM",
-  "https://dummyimage.com/600x800/999/fff&text=JEANS"
-],
- colors:["White","Black"],
-sizes:["S","M","L","XL"],
-
-inventory:{
-  "S": { "Black": 5, "White": 5 },
-  "M": { "Black": 5, "White": 5 },
-  "L": { "Black": 5, "White": 5 },
-  "XL": { "Black": 5, "White": 5 }
-}
-
-},
-{
- id:"AKK005",
- gender:"Women",
- name:"Embroidered Kurti",
- category:"Kurti",
- price:250,
- discount:20,
-     weight: 220,
-img:[
-  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
-  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
-  "https://dummyimage.com/600x800/666/fff&text=DENIM",
-  "https://dummyimage.com/600x800/999/fff&text=JEANS"
-],
-colors:["Pink","Green"],
-
-inventory:{
-  "S": { "Pink":5,"Green":5 },
-  "M": { "Pink":5,"Green":5 },
-  "L": { "Pink":5,"Green":5 }
-}
-
-},
-    {
- id:"AKS006",
- gender:"Men",
- name:"Formal Shirt",
- category:"Shirt",
- price:350,
- discount:25,
-        weight: 250,
-img:[
-  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
-  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
-  "https://dummyimage.com/600x800/666/fff&text=DENIM",
-  "https://dummyimage.com/600x800/999/fff&text=JEANS"
-],
- colors:["White","Blue"],
-sizes:["28","30","32","34"],
-
-inventory:{
-  "28": { "Black": 5, "Blue": 5 },
-  "30": { "Black": 5, "Blue": 5 },
-  "32": { "Black": 5, "Blue": 5 },
-  "34": { "Black": 5, "Blue": 5 }
-}
-
-},
-    {
- id:"AKS007",
- gender:"Men",
- name:"Formal Shirt",
- category:"Shirt",
- price:129,
- discount:25,
-  weight: 250,
-img:[
-  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
-  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
-  "https://dummyimage.com/600x800/666/fff&text=DENIM",
-  "https://dummyimage.com/600x800/999/fff&text=JEANS"
-],
- colors:["White","Blue"],
- sizes:["28","30","32","34"],
-
-inventory:{
-  "28": { "Black": 5, "Blue": 5 },
-  "30": { "Black": 5, "Blue": 5 },
-  "32": { "Black": 5, "Blue": 5 },
-  "34": { "Black": 5, "Blue": 5 }
-}
-
-},
-        {
- id:"AKS008",
- gender:"Men",
- name:"Formal Shirt",
- category:"Shirt",
- price:199,
- discount:25,
-  weight: 250,
-img:[
-  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
-  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
-  "https://dummyimage.com/600x800/666/fff&text=DENIM",
-  "https://dummyimage.com/600x800/999/fff&text=JEANS"
-],
- colors:["White","Blue"],
-sizes:["28","30","32","34"],
-
-inventory:{
-  "28": { "Black": 5, "Blue": 5 },
-  "30": { "Black": 5, "Blue": 5 },
-  "32": { "Black": 5, "Blue": 5 },
-  "34": { "Black": 5, "Blue": 5 }
-}
-
-},
-];
    
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
@@ -885,67 +689,79 @@ function filterProducts(type){
   currentFilter = type;
   renderProducts();
 }
-
-function renderProducts(){
-    if(!Array.isArray(products)) return;
-
+    function renderProducts(){
   const box = document.getElementById("products");
-  let html = ""; // ✅ buffer
+  box.innerHTML = "";
 
-  products.forEach((p,i)=>{
+  products.forEach((p, i) => {
+
     if(currentFilter !== "All" && p.gender !== currentFilter) return;
 
-    const final = Math.round(p.price - (p.price * p.discount / 100));
+    // sizes & colors from variants
+    const sizes = [...new Set(p.variants.map(v => v.size))];
+    const colors = [...new Set(p.variants.map(v => v.color))];
 
-    html += `
+    box.innerHTML += `
       <div class="card">
         <div class="slider">
-
-          <button class="prev" onclick="changeImage(${i}, -1)">‹</button>
-
-          <img
-            id="img${i}"
-            src="${p.img[0]}"
-            class="product-img"
-            onclick="openImage(document.getElementById('img${i}').src)"
-          />
-
-          <button class="next" onclick="changeImage(${i}, 1)">›</button>
-
+          <button class="prev" onclick="changeImage(${i},-1)">‹</button>
+          <img id="img${i}" src="${p.img[0]}" class="product-img"
+               onclick="openImage(this.src)">
+          <button class="next" onclick="changeImage(${i},1)">›</button>
         </div>
 
-        <p style="font-size:12px; font-weight:bold; color:#555;">
-          ${p.gender === "Men" ? "Men’s Product" : "Women’s Product"}
-        </p>
+        <p style="font-size:12px;color:#666">${p.gender}</p>
 
         <h3>${p.name}</h3>
         <p>SKU: ${p.id}</p>
+        <p style="font-weight:bold">
+  Price: ₹${p.variants[0].price}
+</p>
         <p>${p.category}</p>
-        <p>MRP ₹${p.price} | ${p.discount}% OFF</p>
-        <p><b>₹${final}</b></p>
-
-      <p>Measurements: ${p.measure || "Standard Fit"}</p>
+        <p style="font-size:12px">${p.description}</p>
+        <p style="font-size:12px"><b>Measurements:</b> ${p.measure}</p>
 
         <select id="size${i}" onchange="updateStockMsg(${i})">
           <option value="">Select Size</option>
-          ${p.sizes.map(s=>`<option>${s}</option>`).join("")}
+          ${sizes.map(s => `<option>${s}</option>`).join("")}
         </select>
 
         <select id="color${i}" onchange="updateStockMsg(${i})">
           <option value="">Select Color</option>
-          ${p.colors.map(c=>`<option>${c}</option>`).join("")}
+          ${colors.map(c => `<option>${c}</option>`).join("")}
         </select>
 
         <p id="stockMsg${i}" style="font-size:12px;font-weight:bold;"></p>
 
-        <button id="btn${i}" onclick="addToCart(${i})">
+        <button id="btn${i}" onclick="addToCart(${i})" disabled>
           Add to Cart
         </button>
       </div>
     `;
   });
+}
 
-  box.innerHTML = html; // ✅ single DOM update
+async function loadProductsFromSheet(){
+  try{
+    const res = await fetch(PRODUCT_API);
+    const data = await res.json();
+
+    products = data.map(p => ({
+      id: p.id,
+      name: p.name,
+      gender: p.gender,
+      category: p.category,
+      measure: p.measurement,
+      description: p.description,
+      img: p.images.filter(Boolean),
+      variants: p.variants
+    }));
+
+    renderProducts();
+  }catch(err){
+    console.error("Product load error", err);
+    alert("Products load nahi ho rahe");
+  }
 }
 
 function updateStockMsg(i){
@@ -965,7 +781,12 @@ function updateStockMsg(i){
   const p = products[i];
 
   // 🔍 stock check
-  const stock = p.inventory?.[size]?.[color] ?? 0;
+const variant = p.variants.find(
+  v => v.size === size && v.color === color
+);
+
+const stock = variant ? variant.stock : 0;
+
 
   if(stock > 0){
     msg.innerText = `Only ${stock} left`;
@@ -1030,10 +851,7 @@ function openImage(src){
 
 function addToCart(i){
     // 🔒 FINAL SAFETY: server stock ke bina add allow nahi
-if(!products[i].inventory){
-  showToast("Stock not available");
-  return;
-}
+
   const size = document.getElementById("size"+i).value;
   const color = document.getElementById("color"+i).value;
   if(!size || !color){
@@ -1059,7 +877,11 @@ if(existing){
   }
 }else{
   // 🆕 first time add → inventory se max stock nikalo
-  const maxStock = p.inventory?.[size]?.[color] ?? 0;
+ const variant = p.variants.find(
+  v => v.size === size && v.color === color
+);
+
+const maxStock = variant ? variant.stock : 0;
 
   if(maxStock <= 0){
     showToast("Out of stock");
@@ -1093,9 +915,13 @@ function updateCart(){
    // 🔐 SAFE PRICE (recalculate from products list)
 const productRef = products.find(p => p.id === c.id);
 
-const safePrice = productRef
-  ? Math.round(productRef.price - (productRef.price * productRef.discount / 100))
-  : 0;
+const variant = productRef.variants.find(
+  v => v.size === c.size && v.color === c.color
+);
+
+const safePrice = variant ? variant.price : 0;
+subtotal += safePrice * c.qty;
+
    subtotal += safePrice * c.qty;
 
     box.innerHTML += `
@@ -1683,7 +1509,7 @@ function showMyOrders(){
 }
 
     updateCart();
-renderProducts();
+loadProductsFromSheet();
 updateCartBadge();
 
 const cartOverlay = document.getElementById("cartOverlay");
