@@ -337,11 +337,36 @@ footer{
   }
 }
 
+    #floatingCart{
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  background: #000;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 10050;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+@media (max-width:768px){
+  #floatingCart{
+    top: 14px;
+    left: 14px;
+    padding: 9px 11px;
+    font-size: 18px;
+  }
+}
+
 </style>
 </head>
 
 <body>
 <div id="cartOverlay"></div>
+
+    <div id="floatingCart" onclick="toggleCart()">🛒</div>
+    
 
     <header style="position:relative;">
   <h1>AK FASHION HUB</h1>
@@ -353,21 +378,9 @@ footer{
   <div class="address">
    ADDRESS:- KESHAV NAGAR, SWARG AASHRAM ROAD, HAPUR 245101
   </div> 
-        <div onclick="toggleCart()"
-style="
- position:absolute;
- top:22px;
- left:20px;
- cursor:pointer;
- font-size:20px;
- z-index:10002;
-">
- 🛒
-</div>
 
 
-  <!-- Menu Icon -->
-
+        
 </header>
 <!-- CART PANEL -->
 <div id="cartPanel">
