@@ -586,7 +586,9 @@ footer{
      
 
 </footer>
-<div id="addressModal" style="
+  <div id="addressModal"
+     onclick="event.stopPropagation()"
+     style="
   position:fixed;
   top:0; left:0;
   width:100%; height:100%;
@@ -613,14 +615,17 @@ footer{
     <h3 style="text-align:center;">Delivery Address</h3>
 
     <input id="addr_name" placeholder="Full Name *">
-    <input id="addr_phone" placeholder="Mobile Number *" maxlength="10">
+    <input id="addr_phone" placeholder="Mobile Number *" maxlength="10"
+oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 
     <textarea id="addr_address" rows="2"
       placeholder="House No, Street, Area *"></textarea>
 
     <div style="display:flex;gap:6px;">
       <input id="addr_city" placeholder="City *">
-      <input id="addr_pincode" placeholder="Pincode *" maxlength="6">
+     <input id="addr_pincode" placeholder="Pincode *" maxlength="6"
+oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        
     </div>
 
     <input id="addr_state" placeholder="State *">
@@ -976,6 +981,33 @@ function showToast(message){
     toast.classList.remove("show");
   },2000);
 }
+let imageModal = null;
+
+function openImage(src){
+  if(!imageModal){
+    imageModal = document.createElement("div");
+    imageModal.style.position = "fixed";
+    imageModal.style.top = "0";
+    imageModal.style.left = "0";
+    imageModal.style.width = "100%";
+    imageModal.style.height = "100%";
+    imageModal.style.background = "rgba(0,0,0,0.9)";
+    imageModal.style.zIndex = "99999";
+    imageModal.style.display = "flex";
+    imageModal.style.alignItems = "center";
+    imageModal.style.justifyContent = "center";
+
+    imageModal.innerHTML = `
+      <img id="zoomImg" style="max-width:95%; max-height:95%;">
+    `;
+
+    imageModal.onclick = () => imageModal.style.display = "none";
+    document.body.appendChild(imageModal);
+  }
+
+  document.getElementById("zoomImg").src = src;
+  imageModal.style.display = "flex";
+}
 
 function addToCart(i){
   const size = document.getElementById("size"+i).value;
@@ -1312,9 +1344,9 @@ Note: ${addr.note || "N/A"}
       headers:{ "Content-Type":"application/json" },
       body: JSON.stringify({
         orderId,
-        name:n,
-        phone:p,
-        address:a,
+        name: addr.name,
+phone: addr.phone,
+address: `${addr.address}, ${addr.city} - ${addr.pincode}, ${addr.state}`,
         products: cart.map(c =>
           `${c.name} | SKU:${c.id} | Size:${c.size} | Color:${c.color} | Qty:${c.qty}`
         ).join(" || "),
@@ -1533,6 +1565,7 @@ function showMyOrders(){
 
   box.innerHTML = html;
 }
+    updateCart();
 renderProducts();
 
 
