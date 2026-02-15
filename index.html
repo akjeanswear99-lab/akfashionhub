@@ -694,6 +694,9 @@ function filterProducts(type){
   box.innerHTML = "";
 
   products.forEach((p, i) => {
+if(!p.variants || p.variants.length === 0){
+  return;
+}
 
     if(currentFilter !== "All" && p.gender !== currentFilter) return;
 
@@ -705,8 +708,13 @@ function filterProducts(type){
       <div class="card">
         <div class="slider">
           <button class="prev" onclick="changeImage(${i},-1)">‹</button>
-          <img id="img${i}" src="${p.img[0]}" class="product-img"
-               onclick="openImage(this.src)">
+       <img
+  id="img${i}"
+  src="${p.img[0] || 'https://dummyimage.com/600x800/eee/000&text=AK+FASHION+HUB'}"
+  class="product-img"
+  onclick="openImage(this.src)"
+>
+
           <button class="next" onclick="changeImage(${i},1)">›</button>
         </div>
 
@@ -747,7 +755,7 @@ async function loadProductsFromSheet(){
     const data = await res.json();
 
     products = data.map(p => ({
-      id: p.id,
+     id: p.sku,
       name: p.name,
       gender: p.gender,
       category: p.category,
