@@ -1384,15 +1384,16 @@ function toggleCart(){
 
   const isOpen = cartPanel.style.right === "0px";
 
-  if(isOpen){
-    cartPanel.style.right = window.innerWidth < 768 ? "-100%" : "-360px";
-    overlay.style.display = "none";
-    document.body.style.overflow = "";
-  }else{
-    cartPanel.style.right = "0px";
-    overlay.style.display = "block";
-    document.body.style.overflow = "hidden";
-  }
+if(isOpen){
+  cartPanel.style.right = window.innerWidth < 768 ? "-100%" : "-360px";
+  overlay.style.display = "none";
+  floating.style.display = "block";   // 👈 cart बंद → icon दिखे
+  document.body.style.overflow = "";
+}else{
+  cartPanel.style.right = "0px";
+  overlay.style.display = "block";
+  floating.style.display = "none";    // 👈 cart खुला → icon hide
+  document.body.style.overflow = "hidden";
 }
 
 function applyCoupon(){
