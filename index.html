@@ -358,6 +358,29 @@ footer{
     font-size: 18px;
   }
 }
+.address-box{
+  background:#f9f9f9;
+  padding:10px;
+  border-radius:6px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.address-box input,
+.address-box textarea{
+  padding:7px;
+  font-size:13px;
+}
+
+.address-box .row{
+  display:flex;
+  gap:6px;
+}
+
+.address-box .row input{
+  width:50%;
+}
 
 </style>
 </head>
@@ -409,15 +432,24 @@ footer{
 
 <div id="priceBreakup" style="font-size:14px; margin-top:10px;"></div>
 
+<div id="checkoutSection">
 
-  <div id="checkoutSection">
-    <h4>Checkout</h4>
+  <h4 style="margin-bottom:6px;">Delivery Details</h4>
 
-    <input id="name" placeholder="Name">
+  <div style="
+    background:#f9f9f9;
+    padding:10px;
+    border-radius:6px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  ">
+
+    <input id="name" placeholder="Full Name">
 
     <input
       id="phone"
-      placeholder="10 digit mobile number"
+      placeholder="Mobile Number"
       maxlength="10"
       inputmode="numeric"
       oninput="this.value=this.value.replace(/[^0-9]/g,'')"
@@ -425,23 +457,49 @@ footer{
 
     <textarea
       id="address"
-      placeholder="House / Shop No, Street / Area, Landmark, City, State - Pincode"
-      rows="4"
+      rows="2"
+      placeholder="House No, Street, Area"
     ></textarea>
 
-    <textarea id="note" placeholder="Order Note (Optional)"></textarea>
-
-    <div style="margin-top:10px; font-size:14px;">
-      <input type="checkbox" id="terms" style="width:auto;">
-      I agree to
-      <span
-        style="color:#007bff; cursor:pointer; text-decoration:underline;"
-        onclick="openTerms()"
+    <div style="display:flex; gap:6px;">
+      <input id="city" placeholder="City">
+      <input
+        id="pincode"
+        placeholder="Pincode"
+        maxlength="6"
+        inputmode="numeric"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'')"
       >
-        Terms & Conditions
-      </span>
     </div>
 
+    <input id="state" placeholder="State">
+
+    <textarea
+      id="note"
+      rows="2"
+      placeholder="Order Note (max 50 words)"
+    ></textarea>
+
+  </div>
+
+  <div style="margin-top:8px; font-size:13px;">
+    <input type="checkbox" id="terms" style="width:auto;">
+    I agree to
+    <span
+      style="color:#007bff; cursor:pointer; text-decoration:underline;"
+      onclick="openTerms()"
+    >
+      Terms & Conditions
+    </span>
+  </div>
+
+  <button onclick="checkout()" style="margin-top:10px;">
+    Place Order (WhatsApp)
+  </button>
+
+</div>
+
+  
     <button onclick="checkout()" style="margin-top:10px;">
       Place Order (WhatsApp)
     </button>
@@ -542,7 +600,29 @@ footer{
   </a>
 
 </div>
-       
+
+<div style="margin-top:16px; text-align:center;">
+
+  <a href="https://wa.me/919599497909?text=Hello%20AK%20FASHION%20HUB%20%F0%9F%91%8B%0A%0AI%20need%20help%20regarding%20my%20order%20or%20products.%0A%0APlease%20assist%20me%20with%3A%0A%E2%80%A2%20Product%20details%0A%E2%80%A2%20Price%20%26%20offers%0A%E2%80%A2%20Size%20availability%0A%E2%80%A2%20Delivery%20%26%20return%20policy%0A%E2%80%A2%20Order%20status%20%2F%20support%0A%0AThank%20you%20%F0%9F%99%82"
+     target="_blank"
+     style="
+       background:#25D366;
+       color:white;
+       padding:12px 22px;
+       border-radius:30px;
+       text-decoration:none;
+       font-weight:bold;
+       font-size:14px;
+       display:inline-block;
+       box-shadow:0 4px 10px rgba(0,0,0,0.3);
+     ">
+    💬 Help & Support
+  </a>
+
+</div>
+    
+
+     
 
 </footer>
 
@@ -1324,38 +1404,8 @@ function openImage(src){
   imageModal.style.display = "flex";
 }
 
-  modal.onclick = (e) => {
-    if(e.target === modal) modal.remove();
-  };
-
-  document.body.appendChild(modal);
-}
-</script>
-
-</script>
     
-   <a href="https://wa.me/919599497909?text=Hello%20AK%20FASHION%20HUB%20%F0%9F%91%8B%0A%0AI%20am%20interested%20in%20your%20products.%0APlease%20share%20product%20details,%20price,%20size%20availability,%20and%20delivery%20information.%0A%0AThank%20you."
-   target="_blank"
-   style="
-     position:fixed;
-     bottom:100px;
-     right:16px;
-     background:#25D366;
-     color:white;
-     padding:14px 20px;
-     border-radius:30px;
-     text-decoration:none;
-     font-weight:bold;
-     font-size:15px;
-     box-shadow:0 4px 10px rgba(0,0,0,0.3);
-     z-index:9999;
-     display:flex;
-     align-items:center;
-     gap:8px;
-   ">
- 💬 Help & Support
-</a>
-
+  
     <script>
 
         
