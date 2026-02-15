@@ -1029,6 +1029,11 @@ function openImage(src){
 }
 
 function addToCart(i){
+    // 🔒 FINAL SAFETY: server stock ke bina add allow nahi
+if(!products[i].inventory){
+  showToast("Stock not available");
+  return;
+}
   const size = document.getElementById("size"+i).value;
   const color = document.getElementById("color"+i).value;
   if(!size || !color){
@@ -1282,12 +1287,18 @@ function confirmNo(){
   return `AKFH-${date}-${random}`;
 }
 async function checkout(){
+    // 🔒 LOCK CART DURING CHECKOUT
+if(window.__checkoutInProgress){
+  return;
+}
+window.__checkoutInProgress = true;
+
 // ===== SERVER STOCK CHECK =====
 let stockResult;
 
 try{
   const stockResponse = await fetch(
-    "PASTE_WEB_APP_URL_HERE",
+    "https://script.google.com/macros/s/AKfycbz7JHlll_RmJAqwVQ4tYjlyG_ITlidQRi2w7mq9FFP7TKxqvaNaNPC6Nng8kffn3rD9ZQ/exec",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1303,10 +1314,12 @@ try{
   );
 
   stockResult = await stockResponse.json();
+    
 }catch(e){
   alert("Server error. Please try again.");
   return;
 }
+window.__checkoutInProgress = false;
 
 if(stockResult.status !== "SUCCESS"){
   alert(stockResult.message);
@@ -1315,17 +1328,23 @@ if(stockResult.status !== "SUCCESS"){
 
 
   /* ================= TOTAL CALCULATION (FIRST) ================= */
+// ===== SUBTOTAL FROM GOOGLE SHEET PRICE =====
+let subtotal = 0;
 
-  const subtotal = cart.reduce((sum, c) => {
-  const productRef = products.find(p => p.id === c.id);
-  if(!productRef) return sum;
-
-  const safePrice = Math.round(
-    productRef.price - (productRef.price * productRef.discount / 100)
+// stockResult.items me sheet se aaya price hai
+stockResult.items.forEach(sheetItem => {
+  const cartItem = cart.find(
+    c =>
+      c.id === sheetItem.sku &&
+      c.size === sheetItem.size &&
+      c.color === sheetItem.color
   );
 
-  return sum + safePrice * c.qty;
-}, 0);
+  if(cartItem){
+    subtotal += sheetItem.price * cartItem.qty;
+  }
+});
+
 
   const totalWeight = calculateTotalWeight();
   const delivery = calculateDeliveryCharge(totalWeight, subtotal);
@@ -1384,10 +1403,14 @@ Keshav Nagar, Hapur 245101
 `;
 
 cart.forEach(c=>{
-  const productRef = products.find(p => p.id === c.id);
-  const safePrice = productRef
-    ? Math.round(productRef.price - (productRef.price * productRef.discount / 100))
-    : 0;
+const sheetItem = stockResult.items.find(
+  i =>
+    i.sku === c.id &&
+    i.size === c.size &&
+    i.color === c.color
+);
+
+const safePrice = sheetItem ? sheetItem.price : 0;
 
   msg += `${c.name}
 SKU:${c.id}
