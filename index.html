@@ -718,6 +718,7 @@ img:[
   "https://dummyimage.com/600x800/999/fff&text=JEANS"
 ],
 colors:["Red","White","Black"],
+ sizes:["S","M","L","XL"],
 inventory:{
   "S": { "Red":5,"White":5,"Black":5 },
   "M": { "Red":5,"White":5,"Black":5 },
@@ -886,6 +887,8 @@ function filterProducts(type){
 }
 
 function renderProducts(){
+    if(!Array.isArray(products)) return;
+
   const box = document.getElementById("products");
   let html = ""; // ✅ buffer
 
@@ -1280,39 +1283,33 @@ function confirmNo(){
 }
 async function checkout(){
 // ===== SERVER STOCK CHECK =====
-const stockResponse = await fetch(
-  "PASTE_WEB_APP_URL_HERE",
-  {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      items: cart.map(c => ({
-        sku: c.id,
-        size: c.size,
-        color: c.color,
-        qty: c.qty
-      }))
-    })
-  }
-);
+let stockResult;
 
-const stockResult = await stockResponse.json();
+try{
+  const stockResponse = await fetch(
+    "PASTE_WEB_APP_URL_HERE",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items: cart.map(c => ({
+          sku: c.id,
+          size: c.size,
+          color: c.color,
+          qty: c.qty
+        }))
+      })
+    }
+  );
 
-if(stockResult.status !== "SUCCESS"){
-  alert(stockResult.message);
+  stockResult = await stockResponse.json();
+}catch(e){
+  alert("Server error. Please try again.");
   return;
 }
 
-  const termsAccepted = document.getElementById("terms").checked;
-  if(!termsAccepted){
-    alert("Please accept Terms & Conditions");
-    return;
-  }
-
- const addr = JSON.parse(localStorage.getItem("address"));
-
-if(!addr){
-  alert("Please add delivery address");
+if(stockResult.status !== "SUCCESS"){
+  alert(stockResult.message);
   return;
 }
 
@@ -1386,9 +1383,13 @@ Keshav Nagar, Hapur 245101
 
 `;
 
-  cart.forEach(c=>{
-    const price = Math.round(c.price - (c.price * c.discount / 100));
-    msg += `${c.name}
+cart.forEach(c=>{
+  const productRef = products.find(p => p.id === c.id);
+  const safePrice = productRef
+    ? Math.round(productRef.price - (productRef.price * productRef.discount / 100))
+    : 0;
+
+  msg += `${c.name}
 SKU:${c.id}
 Size:${c.size}
 Color:${c.color}
@@ -1396,7 +1397,7 @@ Color:${c.color}
 Qty: ${c.qty}
 
 `;
-  });
+}); 
 
   msg += `
 ------------------------
@@ -1469,6 +1470,7 @@ if(isOpen){
   overlay.style.display = "block";
   floating.style.display = "none";    // 👈 cart खुला → icon hide
   document.body.style.overflow = "hidden";
+    document.body.style.overflow = isOpen ? "" : "hidden";
 }
 }  // ❗ toggleCart function CLOSE
 
@@ -1614,40 +1616,34 @@ function updateBottomBar(total){
   }
 }
 function showMyOrders(){
-    
-    if(phone.length !== 10 || !orderIdInput){
-  box.innerHTML = "<p>Please enter valid phone & Order ID</p>";
-  return;
-}
   const phone = document.getElementById("orderPhone").value.trim();
   const orderIdInput = document.getElementById("orderIdCheck").value.trim();
   const box = document.getElementById("myOrders");
 
-  
+  if(phone.length !== 10 || !orderIdInput){
+    box.innerHTML = "<p>Please enter valid phone & Order ID</p>";
+    return;
+  }
 
   const allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
   const orders = allOrders[phone];
 
-
-  if (!orders) {
+  if(!orders){
     box.innerHTML = "<p>Invalid phone number or Order ID</p>";
     return;
   }
 
-  
   const matched = orders.some(o => o.orderId === orderIdInput);
-
-  if (!matched) {
+  if(!matched){
     box.innerHTML = "<p>Invalid phone number or Order ID</p>";
     return;
   }
 
-  // ✅ dono match ho gaye → saare orders dikhao
   let html = "";
 
   orders.forEach(o => {
     html += `
-      <div style="border:1px solid #ddd; padding:8px; margin-bottom:8px;">
+      <div style="border:1px solid #ddd;padding:8px;margin-bottom:8px;">
         <b>Order ID:</b> ${o.orderId}<br>
         <b>Date:</b> ${o.date}<br>
         <b>Status:</b> ${o.status}<br>
@@ -1662,9 +1658,10 @@ function showMyOrders(){
 
   box.innerHTML = html;
 }
+
     updateCart();
 renderProducts();
-
+updateCartBadge();
 
 const cartOverlay = document.getElementById("cartOverlay");
 cartOverlay.onclick = toggleCart;
