@@ -650,11 +650,8 @@ oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 </div>
 
 <script>
-// Base64 encoded small colored images for offline use
-const img1 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="; // Transparent
-const img2 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="; // Blue
-const img3 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="; // Red
-const img4 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="; // Black
+
+
 
 const products = [
 {
@@ -666,10 +663,10 @@ const products = [
  discount:20,
  weight: 550, 
 img:[
-  "images/jeans1.jpg",
-  "images/jeans2.jpg",
-  "images/jeans3.jpg",
-  "images/jeans4.jpg"
+  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
+  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
+  "https://dummyimage.com/600x800/666/fff&text=DENIM",
+  "https://dummyimage.com/600x800/999/fff&text=JEANS"
 ],
  colors:["Blue","Black"],
  sizes:["28","30","32","34","36"],
@@ -690,10 +687,10 @@ img:[
  discount:15,
  weight: 200,
 img:[
-  "images/jeans1.jpg",
-  "images/jeans2.jpg",
-  "images/jeans3.jpg",
-  "images/jeans4.jpg"
+  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
+  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
+  "https://dummyimage.com/600x800/666/fff&text=DENIM",
+  "https://dummyimage.com/600x800/999/fff&text=JEANS"
 ],
  colors:["Black","Gray"],
  sizes:["S","M","L","XL"],
@@ -715,19 +712,17 @@ img:[
  discount:30,
      weight: 180,
 img:[
-  "images/jeans1.jpg",
-  "images/jeans2.jpg",
-  "images/jeans3.jpg",
-  "images/jeans4.jpg"
+  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
+  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
+  "https://dummyimage.com/600x800/666/fff&text=DENIM",
+  "https://dummyimage.com/600x800/999/fff&text=JEANS"
 ],
- colors:["Red","White","Black"],
- sizes:["S","M","L","XL","XXL"],
- measure:"Chest, Waist, Shoulder",
-   inventory:{
-  "S": { "Black": 5, "Gray": 5 },
-  "M": { "Black": 5, "Gray": 5 },
-  "L": { "Black": 5, "Gray": 5 },
-  "XL": { "Black": 5, "Gray": 5 },
+colors:["Red","White","Black"],
+inventory:{
+  "S": { "Red":5,"White":5,"Black":5 },
+  "M": { "Red":5,"White":5,"Black":5 },
+  "L": { "Red":5,"White":5,"Black":5 },
+  "XL": { "Red":5,"White":5,"Black":5 },
 }
 
 },
@@ -740,12 +735,12 @@ img:[
  discount:25,
      weight: 250,
 img:[
-  "images/jeans1.jpg",
-  "images/jeans2.jpg",
-  "images/jeans3.jpg",
-  "images/jeans4.jpg"
+  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
+  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
+  "https://dummyimage.com/600x800/666/fff&text=DENIM",
+  "https://dummyimage.com/600x800/999/fff&text=JEANS"
 ],
- colors:["White","Blue"],
+ colors:["White","Black"],
 sizes:["S","M","L","XL"],
 
 inventory:{
@@ -765,19 +760,17 @@ inventory:{
  discount:20,
      weight: 220,
 img:[
-  "images/jeans1.jpg",
-  "images/jeans2.jpg",
-  "images/jeans3.jpg",
-  "images/jeans4.jpg"
+  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
+  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
+  "https://dummyimage.com/600x800/666/fff&text=DENIM",
+  "https://dummyimage.com/600x800/999/fff&text=JEANS"
 ],
- colors:["Pink","Green"],
- sizes:["S","M","L"],
- measure:"Chest, Waist, Shoulder, Length",
-   inventory:{
-  "S": { "Black": 5, "Gray": 5 },
-  "M": { "Black": 5, "Gray": 5 },
-  "L": { "Black": 5, "Gray": 5 },
-  "XL": { "Black": 5, "Gray": 5 },
+colors:["Pink","Green"],
+
+inventory:{
+  "S": { "Pink":5,"Green":5 },
+  "M": { "Pink":5,"Green":5 },
+  "L": { "Pink":5,"Green":5 }
 }
 
 },
@@ -790,10 +783,10 @@ img:[
  discount:25,
         weight: 250,
 img:[
-  "images/jeans1.jpg",
-  "images/jeans2.jpg",
-  "images/jeans3.jpg",
-  "images/jeans4.jpg"
+  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
+  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
+  "https://dummyimage.com/600x800/666/fff&text=DENIM",
+  "https://dummyimage.com/600x800/999/fff&text=JEANS"
 ],
  colors:["White","Blue"],
 sizes:["28","30","32","34"],
@@ -815,10 +808,10 @@ inventory:{
  discount:25,
   weight: 250,
 img:[
-  "images/jeans1.jpg",
-  "images/jeans2.jpg",
-  "images/jeans3.jpg",
-  "images/jeans4.jpg"
+  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
+  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
+  "https://dummyimage.com/600x800/666/fff&text=DENIM",
+  "https://dummyimage.com/600x800/999/fff&text=JEANS"
 ],
  colors:["White","Blue"],
  sizes:["28","30","32","34"],
@@ -840,10 +833,10 @@ inventory:{
  discount:25,
   weight: 250,
 img:[
-  "images/jeans1.jpg",
-  "images/jeans2.jpg",
-  "images/jeans3.jpg",
-  "images/jeans4.jpg"
+  "https://dummyimage.com/600x800/000/fff&text=AK+FASHION+HUB",
+  "https://dummyimage.com/600x800/333/fff&text=PREMIUM",
+  "https://dummyimage.com/600x800/666/fff&text=DENIM",
+  "https://dummyimage.com/600x800/999/fff&text=JEANS"
 ],
  colors:["White","Blue"],
 sizes:["28","30","32","34"],
@@ -928,7 +921,7 @@ function renderProducts(){
         <p>MRP ₹${p.price} | ${p.discount}% OFF</p>
         <p><b>₹${final}</b></p>
 
-        <p>Measurements: ${p.measure}</p>
+      <p>Measurements: ${p.measure || "Standard Fit"}</p>
 
         <select id="size${i}" onchange="updateStockMsg(${i})">
           <option value="">Select Size</option>
@@ -958,17 +951,31 @@ function updateStockMsg(i){
   const msg = document.getElementById("stockMsg"+i);
   const btn = document.getElementById("btn"+i);
 
+  // reset
+  btn.disabled = true;
+  msg.innerText = "";
+
   if(!size || !color){
-    msg.innerText = "";
     return;
   }
-// ✅ FINAL STOCK CHECK CHECKOUT PE HOGA
-msg.innerText = "Stock confirmed at checkout";
-msg.style.color = "blue";
-btn.disabled = false;
 
- 
+  const p = products[i];
+
+  // 🔍 stock check
+  const stock = p.inventory?.[size]?.[color] ?? 0;
+
+  if(stock > 0){
+    msg.innerText = `Only ${stock} left`;
+    msg.style.color = "green";
+    btn.disabled = false;
+  }else{
+    msg.innerText = "Out of stock";
+    msg.style.color = "red";
+    btn.disabled = true;
+  }
 }
+
+
 
 function changeImage(i, dir){
   const p = products[i];
@@ -1075,8 +1082,13 @@ function updateCart(){
   box.innerHTML = "";
 
   cart.forEach((c, index)=>{
-    const price = Math.round(c.price - (c.price * c.discount / 100));
-    subtotal += price * c.qty;
+   // 🔐 SAFE PRICE (recalculate from products list)
+const productRef = products.find(p => p.id === c.id);
+
+const safePrice = productRef
+  ? Math.round(productRef.price - (productRef.price * productRef.discount / 100))
+  : 0;
+   subtotal += safePrice * c.qty;
 
     box.innerHTML += `
       <div style="border-bottom:1px solid #ddd;padding:10px 0;">
@@ -1088,6 +1100,10 @@ function updateCart(){
   <span class="qty-count">${c.qty}</span>
   <button class="qty-btn" onclick="changeQty(${index},1)">+</button>
 </div>
+<button onclick="askRemove(${index})"
+ style="margin-top:6px;background:#eee;color:#000;">
+ Remove
+</button>
 
     `;
   });
@@ -1105,36 +1121,31 @@ if(cart.length === 0){
 
   let discount = 0;
   let offerMsg = "";
+// ===== OFFER LOGIC (ONLY ONE ALLOWED) =====
 
-  // AUTO OFFER
+if(appliedCoupon){
+  // 🔹 Coupon applied → AUTO OFFER disable
+  const rule = COUPONS[appliedCoupon];
+  offerMsg = `Coupon ${appliedCoupon} applied`;
+
+  if(rule.type === "FREE_DELIVERY"){
+    delivery = 0;
+  }
+
+  if(rule.type === "FLAT"){
+    discount += rule.value;
+  }
+
+}else{
+  // 🔹 No coupon → AUTO OFFER apply
   if(subtotal >= AUTO_OFFER.minAmount){
-    if(subtotal < 3000 && appliedCoupon){
-      offerMsg = "Only one offer applicable below ₹3000";
-    }else{
-      discount += AUTO_OFFER.discount;
-      offerMsg = `🎉 ₹${AUTO_OFFER.discount} OFF applied`;
-    }
+    discount += AUTO_OFFER.discount;
+    offerMsg = `🎉 ₹${AUTO_OFFER.discount} OFF applied`;
   }else{
     offerMsg = `Add ₹${AUTO_OFFER.minAmount - subtotal} more to get ₹${AUTO_OFFER.discount} OFF`;
   }
+}
 
-  // COUPON
-  if(appliedCoupon){
-    const rule = COUPONS[appliedCoupon];
-
-    if(subtotal < 999){
-      if(rule.type === "FLAT"){
-        discount += Math.min(rule.value, 50);
-      }
-    }else{
-      if(rule.type === "FREE_DELIVERY"){
-        delivery = 0;
-      }
-      if(rule.type === "FLAT"){
-        discount += rule.value;
-      }
-    }
-  }
 
   const finalTotal = Math.max(subtotal + delivery - discount, 0);
 
@@ -1194,6 +1205,10 @@ function calculateDeliveryCharge(weight, orderValue){
 
   // 🔒 Minimum delivery ₹70
   delivery = Math.max(70, delivery);
+// 🔐 LOSS PROTECTION
+delivery = Math.ceil(delivery / 5) * 5; // round to nearest 5
+// 🔐 EXTRA SAFETY FOR HEAVY ORDERS
+delivery = Math.max(delivery, 70 + Math.floor(weight / 1000) * 10);
 
   return delivery;
 }
@@ -1264,6 +1279,29 @@ function confirmNo(){
   return `AKFH-${date}-${random}`;
 }
 async function checkout(){
+// ===== SERVER STOCK CHECK =====
+const stockResponse = await fetch(
+  "PASTE_WEB_APP_URL_HERE",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      items: cart.map(c => ({
+        sku: c.id,
+        size: c.size,
+        color: c.color,
+        qty: c.qty
+      }))
+    })
+  }
+);
+
+const stockResult = await stockResponse.json();
+
+if(stockResult.status !== "SUCCESS"){
+  alert(stockResult.message);
+  return;
+}
 
   const termsAccepted = document.getElementById("terms").checked;
   if(!termsAccepted){
@@ -1282,28 +1320,65 @@ if(!addr){
   /* ================= TOTAL CALCULATION (FIRST) ================= */
 
   const subtotal = cart.reduce((sum, c) => {
-    const price = Math.round(c.price - (c.price * c.discount / 100));
-    return sum + price * c.qty;
-  }, 0);
+  const productRef = products.find(p => p.id === c.id);
+  if(!productRef) return sum;
+
+  const safePrice = Math.round(
+    productRef.price - (productRef.price * productRef.discount / 100)
+  );
+
+  return sum + safePrice * c.qty;
+}, 0);
 
   const totalWeight = calculateTotalWeight();
   const delivery = calculateDeliveryCharge(totalWeight, subtotal);
 
   let discount = 0;
+ if(appliedCoupon){
+  const rule = COUPONS[appliedCoupon];
+
+  if(rule.type === "FREE_DELIVERY"){
+    discount += delivery;
+  }
+
+  if(rule.type === "FLAT"){
+    discount += rule.value;
+  }
+
+}else{
   if(subtotal >= AUTO_OFFER.minAmount){
     discount += AUTO_OFFER.discount;
   }
-  if(appliedCoupon){
-    const rule = COUPONS[appliedCoupon];
-    if(rule?.type === "FLAT") discount += rule.value;
-    if(rule?.type === "FREE_DELIVERY") discount += delivery;
-  }
+}
+
 
   const finalTotal = Math.max(subtotal + delivery - discount, 0);
 
   /* ================= WHATSAPP MESSAGE ================= */
 
   const orderId = generateOrderId();
+// ===== SAVE ORDER FOR MY ORDERS =====
+
+let allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
+
+if(!allOrders[addr.phone]){
+  allOrders[addr.phone] = [];
+}
+
+allOrders[addr.phone].push({
+  orderId: orderId,
+  date: new Date().toLocaleString(),
+  status: "Order Received",
+  total: finalTotal,
+  items: cart.map(c => ({
+    name: c.name,
+    size: c.size,
+    color: c.color,
+    qty: c.qty
+  }))
+});
+
+localStorage.setItem("ordersByPhone", JSON.stringify(allOrders));
 
   let msg = `AK FASHION HUB
 Order ID: ${orderId}
@@ -1317,7 +1392,7 @@ Keshav Nagar, Hapur 245101
 SKU:${c.id}
 Size:${c.size}
 Color:${c.color}
-₹${price}
+₹${safePrice}
 Qty: ${c.qty}
 
 `;
@@ -1395,8 +1470,14 @@ if(isOpen){
   floating.style.display = "none";    // 👈 cart खुला → icon hide
   document.body.style.overflow = "hidden";
 }
+}  // ❗ toggleCart function CLOSE
 
 function applyCoupon(){
+    if(cart.length === 0){
+  alert("Cart is empty");
+  return;
+}
+
   const code = document
     .getElementById("couponInput")
     .value
@@ -1485,7 +1566,7 @@ function updateCartBadge(){
   let badge = document.getElementById("cartCount");
 
   if(!badge){
-    const cartIcon = document.querySelector('[onclick="toggleCart()"]');
+   const cartIcon = document.getElementById("floatingCart");
     badge = document.createElement("span");
     badge.id = "cartCount";
     badge.style.background = "red";
@@ -1533,6 +1614,11 @@ function updateBottomBar(total){
   }
 }
 function showMyOrders(){
+    
+    if(phone.length !== 10 || !orderIdInput){
+  box.innerHTML = "<p>Please enter valid phone & Order ID</p>";
+  return;
+}
   const phone = document.getElementById("orderPhone").value.trim();
   const orderIdInput = document.getElementById("orderIdCheck").value.trim();
   const box = document.getElementById("myOrders");
