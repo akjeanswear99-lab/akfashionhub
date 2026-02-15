@@ -178,6 +178,9 @@ footer{
 
 <!-- ===== OVERLAY ===== -->
 <div id="cartOverlay"></div>
+<script>
+document.getElementById("cartOverlay").onclick = toggleCart;
+</script>
 
 <!-- ===== FLOAT CART ===== -->
 <div id="floatingCart" onclick="toggleCart()">🛒</div>
@@ -322,7 +325,12 @@ function renderProducts(){
     <div class="card">
       <div class="slider">
         <button class="prev" onclick="changeImage(${i},-1)">‹</button>
-        <img id="img${i}" src="${p.img[0]}" />
+       <img
+  id="img${i}"
+  src="${p.img[0]}"
+  style="cursor:pointer"
+  onclick="openImage(this.src)"
+/>
         <button class="next" onclick="changeImage(${i},1)">›</button>
       </div>
 
@@ -369,7 +377,11 @@ function addToCart(i){
   if(!size || !color){ showToast("Select size & color"); return; }
 
   const p = products[i];
-  const maxStock = p.inventory[size][color];
+const maxStock = p.inventory?.[size]?.[color] ?? 0;
+if(maxStock <= 0){
+  showToast("Out of stock");
+  return;
+}
 
   let found = cart.find(x=>x.id===p.id && x.size===size && x.color===color);
   if(found){
@@ -401,6 +413,11 @@ function updateCart(){
         <b>${c.name}</b><br>
         ${c.size} / ${c.color}<br>
         Qty:
+        <br>
+<button onclick="askRemove(${i})"
+  style="margin-top:6px;background:#fff;color:#000;border:1px solid #000">
+  Remove
+</button>
         <div class="qty-box">
           <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
           <span>${c.qty}</span>
@@ -409,10 +426,13 @@ function updateCart(){
       </div>`;
   });
 
-  if(cart.length===0){
-    document.getElementById("total").innerText="Your cart is empty";
-    return;
-  }
+if(cart.length===0){
+  document.getElementById("cartItems").innerHTML = "";
+  document.getElementById("total").innerText = "Your cart is empty";
+  document.getElementById("priceBreakup").innerText = "";
+  return;
+}
+
 
   const weight = cart.reduce((s,i)=>s+i.weight*i.qty,0);
   let delivery = calculateDeliveryCharge(weight,subtotal);
@@ -461,6 +481,7 @@ function changeQty(i,d){
   }
   localStorage.setItem("cart",JSON.stringify(cart));
   updateCart();
+  updateCartBadge();
 }
 
 /* ================= COUPON ================= */
@@ -468,9 +489,13 @@ function changeQty(i,d){
 function applyCoupon(){
   const code = document.getElementById("couponInput").value.trim().toUpperCase();
   if(!COUPONS[code]){
-    document.getElementById("couponMsg").innerText="Invalid code";
-    appliedCoupon=null;
-  }else{
+  document.getElementById("couponMsg").innerText = "Invalid code";
+  appliedCoupon = null;
+  updateCart();
+  return;
+}
+
+else{
     appliedCoupon=code;
     document.getElementById("couponMsg").innerText="Coupon applied";
   }
@@ -478,16 +503,23 @@ function applyCoupon(){
 }
 
 /* ================= CART TOGGLE + TOAST ================= */
-
 function toggleCart(){
   const panel = document.getElementById("cartPanel");
   const overlay = document.getElementById("cartOverlay");
-  if(panel.style.right==="0px"){
-    panel.style.right="-360px";
-    overlay.style.display="none";
+  const floating = document.getElementById("floatingCart");
+
+  if(panel.style.right === "0px"){
+    // 🔒 CART CLOSE
+    panel.style.right = "-360px";
+    overlay.style.display = "none";
+    floating.style.display = "block";   // 🛒 SHOW
+    document.body.style.overflow = "";
   }else{
-    panel.style.right="0px";
-    overlay.style.display="block";
+    // 🔓 CART OPEN
+    panel.style.right = "0px";
+    overlay.style.display = "block";
+    floating.style.display = "none";    // 🛒 HIDE
+    document.body.style.overflow = "hidden";
   }
 }
 
@@ -557,7 +589,9 @@ function openAddressModal(){
 }
 function closeAddressModal(){
   document.getElementById("addressModal").style.display="none";
+  document.body.style.overflow = "";
 }
+
 function saveAddress(){
   const data={
     name:addr_name.value.trim(),
@@ -606,30 +640,19 @@ function generateOrderId(){
 /* ================= CHECKOUT + SERVER STOCK ================= */
 async function checkout(){
 
-  if(cart.length===0){ alert("Cart empty"); return; }
-
-  const addr = JSON.parse(localStorage.getItem("address"));
-  if(!addr){ alert("Add delivery address"); return; }
-
-  // ===== SERVER STOCK CHECK (STEP 4) =====
-  const stockRes = await fetch(
-    "PASTE_WEB_APP_URL_HERE",
-    {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({
-        items:cart.map(c=>({
-          sku:c.id,size:c.size,color:c.color,qty:c.qty
-        }))
-      })
-    }
-  );
-
+try{
+  const stockRes = await fetch("https://script.google.com/macros/s/AKfycbxUSD7sK96InSm9GUWKD1n95x8z8Lg2zaWLx0tTCrgu9aPEfnQTDB_gs3jQXHMQHiiLXA/exec",{...});
   const stockData = await stockRes.json();
+
   if(stockData.status!=="SUCCESS"){
     alert(stockData.message);
     return;
   }
+}catch(e){
+  alert("Server issue. Please try again.");
+  return;
+}
+
 
   // ===== TOTAL =====
   let subtotal=0;
@@ -692,6 +715,43 @@ function showMyOrders(phone,orderId){
       Total: ₹${o.total}
     </div>`).join("");
 }
+  function openImage(src){
+  const modal = document.createElement("div");
+  modal.style.position="fixed";
+  modal.style.top=0;
+  modal.style.left=0;
+  modal.style.width="100%";
+  modal.style.height="100%";
+  modal.style.background="rgba(0,0,0,.9)";
+  modal.style.zIndex="99999";
+  modal.innerHTML=`<img src="${src}" style="max-width:95%;max-height:95%;margin:auto;display:block">`;
+  modal.onclick=()=>modal.remove();
+  document.body.appendChild(modal);
+}
+function updateCartBadge(){
+  let count = cart.reduce((s,i)=>s+i.qty,0);
+  let badge = document.getElementById("cartCount");
+
+  if(!badge){
+    badge = document.createElement("span");
+    badge.id = "cartCount";
+    badge.style.position="absolute";
+    badge.style.top="0";
+    badge.style.right="0";
+    badge.style.background="red";
+    badge.style.color="white";
+    badge.style.borderRadius="50%";
+    badge.style.fontSize="12px";
+    badge.style.padding="2px 6px";
+    document.getElementById("floatingCart").appendChild(badge);
+  }
+  badge.innerText = count;
+}
+window.onload = () => {
+  renderProducts();
+  updateCart();
+};
+
 </script>
 
 </body>
