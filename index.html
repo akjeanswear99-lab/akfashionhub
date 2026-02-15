@@ -434,8 +434,6 @@ footer{
 
 <div id="checkoutSection">
 
-  <h4 style="margin-bottom:6px;">Delivery Details</h4>
-
   <div style="
     background:#f9f9f9;
     padding:10px;
@@ -445,14 +443,25 @@ footer{
     gap:6px;
   ">
 
-    <input type="checkbox" id="terms" style="width:auto;">
-    I agree to
-    <span
-      style="color:#007bff; cursor:pointer; text-decoration:underline;"
-      onclick="openTerms()"
-    >
-      Terms & Conditions
-    </span>
+   <div style="display:flex; align-items:center; gap:6px; font-size:14px;">
+  
+  <input
+    type="checkbox"
+    id="terms"
+    onclick="event.stopPropagation()"
+  >
+
+  <span>I agree to</span>
+
+  <span
+    onclick="openTerms()"
+    style="color:#007bff; cursor:pointer; text-decoration:underline;"
+  >
+    Terms & Conditions
+  </span>
+
+</div>
+
       <button onclick="openAddressModal()" style="margin-top:8px;">
   ➕ Add / Edit Delivery Address
 </button>
@@ -1369,6 +1378,7 @@ address: `${addr.address}, ${addr.city} - ${addr.pincode}, ${addr.state}`,
 
 
 function toggleCart(){
+    const floating = document.getElementById("floatingCart");
   const cartPanel = document.getElementById("cartPanel");
   const overlay = document.getElementById("cartOverlay");
 
