@@ -722,9 +722,10 @@ if(!p.variants || p.variants.length === 0){
 
         <h3>${p.name}</h3>
         <p>SKU: ${p.id}</p>
-        <p style="font-weight:bold">
-  Price: ₹${p.variants[0].price}
+    <p style="font-weight:bold">
+  Price: <span id="price${i}">₹${p.variants[0].price}</span>
 </p>
+
         <p>${p.category}</p>
         <p style="font-size:12px">${p.description}</p>
         <p style="font-size:12px"><b>Measurements:</b> ${p.measure}</p>
@@ -777,6 +778,10 @@ function updateStockMsg(i){
   const color = document.getElementById("color"+i).value;
   const msg = document.getElementById("stockMsg"+i);
   const btn = document.getElementById("btn"+i);
+const priceBox = document.getElementById("price"+i);
+if(variant){
+  priceBox.innerText = "₹" + variant.price;
+}
 
   // reset
   btn.disabled = true;
@@ -927,80 +932,78 @@ function updateCart(){
   const box = document.getElementById("cartItems");
   box.innerHTML = "";
 
-  cart.forEach((c, index)=>{
-   // 🔐 SAFE PRICE (recalculate from products list)
-const productRef = products.find(p => p.id === c.id);
+  // 🔹 LOOP 1 — SUBTOTAL CALCULATION
+  cart.forEach((c) => {
+    const productRef = products.find(p => p.id === c.id);
+    if(!productRef) return;
 
-const variant = productRef.variants.find(
-  v => v.size === c.size && v.color === c.color
-);
+    const variant = productRef.variants.find(
+      v =>
+        String(v.size) === String(c.size) &&
+        String(v.color).toLowerCase() === String(c.color).toLowerCase()
+    );
 
-const safePrice = variant ? variant.price : 0;
-subtotal += safePrice * c.qty;
+    const safePrice = variant ? Number(variant.price) : 0;
+    subtotal += safePrice * c.qty;
+  });
 
-   subtotal += safePrice * c.qty;
-
+  // 🔹 LOOP 2 — CART UI RENDER
+  cart.forEach((c, index) => {
     box.innerHTML += `
       <div style="border-bottom:1px solid #ddd;padding:10px 0;">
         <b>${c.name}</b><br>
         Size: ${c.size} | Color: ${c.color}<br>
-        Qty:
-       <div class="qty-box">
-  <button class="qty-btn" onclick="changeQty(${index},-1)">−</button>
-  <span class="qty-count">${c.qty}</span>
-  <button class="qty-btn" onclick="changeQty(${index},1)">+</button>
-</div>
-<button onclick="askRemove(${index})"
- style="margin-top:6px;background:#eee;color:#000;">
- Remove
-</button>
 
+        Qty:
+        <div class="qty-box">
+          <button class="qty-btn" onclick="changeQty(${index},-1)">−</button>
+          <span class="qty-count">${c.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${index},1)">+</button>
+        </div>
+
+        <button onclick="askRemove(${index})"
+          style="margin-top:6px;background:#eee;color:#000;">
+          Remove
+        </button>
+      </div>
     `;
   });
 
+  // 🔹 EMPTY CART CHECK
+  if(cart.length === 0){
+    document.getElementById("total").innerHTML = "Your cart is empty";
+    document.getElementById("priceBreakup").innerText = "";
+    updateCartBadge();
+    updateBottomBar(0);
+    return;
+  }
+
+  // 🔹 DELIVERY + DISCOUNT
   const totalWeight = calculateTotalWeight();
   let delivery = calculateDeliveryCharge(totalWeight, subtotal);
 
-if(cart.length === 0){
-  document.getElementById("total").innerHTML = "Your cart is empty";
-  document.getElementById("priceBreakup").innerText = "";
-  updateCartBadge();
-  updateBottomBar(0);
-  return;
-}
-
   let discount = 0;
   let offerMsg = "";
-// ===== OFFER LOGIC (ONLY ONE ALLOWED) =====
 
-if(appliedCoupon){
-  // 🔹 Coupon applied → AUTO OFFER disable
-  const rule = COUPONS[appliedCoupon];
-  offerMsg = `Coupon ${appliedCoupon} applied`;
+  if(appliedCoupon){
+    const rule = COUPONS[appliedCoupon];
+    offerMsg = `Coupon ${appliedCoupon} applied`;
 
-  if(rule.type === "FREE_DELIVERY"){
-    delivery = 0;
-  }
+    if(rule.type === "FREE_DELIVERY") delivery = 0;
+    if(rule.type === "FLAT") discount += rule.value;
 
-  if(rule.type === "FLAT"){
-    discount += rule.value;
-  }
-
-}else{
-  // 🔹 No coupon → AUTO OFFER apply
-  if(subtotal >= AUTO_OFFER.minAmount){
-    discount += AUTO_OFFER.discount;
-    offerMsg = `🎉 ₹${AUTO_OFFER.discount} OFF applied`;
   }else{
-    offerMsg = `Add ₹${AUTO_OFFER.minAmount - subtotal} more to get ₹${AUTO_OFFER.discount} OFF`;
+    if(subtotal >= AUTO_OFFER.minAmount){
+      discount += AUTO_OFFER.discount;
+      offerMsg = `🎉 ₹${AUTO_OFFER.discount} OFF applied`;
+    }else{
+      offerMsg = `Add ₹${AUTO_OFFER.minAmount - subtotal} more to get ₹${AUTO_OFFER.discount} OFF`;
+    }
   }
-}
-
 
   const finalTotal = Math.max(subtotal + delivery - discount, 0);
 
   document.getElementById("priceBreakup").innerText = offerMsg;
-
   document.getElementById("total").innerHTML = `
     <div>Subtotal: ₹${subtotal}</div>
     <div>Delivery: ₹${delivery}</div>
@@ -1012,9 +1015,6 @@ if(appliedCoupon){
   updateCartBadge();
   updateBottomBar(finalTotal);
 }
-
- 
-    
 
 
     
