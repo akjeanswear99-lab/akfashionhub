@@ -445,44 +445,6 @@ footer{
     gap:6px;
   ">
 
-    <input id="name" placeholder="Full Name">
-
-    <input
-      id="phone"
-      placeholder="Mobile Number"
-      maxlength="10"
-      inputmode="numeric"
-      oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-    >
-
-    <textarea
-      id="address"
-      rows="2"
-      placeholder="House No, Street, Area"
-    ></textarea>
-
-    <div style="display:flex; gap:6px;">
-      <input id="city" placeholder="City">
-      <input
-        id="pincode"
-        placeholder="Pincode"
-        maxlength="6"
-        inputmode="numeric"
-        oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-      >
-    </div>
-
-    <input id="state" placeholder="State">
-
-    <textarea
-      id="note"
-      rows="2"
-      placeholder="Order Note (max 50 words)"
-    ></textarea>
-
-  </div>
-
-  <div style="margin-top:8px; font-size:13px;">
     <input type="checkbox" id="terms" style="width:auto;">
     I agree to
     <span
@@ -491,6 +453,10 @@ footer{
     >
       Terms & Conditions
     </span>
+      <button onclick="openAddressModal()" style="margin-top:8px;">
+  ➕ Add / Edit Delivery Address
+</button>
+
   </div>
 
  
@@ -620,6 +586,54 @@ footer{
      
 
 </footer>
+<div id="addressModal" style="
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  z-index:60000;
+  align-items:center;
+  justify-content:center;
+">
+
+  <div style="
+    background:#fff;
+    width:90%;
+    max-width:420px;
+    border-radius:10px;
+    padding:15px;
+    position:relative;
+  ">
+
+    <span onclick="closeAddressModal()"
+      style="position:absolute;top:12px;left:12px;
+      font-size:20px;cursor:pointer;">❌</span>
+
+    <h3 style="text-align:center;">Delivery Address</h3>
+
+    <input id="addr_name" placeholder="Full Name *">
+    <input id="addr_phone" placeholder="Mobile Number *" maxlength="10">
+
+    <textarea id="addr_address" rows="2"
+      placeholder="House No, Street, Area *"></textarea>
+
+    <div style="display:flex;gap:6px;">
+      <input id="addr_city" placeholder="City *">
+      <input id="addr_pincode" placeholder="Pincode *" maxlength="6">
+    </div>
+
+    <input id="addr_state" placeholder="State *">
+
+    <textarea id="addr_note" rows="2"
+      placeholder="Note (optional, max 50 words)"></textarea>
+
+    <button onclick="saveAddress()" style="margin-top:10px;">
+      ✅ Save Address
+    </button>
+
+  </div>
+</div>
 
 <script>
 // Base64 encoded small colored images for offline use
@@ -1216,15 +1230,13 @@ async function checkout(){
     return;
   }
 
-  const n = document.getElementById("name").value.trim();
-  const p = document.getElementById("phone").value.trim();
-  const a = document.getElementById("address").value.trim();
-  const note = document.getElementById("note").value.trim();
+ const addr = JSON.parse(localStorage.getItem("address"));
 
-  if(p.length !== 10 || !n || a.length < 20 || cart.length === 0){
-    alert("Fill all details correctly");
-    return;
-  }
+if(!addr){
+  alert("Please add delivery address");
+  return;
+}
+
 
   /* ================= TOTAL CALCULATION (FIRST) ================= */
 
@@ -1279,10 +1291,10 @@ Discount: −₹${discount}
 TOTAL PAYABLE: ₹${finalTotal}
 ------------------------
 
-Customer: ${n}
-Phone: ${p}
-Address: ${a}
-Note: ${note}
+Customer: ${addr.name}
+Phone: ${addr.phone}
+Address: ${addr.address}, ${addr.city} - ${addr.pincode}, ${addr.state}
+Note: ${addr.note || "N/A"}
 `;
 
   /* ================= WHATSAPP OPEN (IMMEDIATE) ================= */
@@ -1367,19 +1379,63 @@ function applyCoupon(){
 
 
 </script>
+<script>
+// ===== ADDRESS MODAL SCRIPT =====
+
+function openAddressModal(){
+  const modal = document.getElementById("addressModal");
+  modal.style.display = "flex";
+  document.body.style.overflow = "hidden";
+
+  const saved = JSON.parse(localStorage.getItem("address"));
+  if(saved){
+    addr_name.value = saved.name;
+    addr_phone.value = saved.phone;
+    addr_address.value = saved.address;
+    addr_city.value = saved.city;
+    addr_pincode.value = saved.pincode;
+    addr_state.value = saved.state;
+    addr_note.value = saved.note || "";
+  }
+}
+
+function closeAddressModal(){
+  document.getElementById("addressModal").style.display = "none";
+  document.body.style.overflow = "";
+}
+
+function saveAddress(){
+  const data = {
+    name: addr_name.value.trim(),
+    phone: addr_phone.value.trim(),
+    address: addr_address.value.trim(),
+    city: addr_city.value.trim(),
+    pincode: addr_pincode.value.trim(),
+    state: addr_state.value.trim(),
+    note: addr_note.value.trim()
+  };
+
+  if(
+    !data.name ||
+    data.phone.length !== 10 ||
+    !data.address ||
+    !data.city ||
+    data.pincode.length !== 6 ||
+    !data.state
+  ){
+    alert("Please fill all mandatory address fields");
+    return;
+  }
+
+  localStorage.setItem("address", JSON.stringify(data));
+  closeAddressModal();
+  alert("Address saved successfully");
+}
+</script>
 
 <script>
 
         
-
-       const noteField = document.getElementById("note");
-
-noteField.oninput = function () {
-  const words = this.value.trim().split(/\s+/);
-  if (words.length > 30) {
-    this.value = words.slice(0, 30).join(" ");
-  }
-};
 
   
 function updateCartBadge(){
