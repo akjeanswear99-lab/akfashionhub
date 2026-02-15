@@ -768,7 +768,7 @@ async function loadProductsFromSheet(){
     renderProducts();
   }catch(err){
     console.error("Product load error", err);
-    alert("Products load nahi ho rahe");
+    alert("Some products may not load properly  Please refresh the page to try again ");
   }
 }
 
@@ -790,21 +790,23 @@ function updateStockMsg(i){
 
   // 🔍 stock check
 const variant = p.variants.find(
-  v => v.size === size && v.color === color
+  v => String(v.size) === String(size) &&
+       String(v.color).toLowerCase() === String(color).toLowerCase()
 );
+
 
 const stock = variant ? variant.stock : 0;
 
 
-  if(stock > 0){
-    msg.innerText = `Only ${stock} left`;
-    msg.style.color = "green";
-    btn.disabled = false;
-  }else{
-    msg.innerText = "Out of stock";
-    msg.style.color = "red";
-    btn.disabled = true;
-  }
+if (variant && variant.stock > 0) {
+  msg.innerText = `Only ${variant.stock} left`;
+  msg.style.color = "green";
+  btn.disabled = false;
+} else {
+  msg.innerText = "Out of stock";
+  msg.style.color = "red";
+  btn.disabled = true;
+}
 }
 
 
@@ -885,9 +887,11 @@ if(existing){
   }
 }else{
   // 🆕 first time add → inventory se max stock nikalo
- const variant = p.variants.find(
-  v => v.size === size && v.color === color
+const variant = p.variants.find(
+  v => String(v.size) === String(size) &&
+       String(v.color).toLowerCase() === String(color).toLowerCase()
 );
+
 
 const maxStock = variant ? variant.stock : 0;
 
