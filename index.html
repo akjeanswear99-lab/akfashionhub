@@ -778,40 +778,28 @@ function updateStockMsg(i){
   const color = document.getElementById("color"+i).value;
   const msg = document.getElementById("stockMsg"+i);
   const btn = document.getElementById("btn"+i);
-const priceBox = document.getElementById("price"+i);
-if(variant){
-  priceBox.innerText = "₹" + variant.price;
-}
 
-  // reset
   btn.disabled = true;
   msg.innerText = "";
 
-  if(!size || !color){
-    return;
-  }
+  if(!size || !color) return;
 
   const p = products[i];
 
-  // 🔍 stock check
-const variant = p.variants.find(
-  v => String(v.size) === String(size) &&
-       String(v.color).toLowerCase() === String(color).toLowerCase()
-);
+  const variant = p.variants.find(v =>
+    String(v.size).trim() === String(size).trim() &&
+    String(v.color).toLowerCase().trim() === String(color).toLowerCase().trim()
+  );
 
-
-const stock = variant ? variant.stock : 0;
-
-
-if (variant && variant.stock > 0) {
-  msg.innerText = `Only ${variant.stock} left`;
-  msg.style.color = "green";
-  btn.disabled = false;
-} else {
-  msg.innerText = "Out of stock";
-  msg.style.color = "red";
-  btn.disabled = true;
-}
+  if(variant && Number(variant.stock) > 0){
+    msg.innerText = `Only ${variant.stock} left`;
+    msg.style.color = "green";
+    btn.disabled = false;   // 🔥 THIS IS IMPORTANT
+  }else{
+    msg.innerText = "Out of stock";
+    msg.style.color = "red";
+    btn.disabled = true;
+  }
 }
 
 
@@ -865,10 +853,9 @@ function openImage(src){
 }
 
 function addToCart(i){
-    // 🔒 FINAL SAFETY: server stock ke bina add allow nahi
-
   const size = document.getElementById("size"+i).value;
   const color = document.getElementById("color"+i).value;
+
   if(!size || !color){
     showToast("Select size & color");
     return;
@@ -876,46 +863,43 @@ function addToCart(i){
 
   const p = products[i];
 
-  // reduce stock
- 
-let existing = cart.find(
-  item => item.id === p.id && item.size === size && item.color === color
-);
+  const variant = p.variants.find(v =>
+    String(v.size) === String(size) &&
+    String(v.color).toLowerCase() === String(color).toLowerCase()
+  );
 
-if(existing){
-  // 🔒 already cart me hai → stock limit check
-  if(existing.qty < existing.maxStock){
-    existing.qty++;
-  }else{
-    showToast("Stock limit reached");
-    return;
-  }
-}else{
-  // 🆕 first time add → inventory se max stock nikalo
-const variant = p.variants.find(
-  v => String(v.size) === String(size) &&
-       String(v.color).toLowerCase() === String(color).toLowerCase()
-);
-
-
-const maxStock = variant ? variant.stock : 0;
-
-  if(maxStock <= 0){
+  if(!variant || variant.stock <= 0){
     showToast("Out of stock");
     return;
   }
 
-cart.push({
-  id: p.id,
-  name: p.name,
-  size,
-  color,
-  qty: 1,
-  maxStock: variant.stock,
-  price: variant.price,
-  weight: variant.weight || 500
-});
+  let existing = cart.find(
+    item => item.id === p.id && item.size === size && item.color === color
+  );
 
+  if(existing){
+    if(existing.qty < existing.maxStock){
+      existing.qty++;
+    }else{
+      showToast("Stock limit reached");
+      return;
+    }
+  }else{
+    cart.push({
+      id: p.id,
+      name: p.name,
+      size,
+      color,
+      qty: 1,
+      maxStock: variant.stock,
+      price: variant.price,
+      weight: variant.weight || 500
+    });
+  }
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCart();
+  showToast("Item added to cart");
 }
 
 
