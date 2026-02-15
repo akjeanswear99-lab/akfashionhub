@@ -900,13 +900,17 @@ const maxStock = variant ? variant.stock : 0;
     return;
   }
 
-  cart.push({
-    ...p,
-    size,
-    color,
-    qty: 1,
-    maxStock: maxStock  
-  });
+cart.push({
+  id: p.id,
+  name: p.name,
+  size,
+  color,
+  qty: 1,
+  maxStock: variant.stock,
+  price: variant.price,
+  weight: variant.weight || 500
+});
+
 }
 
 
