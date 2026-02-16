@@ -673,7 +673,10 @@ if(!p.variants || p.variants.length === 0){
 
         <h3>${p.name}</h3>
         <p>SKU: ${p.id}</p>
-    <p style="font-weight:bold">
+   <p style="font-weight:bold">
+  Price: ₹${p.variants[0].price}
+</p>
+
  
 
         <p>${p.category}</p>
@@ -913,7 +916,11 @@ function updateCart(){
   let offerMsg = "";
 
   if(appliedCoupon){
-    const rule = COUPONS[appliedCoupon];
+   const rule = COUPONS[appliedCoupon];
+if(!rule){
+  appliedCoupon = null;
+}
+
     offerMsg = `Coupon ${appliedCoupon} applied`;
 
     if(rule.type === "FREE_DELIVERY") delivery = 0;
@@ -1092,13 +1099,13 @@ async function checkout(){
     );
 
     stockResult = await stockResponse.json();
+if(!stockResult || stockResult.status !== "SUCCESS" || !Array.isArray(stockResult.items)){
+  alert(stockResult?.message || "Stock verification failed");
+  window.__checkoutInProgress = false;
+  return;
+}
 
-    if(!stockResult || !Array.isArray(stockResult.items)){
-      alert("Stock verification failed");
-      window.__checkoutInProgress = false;
-      return;
-    }
-
+ 
   }catch(e){
     window.__checkoutInProgress = false;
     alert("Server error");
@@ -1107,10 +1114,8 @@ async function checkout(){
 
   window.__checkoutInProgress = false;
 
-  if(stockResult.status !== "SUCCESS"){
-    alert(stockResult.message);
-    return;
-  }
+
+
 
   // ===== PRICE FROM SHEET =====
   let subtotal = 0;
@@ -1128,14 +1133,24 @@ async function checkout(){
   const totalWeight = calculateTotalWeight();
   const delivery = calculateDeliveryCharge(totalWeight, subtotal);
 
-  let discount = 0;
-  if(appliedCoupon){
-    const rule = COUPONS[appliedCoupon];
+let discount = 0;
+
+if(appliedCoupon){
+  const rule = COUPONS[appliedCoupon];
+
+  if(rule){
     if(rule.type === "FREE_DELIVERY") discount += delivery;
     if(rule.type === "FLAT") discount += rule.value;
-  }else if(subtotal >= AUTO_OFFER.minAmount){
+  }else{
+    appliedCoupon = null;
+  }
+
+}else{
+  if(subtotal >= AUTO_OFFER.minAmount){
     discount += AUTO_OFFER.discount;
   }
+}
+
 
   const finalTotal = Math.max(subtotal + delivery - discount, 0);
 
