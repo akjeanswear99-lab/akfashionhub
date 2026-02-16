@@ -711,16 +711,17 @@ async function loadProductsFromSheet(){
     const res = await fetch(PRODUCT_API);
     const data = await res.json();
 
-    products = data.map(p => ({
-     id: p.sku,
-      name: p.name,
-      gender: p.gender,
-      category: p.category,
-      measure: p.measurement,
-      description: p.description,
-      img: p.images.filter(Boolean),
-      variants: p.variants
-    }));
+   products = data.map(p => ({
+  id: p.id,
+  name: p.id,              // SKU as name
+  gender: "Men",           // default safe
+  category: p.category,
+  measure: p.measure,
+  description: p.description,
+  img: p.img,
+  variants: p.variants
+}));
+
 
     renderProducts();
   }catch(err){
