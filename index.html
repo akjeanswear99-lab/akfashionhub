@@ -1069,9 +1069,7 @@ async function checkout(){
     return;
   }
 
-  if(window.__checkoutInProgress){
-    return;
-  }
+  if(window.__checkoutInProgress) return;
   window.__checkoutInProgress = true;
 
   let stockResult;
@@ -1080,8 +1078,8 @@ async function checkout(){
     const stockResponse = await fetch(
       "https://script.google.com/macros/s/AKfycbz7JHlll_RmJAqwVQ4tYjlyG_ITlidQRi2w7mq9FFP7TKxqvaNaNPC6Nng8kffn3rD9ZQ/exec",
       {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
         body: JSON.stringify({
           items: cart.map(c => ({
             sku: c.id,
@@ -1095,30 +1093,27 @@ async function checkout(){
 
     stockResult = await stockResponse.json();
 
-    // ✅ SAFE CHECK
-    if(!stockResult || !stockResult.items || !Array.isArray(stockResult.items)){
-      alert("Stock verification failed. Please try again.");
+    if(!stockResult || !Array.isArray(stockResult.items)){
+      alert("Stock verification failed");
       window.__checkoutInProgress = false;
       return;
     }
 
   }catch(e){
     window.__checkoutInProgress = false;
-    alert("Server error. Please try again.");
+    alert("Server error");
     return;
   }
 
   window.__checkoutInProgress = false;
 
   if(stockResult.status !== "SUCCESS"){
-    alert(stockResult.message || "Stock not available");
+    alert(stockResult.message);
     return;
   }
 
-  /* ================= PRICE CALCULATION ================= */
-
+  // ===== PRICE FROM SHEET =====
   let subtotal = 0;
-
   stockResult.items.forEach(sheetItem => {
     const cartItem = cart.find(c =>
       c.id === sheetItem.sku &&
@@ -1134,158 +1129,54 @@ async function checkout(){
   const delivery = calculateDeliveryCharge(totalWeight, subtotal);
 
   let discount = 0;
-
   if(appliedCoupon){
     const rule = COUPONS[appliedCoupon];
-
-    if(rule.type === "FREE_DELIVERY"){
-      discount += delivery;
-    }
-
-    if(rule.type === "FLAT"){
-      discount += rule.value;
-    }
-
-  }else{
-    if(subtotal >= AUTO_OFFER.minAmount){
-      discount += AUTO_OFFER.discount;
-    }
+    if(rule.type === "FREE_DELIVERY") discount += delivery;
+    if(rule.type === "FLAT") discount += rule.value;
+  }else if(subtotal >= AUTO_OFFER.minAmount){
+    discount += AUTO_OFFER.discount;
   }
 
   const finalTotal = Math.max(subtotal + delivery - discount, 0);
 
-  /* ================= WHATSAPP / SHEET CODE ================= */
-  // yahan tumhara existing WhatsApp + Sheet save code rahega
-}
-
-
+  // ===== ORDER SAVE =====
   const orderId = generateOrderId();
-// ===== SAVE ORDER FOR MY ORDERS =====
 
-let allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
+  let allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
+  if(!allOrders[addr.phone]) allOrders[addr.phone] = [];
 
-if(!allOrders[addr.phone]){
-  allOrders[addr.phone] = [];
-}
+  allOrders[addr.phone].push({
+    orderId,
+    date:new Date().toLocaleString(),
+    status:"Order Received",
+    total:finalTotal,
+    items:cart
+  });
 
-allOrders[addr.phone].push({
-  orderId: orderId,
-  date: new Date().toLocaleString(),
-  status: "Order Received",
-  total: finalTotal,
-  items: cart.map(c => ({
-    name: c.name,
-    size: c.size,
-    color: c.color,
-    qty: c.qty
-  }))
-});
+  localStorage.setItem("ordersByPhone", JSON.stringify(allOrders));
 
-localStorage.setItem("ordersByPhone", JSON.stringify(allOrders));
-
+  // ===== WHATSAPP =====
   let msg = `AK FASHION HUB
 Order ID: ${orderId}
-Keshav Nagar, Hapur 245101
 
-`;
-
-cart.forEach(c=>{
-const sheetItem = stockResult.items.find(
-  i =>
-    i.sku === c.id &&
-    i.size === c.size &&
-    i.color === c.color
-);
-
-const safePrice = sheetItem ? sheetItem.price : 0;
-
-  msg += `${c.name}
-SKU:${c.id}
-Size:${c.size}
-Color:${c.color}
-₹${safePrice}
-Qty: ${c.qty}
-
-`;
-}); 
-
-  msg += `
-------------------------
-Subtotal: ₹${subtotal}
-Delivery: ₹${delivery}
-Discount: −₹${discount}
-------------------------
-TOTAL PAYABLE: ₹${finalTotal}
-------------------------
+TOTAL: ₹${finalTotal}
 
 Customer: ${addr.name}
 Phone: ${addr.phone}
-Address: ${addr.address}, ${addr.city} - ${addr.pincode}, ${addr.state}
-Note: ${addr.note || "N/A"}
-
+Address: ${addr.address}, ${addr.city}
 `;
-
-  /* ================= WHATSAPP OPEN (IMMEDIATE) ================= */
 
   window.open(
     "https://wa.me/919599497909?text=" + encodeURIComponent(msg),
     "_blank"
   );
 
-  /* ================= BACKGROUND WORK ================= */
-
-  try{
- await fetch("https://script.google.com/macros/s/AKfycbxRjrqSNmOlYFlGHe3FDGOEpCaPkVQrypY0PISQA4gzDD24KwRAG4YgLl1x7ZPLBTQG9g/exec", {
-  method:"POST",
-  headers:{ "Content-Type":"application/json" },
-  body: JSON.stringify({
-    orderId,
-    name: addr.name,
-    phone: addr.phone,
-    alt_phone: "",
-    address: `${addr.address}, ${addr.city}`,
-    city: addr.city,
-    state: addr.state,
-    pincode: addr.pincode,
-
-    items: cart.map(c =>
-      `${c.name} (SKU:${c.id}) x${c.qty}`
-    ).join(" || "),
-
-    variant_details: cart.map(c =>
-      `SKU:${c.id} | Size:${c.size} | Color:${c.color} | Qty:${c.qty}`
-    ).join(" || "),
-
-    size_list: [...new Set(cart.map(c => c.size))].join(", "),
-    color_list: [...new Set(cart.map(c => c.color))].join(", "),
-
-    total_quantity: cart.reduce((s,i)=>s+i.qty,0),
-    total_weight: calculateTotalWeight(),
-
-    subtotal,
-    delivery_charge: delivery,
-    discount,
-    final_amount: finalTotal,
-
-    payment_status: "Pending",
-    payment_mode: "COD",
-    payment_id: "",
-
-    source: "Website"
-  })
-});
-
-
-  }catch(e){
-    console.log("Sheet error", e);
-  }
-
-  alert("Order Placed Successfully!\nOrder ID: " + orderId);
-
   cart = [];
   localStorage.removeItem("cart");
   updateCart();
   renderProducts();
+
+  alert("Order Placed Successfully!\nOrder ID: " + orderId);
 }
 
 
