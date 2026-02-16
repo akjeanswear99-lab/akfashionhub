@@ -375,17 +375,34 @@ footer{
   <h3 id="total"></h3>
    
 <div style="margin:12px 0;">
-  <input
-    id="couponInput"
-    placeholder="Enter offer code"
-    style="text-transform:uppercase;"
-  >
-  <button onclick="applyCoupon()" style="margin-top:6px;">
-    Apply Offer
-  </button>
 
-  <p id="couponMsg" style="font-size:13px; margin-top:6px;"></p>
+  <div style="
+    display:flex;
+    border:1px solid #ccc;
+    border-radius:6px;
+    overflow:hidden;
+  ">
+    <input
+      id="couponInput"
+      placeholder="Enter coupon code"
+      style="border:none;outline:none;flex:1;padding:10px;"
+      oninput="autoApplyCoupon()"
+    >
+
+    <div style="
+      background:#000;
+      color:#fff;
+      padding:10px 14px;
+      font-size:13px;
+    ">
+      APPLY
+    </div>
+  </div>
+
+  <p id="couponMsg" style="font-size:13px;margin-top:6px;"></p>
+
 </div>
+
 
 
 <div id="priceBreakup" style="font-size:14px; margin-top:10px;"></div>
@@ -401,15 +418,13 @@ footer{
     gap:6px;
   ">
 
-   <div style="display:flex; align-items:center; gap:6px; font-size:14px;">
-  
-  <input
-    type="checkbox"
-    id="terms"
-    onclick="event.stopPropagation()"
-  >
+ <div style="display:flex; align-items:center; gap:8px; font-size:14px;">
 
-  <span>I agree to</span>
+  <input type="checkbox" id="terms">
+
+  <label for="terms" style="cursor:pointer;">
+    I Agree
+  </label>
 
   <span
     onclick="openTerms()"
@@ -419,6 +434,7 @@ footer{
   </span>
 
 </div>
+
 
       <button onclick="openAddressModal()" style="margin-top:8px;">
   ➕ Add / Edit Delivery Address
@@ -1111,17 +1127,11 @@ async function checkout(){
 
 
   // ===== PRICE FROM SHEET =====
-  let subtotal = 0;
-  stockResult.items.forEach(sheetItem => {
-    const cartItem = cart.find(c =>
-      c.id === sheetItem.sku &&
-      c.size === sheetItem.size &&
-      c.color === sheetItem.color
-    );
-    if(cartItem){
-      subtotal += Number(sheetItem.price) * cartItem.qty;
-    }
-  });
+ let subtotal = 0;
+cart.forEach(c => {
+  subtotal += Number(c.price) * c.qty;
+});
+
 
   const totalWeight = calculateTotalWeight();
   const delivery = calculateDeliveryCharge(totalWeight, subtotal);
@@ -1174,10 +1184,8 @@ Phone: ${addr.phone}
 Address: ${addr.address}, ${addr.city}
 `;
 
-  window.open(
-    "https://wa.me/919599497909?text=" + encodeURIComponent(msg),
-    "_blank"
-  );
+ location.href =
+  "https://wa.me/919599497909?text=" + encodeURIComponent(msg);
 
 cart = [];
 localStorage.removeItem("cart");
@@ -1239,8 +1247,66 @@ function applyCoupon(){
   updateCart();
 }
 
+function autoApplyCoupon(){
+  const code = document
+    .getElementById("couponInput")
+    .value
+    .trim()
+    .toUpperCase();
 
+  const msg = document.getElementById("couponMsg");
+
+  if(code.length < 4){
+    msg.innerText = "";
+    appliedCoupon = null;
+    updateCart();
+    return;
+  }
+
+  if(!COUPONS[code]){
+    msg.innerText = "❌ Invalid coupon";
+    msg.style.color = "red";
+    appliedCoupon = null;
+    updateCart();
+    return;
+  }
+
+  appliedCoupon = code;
+  msg.innerText = "✅ Coupon applied";
+  msg.style.color = "green";
+  updateCart();
+}
+
+<script>
+(function(){
+  const cart = document.getElementById("cartPanel");
+
+  if(!cart) return;
+
+  // 🖱️ MOUSE / TRACKPAD
+  cart.addEventListener("wheel", function(e){
+    const scrollTop = cart.scrollTop;
+    const scrollHeight = cart.scrollHeight;
+    const height = cart.clientHeight;
+    const delta = e.deltaY;
+
+    // cart ke andar hi scroll ho
+    if (
+      (delta > 0 && scrollTop + height < scrollHeight) ||
+      (delta < 0 && scrollTop > 0)
+    ){
+      e.stopPropagation();
+    }
+  }, { passive:false });
+
+  // 📱 TOUCH (mobile)
+  cart.addEventListener("touchmove", function(e){
+    e.stopPropagation();
+  }, { passive:false });
+
+})();
 </script>
+
 <script>
 // ===== ADDRESS MODAL SCRIPT =====
 
