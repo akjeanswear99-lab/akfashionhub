@@ -468,8 +468,29 @@ footer{
   from{ transform: scale(0.85); opacity:0; }
   to{ transform: scale(1); opacity:1; }
 }
+/* ===== FIX: Checkbox alignment & ghost focus box ===== */
+#checkoutSection label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+
+label input[type="checkbox"]{
+  margin:0;
+}
+
+/* REMOVE GHOST / LIGHT FOCUS BOX */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus{
+  outline:none !important;
+  box-shadow:none !important;
+}
 
 </style>
+    
 </head>
 
 <body>
@@ -537,8 +558,6 @@ footer{
 
 <p id="couponMsg" style="font-size:13px;margin-top:6px;"></p>
 
-  
-  <p id="couponMsg" style="font-size:13px;margin-top:6px;"></p>
 
 </div>
 
@@ -595,13 +614,14 @@ footer{
     <div id="myOrders" style="margin-top:10px;"></div>
 
     <button
-      style="margin-top:12px;background:#000;color:#fff;"
-     onclick="
+     
+   onclick="
   document.getElementById('myOrdersSection').style.display='none';
   document.getElementById('checkoutSection').style.display='block';
   document.getElementById('myOrdersBtn').style.display='block';
+  document.getElementById('productSection').style.display='block';
 "
-    >
+
       ← BACK TO CHECKOUT
     </button>
   </div>
@@ -623,7 +643,7 @@ footer{
 </div>
 
 
-<div class="container">
+<div class="container" id="productSection">
     <h2>Products</h2>
     <div style="margin-bottom:20px; display:flex; gap:10px;">
   <button onclick="filterProducts('All')">All</button>
@@ -794,7 +814,7 @@ function filterProducts(type){
     function renderProducts(){
         
   const box = document.getElementById("products");
-        document.getElementById("loaderWrap").style.display = "none";
+        
 
   box.innerHTML = "";
 
@@ -1661,7 +1681,10 @@ function openMyOrders(){
   document.getElementById("checkoutSection").style.display = "none";
   document.getElementById("myOrdersSection").style.display = "block";
   document.getElementById("myOrdersBtn").style.display = "none";
+
+  document.getElementById("productSection").style.display = "none";
 }
+
     </script>
 
 
@@ -1808,28 +1831,31 @@ window.openTerms = function(){
 };
 </script>
 <script>
-(function(){
+
+    (function(){
   const cart = document.getElementById("cartPanel");
   if(!cart) return;
 
   cart.addEventListener("wheel", function(e){
-    const scrollTop = cart.scrollTop;
-    const scrollHeight = cart.scrollHeight;
-    const height = cart.clientHeight;
-    const delta = e.deltaY;
+    const atTop = cart.scrollTop === 0;
+    const atBottom =
+      cart.scrollTop + cart.clientHeight >= cart.scrollHeight - 1;
 
     if (
-      (delta > 0 && scrollTop + height < scrollHeight) ||
-      (delta < 0 && scrollTop > 0)
+      (e.deltaY < 0 && atTop) ||
+      (e.deltaY > 0 && atBottom)
     ){
-      e.stopPropagation();
+      return; // allow page scroll
     }
+
+    e.preventDefault(); // lock scroll inside cart
   }, { passive:false });
 
   cart.addEventListener("touchmove", function(e){
     e.stopPropagation();
   }, { passive:false });
 })();
+
 </script>
 <div id="checkoutLoader" style="
   position:fixed;
