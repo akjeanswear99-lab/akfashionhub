@@ -116,6 +116,10 @@ header .address{
     padding:5px;
     cursor:pointer;
 }
+    .single-img button{
+  display: none;
+}
+
     .slider {
   width: 100%;
   height: auto;
@@ -214,21 +218,7 @@ footer{
     font-size:13px;
     margin:4px 0;
 }
-    .menu-icon{
-  position:absolute;
-  top:22px;
-  right:20px;
-  cursor:pointer;
-  z-index:10001;
-}
-
-.menu-icon span{
-  display:block;
-  width:26px;
-  height:3px;
-  background:#fff;
-  margin:5px 0;
-}
+  
 #toast{
   position: fixed;
   top: 20px;
@@ -280,26 +270,8 @@ footer{
     padding: 12px;
   }
 
-  .card img{
-    height: 260px;
-  }
-
-  button{
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  #cartPanel{
-    width: 100%;
-    right: -100%;
-  }
-}
-    
-@media (max-width: 768px){
-
   .products{
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); 
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
 
@@ -307,8 +279,13 @@ footer{
     padding: 10px;
   }
 
-  .card img{
-    height: 200px;
+  .card img,
+  .product-img{
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    height: auto;
+    object-fit: contain;
+    background: #f7f7f7;
   }
 
   .card h3{
@@ -319,23 +296,24 @@ footer{
     font-size: 12px;
   }
 
-  select, button{
+  button, select{
     font-size: 13px;
     padding: 8px;
   }
-}
 
-@media (max-width: 768px){
-
-  .card img,
-  .product-img{
+  #cartPanel{
     width: 100%;
-    height: auto;          
-    aspect-ratio: 3 / 4;  
-    object-fit: contain;   
-    background: #f7f7f7;
+    right: -100%;
+  }
+
+  #floatingCart{
+    top: 14px;
+    left: 14px;
+    padding: 9px 11px;
+    font-size: 18px;
   }
 }
+
 
     #floatingCart{
   position: fixed;
@@ -350,28 +328,8 @@ footer{
   z-index: 10050;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
-@media (max-width:768px){
-  #floatingCart{
-    top: 14px;
-    left: 14px;
-    padding: 9px 11px;
-    font-size: 18px;
-  }
-}
-.address-box{
-  background:#f9f9f9;
-  padding:10px;
-  border-radius:6px;
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
 
-.address-box input,
-.address-box textarea{
-  padding:7px;
-  font-size:13px;
-}
+
 
 .address-box .row{
   display:flex;
@@ -664,21 +622,8 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
   discount: 100    
 };
   
-const COUPONS = {
-  "FREEDEL": {
-    type: "FREE_DELIVERY"
-  },
+let COUPONS = {};   // empty at start
 
-  "SAVE30": {
-    type: "FLAT",
-    value: 30
-  },
-
-  "SAVE50": {
-    type: "FLAT",
-    value: 50
-  }
-};
 
 let appliedCoupon = null;
 
@@ -690,6 +635,7 @@ function filterProducts(type){
   renderProducts();
 }
     function renderProducts(){
+        
   const box = document.getElementById("products");
   box.innerHTML = "";
 
@@ -706,25 +652,29 @@ if(!p.variants || p.variants.length === 0){
 
     box.innerHTML += `
       <div class="card">
-        <div class="slider">
-          <button class="prev" onclick="changeImage(${i},-1)">‹</button>
-       <img
-  id="img${i}"
-  src="${p.img[0] || 'https://dummyimage.com/600x800/eee/000&text=AK+FASHION+HUB'}"
-  class="product-img"
-  onclick="openImage(this.src)"
->
+ <div class="slider ${p.img.length <= 1 ? 'single-img' : ''}">
 
-          <button class="next" onclick="changeImage(${i},1)">›</button>
-        </div>
+  <button class="prev" onclick="changeImage(${i},-1)">‹</button>
+
+  <img
+    id="img${i}"
+    src="${p.img[0] || 'https://dummyimage.com/600x800/eee/000&text=AK+FASHION+HUB'}"
+    class="product-img"
+    onclick="openImage(this.src)"
+  >
+
+
+
+  <button class="next" onclick="changeImage(${i},1)">›</button>
+</div>
+
 
         <p style="font-size:12px;color:#666">${p.gender}</p>
 
         <h3>${p.name}</h3>
         <p>SKU: ${p.id}</p>
     <p style="font-weight:bold">
-  Price: <span id="price${i}">₹${p.variants[0].price}</span>
-</p>
+ 
 
         <p>${p.category}</p>
         <p style="font-size:12px">${p.description}</p>
@@ -903,15 +853,8 @@ function addToCart(i){
 }
 
 
-
-  localStorage.setItem("cart", JSON.stringify(cart));
-
-  updateCart();
-    showToast("Item added to cart successfully");
-    toggleCart();
-}
-
 function updateCart(){
+ 
   let subtotal = 0;
   const box = document.getElementById("cartItems");
   box.innerHTML = "";
@@ -1015,7 +958,7 @@ function updateCart(){
 function calculateDeliveryCharge(weight, orderValue){
 
   if(weight <= 0) return 0;
-  if(weight > 5000) return 0;
+  if(weight > 5000) return 200;
 
   // 🔹 50g slab = ₹7
   const roundedWeight = Math.ceil(weight / 50) * 50;
@@ -1112,91 +1055,109 @@ function confirmNo(){
   const random = Math.floor(1000 + Math.random() * 9000);
   return `AKFH-${date}-${random}`;
 }
-async function checkout(){
-    // 🔒 LOCK CART DURING CHECKOUT
-if(window.__checkoutInProgress){
-  return;
-}
-window.__checkoutInProgress = true;
-
-// ===== SERVER STOCK CHECK =====
-let stockResult;
-
-try{
-  const stockResponse = await fetch(
-    "https://script.google.com/macros/s/AKfycbz7JHlll_RmJAqwVQ4tYjlyG_ITlidQRi2w7mq9FFP7TKxqvaNaNPC6Nng8kffn3rD9ZQ/exec",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        items: cart.map(c => ({
-          sku: c.id,
-          size: c.size,
-          color: c.color,
-          qty: c.qty
-        }))
-      })
-    }
-  );
-
-  stockResult = await stockResponse.json();
     
-}catch(e){
-  alert("Server error. Please try again.");
-  return;
-}
-window.__checkoutInProgress = false;
+async function checkout(){
 
-if(stockResult.status !== "SUCCESS"){
-  alert(stockResult.message);
-  return;
-}
+  if(!document.getElementById("terms").checked){
+    alert("Please agree to Terms & Conditions");
+    return;
+  }
 
+  const addr = JSON.parse(localStorage.getItem("address"));
+  if(!addr){
+    alert("Please add delivery address first");
+    return;
+  }
 
-  /* ================= TOTAL CALCULATION (FIRST) ================= */
-// ===== SUBTOTAL FROM GOOGLE SHEET PRICE =====
-let subtotal = 0;
+  if(window.__checkoutInProgress){
+    return;
+  }
+  window.__checkoutInProgress = true;
 
-// stockResult.items me sheet se aaya price hai
-stockResult.items.forEach(sheetItem => {
-  const cartItem = cart.find(
-    c =>
+  let stockResult;
+
+  try{
+    const stockResponse = await fetch(
+      "https://script.google.com/macros/s/AKfycbz7JHlll_RmJAqwVQ4tYjlyG_ITlidQRi2w7mq9FFP7TKxqvaNaNPC6Nng8kffn3rD9ZQ/exec",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: cart.map(c => ({
+            sku: c.id,
+            size: c.size,
+            color: c.color,
+            qty: c.qty
+          }))
+        })
+      }
+    );
+
+    stockResult = await stockResponse.json();
+
+    // ✅ SAFE CHECK
+    if(!stockResult || !stockResult.items || !Array.isArray(stockResult.items)){
+      alert("Stock verification failed. Please try again.");
+      window.__checkoutInProgress = false;
+      return;
+    }
+
+  }catch(e){
+    window.__checkoutInProgress = false;
+    alert("Server error. Please try again.");
+    return;
+  }
+
+  window.__checkoutInProgress = false;
+
+  if(stockResult.status !== "SUCCESS"){
+    alert(stockResult.message || "Stock not available");
+    return;
+  }
+
+  /* ================= PRICE CALCULATION ================= */
+
+  let subtotal = 0;
+
+  stockResult.items.forEach(sheetItem => {
+    const cartItem = cart.find(c =>
       c.id === sheetItem.sku &&
       c.size === sheetItem.size &&
       c.color === sheetItem.color
-  );
-
-  if(cartItem){
-    subtotal += sheetItem.price * cartItem.qty;
-  }
-});
-
+    );
+    if(cartItem){
+      subtotal += Number(sheetItem.price) * cartItem.qty;
+    }
+  });
 
   const totalWeight = calculateTotalWeight();
   const delivery = calculateDeliveryCharge(totalWeight, subtotal);
 
   let discount = 0;
- if(appliedCoupon){
-  const rule = COUPONS[appliedCoupon];
 
-  if(rule.type === "FREE_DELIVERY"){
-    discount += delivery;
+  if(appliedCoupon){
+    const rule = COUPONS[appliedCoupon];
+
+    if(rule.type === "FREE_DELIVERY"){
+      discount += delivery;
+    }
+
+    if(rule.type === "FLAT"){
+      discount += rule.value;
+    }
+
+  }else{
+    if(subtotal >= AUTO_OFFER.minAmount){
+      discount += AUTO_OFFER.discount;
+    }
   }
-
-  if(rule.type === "FLAT"){
-    discount += rule.value;
-  }
-
-}else{
-  if(subtotal >= AUTO_OFFER.minAmount){
-    discount += AUTO_OFFER.discount;
-  }
-}
-
 
   const finalTotal = Math.max(subtotal + delivery - discount, 0);
 
-  /* ================= WHATSAPP MESSAGE ================= */
+  /* ================= WHATSAPP / SHEET CODE ================= */
+  // yahan tumhara existing WhatsApp + Sheet save code rahega
+}
+
 
   const orderId = generateOrderId();
 // ===== SAVE ORDER FOR MY ORDERS =====
@@ -1261,6 +1222,7 @@ Customer: ${addr.name}
 Phone: ${addr.phone}
 Address: ${addr.address}, ${addr.city} - ${addr.pincode}, ${addr.state}
 Note: ${addr.note || "N/A"}
+
 `;
 
   /* ================= WHATSAPP OPEN (IMMEDIATE) ================= */
@@ -1273,22 +1235,47 @@ Note: ${addr.note || "N/A"}
   /* ================= BACKGROUND WORK ================= */
 
   try{
-    await fetch("https://script.google.com/macros/s/AKfycbwMWrEhaO4sGqHhUX7nr-zrCtROhYx0krL2Cx6rVbA0pMCenDGP32xDWMrcQb9KgaLi/exec", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({
-        orderId,
-        name: addr.name,
-phone: addr.phone,
-address: `${addr.address}, ${addr.city} - ${addr.pincode}, ${addr.state}`,
-        products: cart.map(c =>
-          `${c.name} | SKU:${c.id} | Size:${c.size} | Color:${c.color} | Qty:${c.qty}`
-        ).join(" || "),
-        totalQty: cart.reduce((s,i)=>s+i.qty,0),
-        totalAmount: finalTotal,
-        status:"Order Received"
-      })
-    });
+ await fetch("https://script.google.com/macros/s/AKfycbxRjrqSNmOlYFlGHe3FDGOEpCaPkVQrypY0PISQA4gzDD24KwRAG4YgLl1x7ZPLBTQG9g/exec", {
+  method:"POST",
+  headers:{ "Content-Type":"application/json" },
+  body: JSON.stringify({
+    orderId,
+    name: addr.name,
+    phone: addr.phone,
+    alt_phone: "",
+    address: `${addr.address}, ${addr.city}`,
+    city: addr.city,
+    state: addr.state,
+    pincode: addr.pincode,
+
+    items: cart.map(c =>
+      `${c.name} (SKU:${c.id}) x${c.qty}`
+    ).join(" || "),
+
+    variant_details: cart.map(c =>
+      `SKU:${c.id} | Size:${c.size} | Color:${c.color} | Qty:${c.qty}`
+    ).join(" || "),
+
+    size_list: [...new Set(cart.map(c => c.size))].join(", "),
+    color_list: [...new Set(cart.map(c => c.color))].join(", "),
+
+    total_quantity: cart.reduce((s,i)=>s+i.qty,0),
+    total_weight: calculateTotalWeight(),
+
+    subtotal,
+    delivery_charge: delivery,
+    discount,
+    final_amount: finalTotal,
+
+    payment_status: "Pending",
+    payment_mode: "COD",
+    payment_id: "",
+
+    source: "Website"
+  })
+});
+
+
   }catch(e){
     console.log("Sheet error", e);
   }
@@ -1324,6 +1311,7 @@ if(isOpen){
 }  // ❗ toggleCart function CLOSE
 
 function applyCoupon(){
+
     if(cart.length === 0){
   alert("Cart is empty");
   return;
