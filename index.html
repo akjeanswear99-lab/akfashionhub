@@ -759,18 +759,18 @@ function updateStockMsg(i){
 }
 
 
-
 function changeImage(i, dir){
-    if(!p.img || p.img.length <= 1) return;
   const p = products[i];
-  const imgEl = document.getElementById("img"+i);
+  if(!p || !p.img || p.img.length <= 1) return;
 
+  const imgEl = document.getElementById("img"+i);
   let current = p.img.findIndex(src => imgEl.src.includes(src));
   if(current === -1) current = 0;
 
   current = (current + dir + p.img.length) % p.img.length;
   imgEl.src = p.img[current];
 }
+
 
 function showToast(message){
   const toast = document.getElementById("toast");
@@ -859,33 +859,26 @@ function addToCart(i){
   showToast("Item added to cart");
 }
 
-
-
 function updateCart(){
 
   let subtotal = 0;
   const box = document.getElementById("cartItems");
   box.innerHTML = "";
 
-  // 🔹 SUBTOTAL LOOP (YAHIN LAGANA HAI)
-  cart.forEach((c, idx) => {
+  // 🔹 LOOP 1 — SUBTOTAL + SAFETY
+  for(let i = cart.length - 1; i >= 0; i--){
+    const c = cart[i];
 
-    // ❗ PRICE SAFETY CHECK
     if(!c.price || isNaN(c.price)){
       showToast("Price error, item removed");
-      cart.splice(idx, 1);                 // 👈 item remove
-      localStorage.setItem("cart", JSON.stringify(cart));
-      return;                              // 👈 iss item ka subtotal skip
+      cart.splice(i, 1);
+      continue;
     }
 
     subtotal += Number(c.price) * c.qty;
-  });
+  }
 
-  // ⬇️ rest of updateCart() unchanged
-}
-
-
-  // 🔹 LOOP 2 — CART UI RENDER
+  // 🔹 LOOP 2 — CART UI
   cart.forEach((c, index) => {
     box.innerHTML += `
       <div style="border-bottom:1px solid #ddd;padding:10px 0;">
@@ -907,7 +900,6 @@ function updateCart(){
     `;
   });
 
-  // 🔹 EMPTY CART CHECK
   if(cart.length === 0){
     document.getElementById("total").innerHTML = "Your cart is empty";
     document.getElementById("priceBreakup").innerText = "";
@@ -916,7 +908,6 @@ function updateCart(){
     return;
   }
 
-  // 🔹 DELIVERY + DISCOUNT
   const totalWeight = calculateTotalWeight();
   let delivery = calculateDeliveryCharge(totalWeight, subtotal);
 
@@ -924,16 +915,14 @@ function updateCart(){
   let offerMsg = "";
 
   if(appliedCoupon){
-   const rule = COUPONS[appliedCoupon];
-if(!rule){
-  appliedCoupon = null;
-}
-
-    offerMsg = `Coupon ${appliedCoupon} applied`;
-
-    if(rule.type === "FREE_DELIVERY") delivery = 0;
-    if(rule.type === "FLAT") discount += rule.value;
-
+    const rule = COUPONS[appliedCoupon];
+    if(rule){
+      if(rule.type === "FREE_DELIVERY") delivery = 0;
+      if(rule.type === "FLAT") discount += rule.value;
+      offerMsg = `Coupon ${appliedCoupon} applied`;
+    }else{
+      appliedCoupon = null;
+    }
   }else{
     if(subtotal >= AUTO_OFFER.minAmount){
       discount += AUTO_OFFER.discount;
@@ -945,7 +934,9 @@ if(!rule){
 
   const finalTotal = Math.max(subtotal + delivery - discount, 0);
 
-  document.getElementById("priceBreakup").innerText = offerMsg;
+document.getElementById("priceBreakup").innerText =
+  offerMsg + (appliedCoupon ? " 🎟️" : "");
+
   document.getElementById("total").innerHTML = `
     <div>Subtotal: ₹${subtotal}</div>
     <div>Delivery: ₹${delivery}</div>
@@ -954,9 +945,12 @@ if(!rule){
     <b>Total Payable: ₹${finalTotal}</b>
   `;
 
+  localStorage.setItem("cart", JSON.stringify(cart));
   updateCartBadge();
   updateBottomBar(finalTotal);
 }
+
+
 
 
     
@@ -1108,21 +1102,16 @@ async function checkout(){
 
     stockResult = await stockResponse.json();
 if(!stockResult || stockResult.status !== "SUCCESS" || !Array.isArray(stockResult.items)){
+  window.__checkoutInProgress = false;
   alert(stockResult?.message || "Stock verification failed");
-
   return;
 }
 
- 
-  }catch(e){
-   
-    alert("Server error");
-    return;
-  }
-
-
-
-
+}catch(e){
+  window.__checkoutInProgress = false;
+  alert("Server error");
+  return;
+}
 
 
   // ===== PRICE FROM SHEET =====
