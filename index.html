@@ -610,7 +610,7 @@ oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 <script>
 
 let products = [];
-const PRODUCT_API = "https://script.google.com/macros/s/AKfycbzMHWpD8w3qrQO89LbiEhSu10_EUzzJZWGYp6hDhNH6eLDQapkUdY9k6vjY1Tu5C81iOg/exec";
+const PRODUCT_API = "https://script.google.com/macros/s/AKfycbxWVmO0W8OycJoXmQHW4M9b3hZqH5zJJw_XbOB42zWt1XFOZr7D1Xjg_l3LDVNkJuVAMQ/exec";
 
 
    
@@ -1081,36 +1081,32 @@ async function checkout(){
   if(window.__checkoutInProgress) return;
   window.__checkoutInProgress = true;
 
-  let stockResult;
-
   try{
-    const stockResponse = await fetch(
-      "https://script.google.com/macros/s/AKfycbz7JHlll_RmJAqwVQ4tYjlyG_ITlidQRi2w7mq9FFP7TKxqvaNaNPC6Nng8kffn3rD9ZQ/exec",
-      {
-        method:"POST",
-        body: JSON.stringify({
-          items: cart.map(c => ({
-            sku: c.id,
-            size: c.size,
-            color: c.color,
-            qty: c.qty
-          }))
-        })
-      }
-    );
+    const res = await fetch(PRODUCT_API, {
+      method: "POST",
+      body: JSON.stringify({
+        items: cart.map(c => ({
+          sku: c.id,
+          size: c.size,
+          color: c.color,
+          qty: c.qty
+        }))
+      })
+    });
 
-    stockResult = await stockResponse.json();
-if(!stockResult || stockResult.status !== "SUCCESS" || !Array.isArray(stockResult.items)){
-  window.__checkoutInProgress = false;
-  alert(stockResult?.message || "Stock verification failed");
-  return;
-}
+    const result = await res.json();
 
-}catch(e){
-  window.__checkoutInProgress = false;
-  alert("Server error");
-  return;
-}
+    if(!result || result.status !== "SUCCESS"){
+      window.__checkoutInProgress = false;
+      alert("Out of stock. Please refresh cart.");
+      return;
+    }
+
+  }catch(e){
+    window.__checkoutInProgress = false;
+    alert("Server error. Please try again.");
+    return;
+  }
 
 
   // ===== PRICE FROM SHEET =====
