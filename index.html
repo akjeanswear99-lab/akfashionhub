@@ -1088,7 +1088,6 @@ async function checkout(){
       "https://script.google.com/macros/s/AKfycbz7JHlll_RmJAqwVQ4tYjlyG_ITlidQRi2w7mq9FFP7TKxqvaNaNPC6Nng8kffn3rD9ZQ/exec",
       {
         method:"POST",
-        headers:{ "Content-Type":"application/json" },
         body: JSON.stringify({
           items: cart.map(c => ({
             sku: c.id,
