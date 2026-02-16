@@ -523,29 +523,21 @@ footer{
    
 <div style="margin:12px 0;">
 
-  <div style="
-    display:flex;
+    <input
+  id="couponInput"
+  placeholder="Enter coupon code"
+  style="
+    width:100%;
+    padding:10px;
     border:1px solid #ccc;
     border-radius:6px;
-    overflow:hidden;
-  ">
-    <input
-      id="couponInput"
-      placeholder="Enter coupon code"
-      style="border:none;outline:none;flex:1;padding:10px;"
-      oninput="autoApplyCoupon()"
-    >
+  "
+  oninput="autoApplyCoupon()"
+/>
 
-    <div style="
-      background:#000;
-      color:#fff;
-      padding:10px 14px;
-      font-size:13px;
-    ">
-      APPLY
-    </div>
-  </div>
+<p id="couponMsg" style="font-size:13px;margin-top:6px;"></p>
 
+  
   <p id="couponMsg" style="font-size:13px;margin-top:6px;"></p>
 
 </div>
@@ -565,21 +557,17 @@ footer{
     gap:6px;
   ">
 
- <div style="display:flex; align-items:center; gap:8px; font-size:14px;">
-
-  <input type="checkbox" id="terms">
-
-  <label for="terms" style="cursor:pointer;">
-    I Agree
+<div style="font-size:14px; margin-top:6px;">
+  <label>
+    <input type="checkbox" id="terms">
+    I agree to the
+    <span
+      onclick="openTerms()"
+      style="color:#007bff; text-decoration:underline; cursor:pointer;"
+    >
+      Terms & Conditions
+    </span>
   </label>
-
-  <span
-    onclick="openTerms()"
-    style="color:#007bff; cursor:pointer; text-decoration:underline;"
-  >
-    Terms & Conditions
-  </span>
-
 </div>
 
 
@@ -1300,19 +1288,29 @@ function confirmNo(){
 }
     
 async function checkout(){
+    document.getElementById("checkoutLoader").style.display = "flex";
 
-  if(!document.getElementById("terms").checked){
-    alert("Please agree to Terms & Conditions");
-    return;
-  }
+
+ if(!document.getElementById("terms").checked){
+  document.getElementById("checkoutLoader").style.display = "none";
+  alert("Please agree to Terms & Conditions");
+  return;
+}
+
 
   const addr = JSON.parse(localStorage.getItem("address"));
-  if(!addr){
-    alert("Please add delivery address first");
-    return;
-  }
+ if(!addr){
+  document.getElementById("checkoutLoader").style.display = "none";
+  alert("Please add delivery address first");
+  return;
+}
 
-  if(window.__checkoutInProgress) return;
+if(window.__checkoutInProgress){
+  document.getElementById("checkoutLoader").style.display = "none";
+  return;
+}
+
+ 
   window.__checkoutInProgress = true;
 
   try{
@@ -1330,18 +1328,19 @@ async function checkout(){
 
     const result = await res.json();
 
-    if(!result || result.status !== "SUCCESS"){
-      window.__checkoutInProgress = false;
-      alert("Out of stock. Please refresh cart.");
-      return;
-    }
+   if(!result || result.status !== "SUCCESS"){
+  window.__checkoutInProgress = false;
+  document.getElementById("checkoutLoader").style.display = "none";
+  alert("Out of stock. Please refresh cart.");
+  return;
+}
 
-  }catch(e){
-    window.__checkoutInProgress = false;
-    alert("Server error. Please try again.");
-    return;
-  }
-
+ }catch(e){
+  window.__checkoutInProgress = false;
+  document.getElementById("checkoutLoader").style.display = "none";
+  alert("Server error. Please try again.");
+  return;
+}
 
   // ===== PRICE FROM SHEET =====
  let subtotal = 0;
@@ -1400,6 +1399,8 @@ Customer: ${addr.name}
 Phone: ${addr.phone}
 Address: ${addr.address}, ${addr.city}
 `;
+    
+document.getElementById("checkoutLoader").style.display = "none";
 
  location.href =
   "https://wa.me/919599497909?text=" + encodeURIComponent(msg);
@@ -1811,6 +1812,29 @@ window.openTerms = function(){
   }, { passive:false });
 })();
 </script>
+<div id="checkoutLoader" style="
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999999;
+">
+  <div style="
+    background:#fff;
+    padding:26px;
+    border-radius:12px;
+    text-align:center;
+    width:260px;
+  ">
+    <div class="ring"></div>
+    <h3 style="margin:12px 0 6px;">Placing Order</h3>
+    <p style="font-size:13px;color:#555;">
+      Please wait, do not refresh…
+    </p>
+  </div>
+</div>
 
 </body>
 </html>
