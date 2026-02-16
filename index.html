@@ -406,11 +406,91 @@ footer{
   font-size:13px;
   color:#555;
 }
+/* ===== FULL SCREEN LOADER ===== */
+#loaderWrap,
+#errorBox{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.loaderCard{
+  background:#fff;
+  padding:30px 26px;
+  border-radius:14px;
+  text-align:center;
+  width:260px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.35);
+  animation: popIn 0.4s ease;
+}
+
+.loaderCard h3{
+  margin:14px 0 6px;
+  font-size:18px;
+  letter-spacing:1px;
+}
+
+.loaderCard p{
+  font-size:13px;
+  color:#666;
+}
+
+.ring{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  border:4px solid #ddd;
+  border-top:4px solid #000;
+  margin:auto;
+  animation: spin 1s linear infinite;
+}
+
+#errorBox button{
+  margin-top:12px;
+  padding:8px 14px;
+  background:#000;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+@keyframes spin{
+  to{ transform: rotate(360deg); }
+}
+
+@keyframes popIn{
+  from{ transform: scale(0.85); opacity:0; }
+  to{ transform: scale(1); opacity:1; }
+}
 
 </style>
 </head>
 
 <body>
+    <!-- 🔄 PRODUCT LOADER -->
+<div id="loaderWrap">
+  <div class="loaderCard">
+    <div class="ring"></div>
+    <h3>AK FASHION HUB</h3>
+    <p>Loading premium products…</p>
+  </div>
+</div>
+
+<!-- ❌ LOAD ERROR -->
+<div id="errorBox">
+  <div class="loaderCard">
+    <h3>Something went wrong</h3>
+    <p>Please refresh the page</p>
+    <button onclick="location.reload()">↻ Refresh</button>
+  </div>
+</div>
+
 <div id="cartOverlay"></div>
 
     <div id="floatingCart" onclick="toggleCart()">🛒</div>
@@ -551,17 +631,6 @@ footer{
     MY ORDERS
   </button>
 
-</div>
-
-<div id="loaderWrap">
-  <div class="loader"></div>
-  <div class="loader-text">Loading products…</div>
-</div>
-
-<div id="errorBox">
-  <div class="icon">⚠</div>
-  <div class="msg">Unable to load products</div>
-  <div class="hint">Please refresh this page</div>
 </div>
 
 
@@ -806,11 +875,12 @@ if(!p.variants || p.variants.length === 0){
 
 async function loadProductsFromSheet(){
 
-  const loader = document.getElementById("loaderWrap");
-  const error = document.getElementById("errorBox");
+const loader = document.getElementById("loaderWrap");
+const errorBox = document.getElementById("errorBox");
+loader.style.display = "flex";
+;
 
   loader.style.display = "flex";
-  error.style.display = "none";
 
   // 🔹 STEP A — CACHE CHECK
   const cached = localStorage.getItem(PRODUCT_CACHE_KEY);
@@ -882,11 +952,13 @@ async function fetchFreshProducts(showLoader){
     renderProducts();
 
   }catch(err){
+     loader.style.display = "none";
+errorBox.style.display = "flex";
     console.error("Fresh load failed", err);
 
     if(!products || products.length === 0){
       loader.style.display = "none";
-      error.style.display = "block";
+      
     }
   }
 }
@@ -1457,11 +1529,10 @@ if(
 }
 </script>
 
+
+    
 <script>
 
-        
-
-  
 function updateCartBadge(){
   let badge = document.getElementById("cartCount");
 
