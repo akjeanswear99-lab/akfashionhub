@@ -609,7 +609,8 @@ select:focus{
     <input id="orderPhone" placeholder="Enter phone number" maxlength="10">
     <input id="orderIdCheck" placeholder="Enter Order ID">
 
-    <button onclick="showMyOrders()">VIEW ORDERS</button>
+ <button id="trackBtn" onclick="trackMyOrder()">TRACK ORDER</button>
+
 
     <div id="myOrders" style="margin-top:10px;"></div>
 
@@ -617,6 +618,7 @@ select:focus{
      
    onclick="
   document.getElementById('myOrdersSection').style.display='none';
+        document.getElementById("myOrders").innerHTML = "";
   document.getElementById('checkoutSection').style.display='block';
   document.getElementById('myOrdersBtn').style.display='block';
   document.getElementById('productSection').style.display='block';
@@ -786,7 +788,6 @@ const PRODUCT_CACHE_TIME = 1000 * 60 * 10; // 10 minutes
 
 const PRODUCT_API = "https://script.google.com/macros/s/AKfycbxWVmO0W8OycJoXmQHW4M9b3hZqH5zJJw_XbOB42zWt1XFOZr7D1Xjg_l3LDVNkJuVAMQ/exec";
 
-
    
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
@@ -926,6 +927,7 @@ async function fetchFreshProducts(showLoader){
   if(showLoader){
     loader.style.display = "flex";
   }
+
 
   try{
     const res = await fetch(PRODUCT_API, { cache:"no-store" });
@@ -1352,16 +1354,28 @@ if(window.__checkoutInProgress){
   window.__checkoutInProgress = true;
 
   try{
+      const orderId = generateOrderId();
+let subtotal = 0;
+cart.forEach(c => subtotal += Number(c.price) * c.qty);
+
+const totalWeight = calculateTotalWeight();
+const delivery = calculateDeliveryCharge(totalWeight, subtotal);
+const finalTotal = Math.max(subtotal + delivery, 0);
+
     const res = await fetch(PRODUCT_API, {
       method: "POST",
-      body: JSON.stringify({
-        items: cart.map(c => ({
-          sku: c.id,
-          size: c.size,
-          color: c.color,
-          qty: c.qty
-        }))
-      })
+    body: JSON.stringify({
+  orderId,
+  name: addr.name,
+  phone: addr.phone,
+  products: cart.map(c => `${c.name} (${c.size}, ${c.color}) × ${c.qty}`).join(", "),
+  totalQty: cart.reduce((s,i)=>s+i.qty,0),
+  productsPrice: subtotal,
+  deliveryCharge: delivery,
+  totalAmount: finalTotal,
+  address: `${addr.address}, ${addr.city}, ${addr.state} - ${addr.pincode}`
+})
+
     });
 
     const result = await res.json();
@@ -1413,20 +1427,13 @@ if(appliedCoupon){
 
   // ===== ORDER SAVE =====
   const orderId = generateOrderId();
+localStorage.setItem("activeOrder", JSON.stringify({
+  orderId: orderId,
+  phone: addr.phone,
+  deliveredAt: null
+}));
 
-  let allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
-  if(!allOrders[addr.phone]) allOrders[addr.phone] = [];
-
-  allOrders[addr.phone].push({
-    orderId,
-    date:new Date().toLocaleString(),
-    status:"Order Received",
-    total:finalTotal,
-    items:cart
-  });
-
-  localStorage.setItem("ordersByPhone", JSON.stringify(allOrders));
-
+ 
   // ===== WHATSAPP =====
   let msg = `AK FASHION HUB
 Order ID: ${orderId}
@@ -1625,59 +1632,26 @@ function updateBottomBar(total){
     bar.style.display = "none";
   }
 }
-function showMyOrders(){
-  const phone = document.getElementById("orderPhone").value.trim();
-  const orderIdInput = document.getElementById("orderIdCheck").value.trim();
-  const box = document.getElementById("myOrders");
 
- if(!/^[6-9]\d{9}$/.test(phone) || !orderIdInput){
-  box.innerHTML = "<p>Please enter a valid mobile number & Order ID</p>";
-  return;
-}
 
-  const allOrders = JSON.parse(localStorage.getItem("ordersByPhone")) || {};
-  const orders = allOrders[phone];
 
-  if(!orders){
-    box.innerHTML = "<p>Invalid phone number or Order ID</p>";
-    return;
-  }
-
-  const matched = orders.some(o => o.orderId === orderIdInput);
-  if(!matched){
-    box.innerHTML = "<p>Invalid phone number or Order ID</p>";
-    return;
-  }
-
-  let html = "";
-
-  orders.forEach(o => {
-    html += `
-      <div style="border:1px solid #ddd;padding:8px;margin-bottom:8px;">
-        <b>Order ID:</b> ${o.orderId}<br>
-        <b>Date:</b> ${o.date}<br>
-        <b>Status:</b> ${o.status}<br>
-        <b>Total:</b> ₹${o.total}<br>
-        <b>Items:</b><br>
-        ${o.items.map(i =>
-          `• ${i.name} (${i.size}, ${i.color}) × ${i.qty}`
-        ).join("<br>")}
-      </div>
-    `;
-  });
-
-  box.innerHTML = html;
-}
 
     updateCart();
 loadProductsFromSheet();
 updateCartBadge();
+    
+const active = JSON.parse(localStorage.getItem("activeOrder"));
+if(active){
+  orderPhone.value = active.phone;
+  orderIdCheck.value = active.orderId;
+}
 
 const cartOverlay = document.getElementById("cartOverlay");
 cartOverlay.onclick = toggleCart;
 
 
 function openMyOrders(){
+    document.getElementById("myOrders").innerHTML = "";
   document.getElementById("checkoutSection").style.display = "none";
   document.getElementById("myOrdersSection").style.display = "block";
   document.getElementById("myOrdersBtn").style.display = "none";
@@ -1685,6 +1659,15 @@ function openMyOrders(){
   document.getElementById("productSection").style.display = "none";
 }
 
+if(active){
+  orderPhone.value = active.phone;
+  orderIdCheck.value = active.orderId;
+}
+if(active.phone && active.orderId){
+  trackMyOrder();
+}
+
+    
     </script>
 
 
@@ -1880,6 +1863,101 @@ window.openTerms = function(){
     </p>
   </div>
 </div>
+    <script>
+
+async function trackMyOrder(){
+    const btn = document.getElementById("trackBtn");
+btn.disabled = true;
+
+  const phone = orderPhone.value.trim();
+  const orderId = orderIdCheck.value.trim();
+  const box = document.getElementById("myOrders");
+
+  if(!/^[6-9]\d{9}$/.test(phone) || !orderId){
+    box.innerHTML = "";
+      btn.disabled = false;
+    return;
+  }
+
+  checkoutLoader.style.display = "flex";
+
+  const res = await fetch(PRODUCT_API + `?phone=${phone}&orderId=${orderId}`);
+  const data = await res.json();
+// TEMP TEST MODE
+
+
+  checkoutLoader.style.display = "none";
+
+  if(data.status !== "SUCCESS"){
+    box.innerHTML = "";
+      btn.disabled = false;
+    return;
+  }
+
+  renderMyOrder(data);
+if(data.orderStatus === "Delivered"){
+  const active = JSON.parse(localStorage.getItem("activeOrder"));
+  if(active && active.deliveredAt){
+    if(Date.now() - active.deliveredAt > 7*24*60*60*1000){
+      document.getElementById("myOrders").innerHTML = "";
+      return;
+    }
+  }
+}
+  
+
+    if(data.orderStatus === "Delivered"){
+  const active = JSON.parse(localStorage.getItem("activeOrder"));
+  if(active && !active.deliveredAt){
+    active.deliveredAt = Date.now();
+    localStorage.setItem("activeOrder", JSON.stringify(active));
+  }
+}
+function renderMyOrder(data){
+  document.getElementById("myOrders").innerHTML = `
+    <b>Order ID:</b> ${data.orderId}<br>
+    <b>Status:</b> ${data.orderStatus}<br>
+    <b>Total:</b> ₹${data.total}<br>
+    <div id="orderTimeline" style="margin-top:10px;"></div>
+  `;
+  renderTimeline(data.orderStatus);
+}
+
+function renderTimeline(status){
+  const steps = [
+    "Order Placed",
+    "Dispatched",
+    "Out for Delivery",
+    "Delivered"
+  ];
+
+  let html = "";
+  steps.forEach(s => {
+    const done = steps.indexOf(s) <= steps.indexOf(status);
+    html += `
+      <div style="
+        margin:6px 0;
+        font-weight:${done ? 'bold' : 'normal'};
+        color:${done ? 'green' : '#999'};
+      ">
+        ${done ? "✔️" : "⏳"} ${s}
+      </div>
+    `;
+  });
+
+  document.getElementById("orderTimeline").innerHTML = html;
+}
+
+    btn.disabled = false;
+    
+function shouldHideDelivered(deliveryDate){
+  if(!deliveryDate) return false;
+  return Date.now() - new Date(deliveryDate).getTime() > 7*24*60*60*1000;
+}
+
+
+
+</script>
 
 </body>
 </html>
