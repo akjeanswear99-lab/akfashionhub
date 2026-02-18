@@ -488,6 +488,49 @@ select:focus{
   box-shadow:none !important;
 }
 
+/* ===== POPUP STYLES ===== */
+#discountPopup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 999999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+  animation: popIn 0.4s ease;
+  position: relative;
+}
+
+.popup-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+}
+
+.star-rating {
+  font-size: 28px;
+  color: #ddd;
+  margin: 10px 0;
+  cursor: pointer;
+}
+.star-rating .star.active {
+  color: #ffc107;
+}
+
 </style>
     
 </head>
@@ -508,6 +551,28 @@ select:focus{
     <h3>Something went wrong</h3>
     <p>Please refresh the page</p>
     <button onclick="location.reload()">↻ Refresh</button>
+  </div>
+</div>
+
+<!-- 🎁 DISCOUNT POPUP -->
+<div id="discountPopup">
+  <div class="popup-card">
+    <span class="popup-close" onclick="closePopup()">&times;</span>
+    <h3 style="margin-bottom:10px;">🎁 Exclusive Offer!</h3>
+    <p style="font-size:14px; color:#555; margin-bottom:15px;">
+      Enter your mobile number to unlock a special discount coupon.
+    </p>
+    <input id="popupPhone" type="tel" maxlength="10" placeholder="Enter Mobile Number" style="margin-bottom:10px;">
+    <p id="popupError" style="color:red; font-size:12px; margin:0;"></p>
+    <button onclick="submitPopup()" style="margin-top:10px; width:100%;">UNLOCK COUPON</button>
+    <p onclick="maybeLater()" style="margin-top:15px; font-size:12px; color:#999; cursor:pointer; text-decoration:underline;">
+      Maybe Later
+    </p>
+    <div id="couponResult" style="display:none; margin-top:15px; background:#f0fff0; padding:10px; border-radius:8px; border:1px solid #0f0;">
+       <b style="color:green;">Your Coupon: SAVE100</b>
+       <p style="font-size:12px; margin-top:5px;">Screenshot this & apply at checkout!</p>
+       <a href="https://wa.me/919599497909?text=Hi!%20I%20got%20SAVE100%20coupon%20from%20website." target="_blank" style="background:#25D366; color:#fff; padding:8px 15px; border-radius:20px; text-decoration:none; display:inline-block; margin-top:8px; font-size:13px;">Claim on WhatsApp</a>
+    </div>
   </div>
 </div>
 
@@ -787,7 +852,8 @@ let products = [];
     const PRODUCT_CACHE_KEY = "akfh_products_cache";
 const PRODUCT_CACHE_TIME = 1000 * 60 * 10; // 10 minutes
 
-const PRODUCT_API = "https://script.google.com/macros/s/AKfycbxWVmO0W8OycJoXmQHW4M9b3hZqH5zJJw_XbOB42zWt1XFOZr7D1Xjg_l3LDVNkJuVAMQ/exec";
+// ✅ UPDATED API URL
+const PRODUCT_API = "https://script.google.com/macros/s/AKfycbyHuIIjtRd4EOVxwW5mQw5jpBxIQgYY-H_kfl3njPDmejGv-wAsj_JJp2O7QpEDzv4A/exec";
 
    
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -942,7 +1008,7 @@ async function fetchFreshProducts(showLoader){
     const freshProducts = data.map(p => ({
       id: p.id,
       name: p.id,
-      gender: "Men",
+      gender: p.gender,
       category: p.category,
       measure: p.measure,
       description: p.description,
@@ -1378,7 +1444,10 @@ if(window.__checkoutInProgress){
   try{
       const res = await fetch(PRODUCT_API, {
       method: "POST",
-    body: JSON.stringify({
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
   orderId: orderId,
   name: addr.name,
   phone: addr.phone,
@@ -1397,7 +1466,7 @@ if(window.__checkoutInProgress){
    if(!result || result.status !== "SUCCESS"){
   window.__checkoutInProgress = false;
   document.getElementById("checkoutLoader").style.display = "none";
-  alert("Out of stock. Please refresh cart.");
+  alert("Order failed. Please try again.");
   return;
 }
 
@@ -1540,7 +1609,7 @@ document.documentElement.style.overflow = "";
 
 }
 
-function saveAddress(){
+async function saveAddress(){
   const data = {
     name: addr_name.value.trim(),
     phone: addr_phone.value.trim(),
@@ -1568,8 +1637,23 @@ if(
   return;
 }
 
-
   localStorage.setItem("address", JSON.stringify(data));
+  
+  // ✅ SAVE TO coscart SHEET (CHECKOUT LEAD)
+  // This runs in background, doesn't stop user
+  fetch(PRODUCT_API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: "CHECKOUT_LEAD",
+      phone: data.phone,
+      name: data.name,
+      address: `${data.address}, ${data.city}, ${data.state} - ${data.pincode}`,
+      cart: JSON.stringify(cart),
+      total: document.getElementById("total").innerText
+    })
+  }).catch(e => console.log("Lead save error", e));
+
   closeAddressModal();
   alert("Address saved successfully");
 }
@@ -1868,44 +1952,99 @@ btn.disabled = true;
 
   const res = await fetch(PRODUCT_API + `?phone=${phone}&orderId=${orderId}`);
   const data = await res.json();
-// TEMP TEST MODE
-
 
   checkoutLoader.style.display = "none";
 
   if(data.status !== "SUCCESS"){
-    box.innerHTML = "";
+    box.innerHTML = "<p style='color:red;text-align:center;'>Order not found</p>";
       btn.disabled = false;
     return;
   }
 
-  renderMyOrder(data);
-if(data.orderStatus === "Delivered"){
-  const active = JSON.parse(localStorage.getItem("activeOrder"));
-  if(active && active.deliveredAt){
-    if(Date.now() - active.deliveredAt > 7*24*60*60*1000){
-      document.getElementById("myOrders").innerHTML = "";
-      return;
-    }
-  }
+  renderMyOrder(data, phone);
+  btn.disabled = false;
+    
 }
-  
 
-    if(data.orderStatus === "Delivered"){
-  const active = JSON.parse(localStorage.getItem("activeOrder"));
-  if(active && !active.deliveredAt){
-    active.deliveredAt = Date.now();
-    localStorage.setItem("activeOrder", JSON.stringify(active));
+function renderMyOrder(data, phone){
+  let reviewHtml = "";
+  
+  // ✅ REVIEW LOGIC
+  if(data.reviewAllowed && data.orderStatus === "Delivered"){
+    reviewHtml = `
+      <div style="margin-top:15px; padding:10px; background:#f9f9f9; border-radius:8px;">
+        <p style="font-weight:bold; margin-bottom:5px;">⭐ Rate your experience</p>
+        <div class="star-rating" id="starRating">
+          <span class="star" onclick="setRating(1)">★</span>
+          <span class="star" onclick="setRating(2)">★</span>
+          <span class="star" onclick="setRating(3)">★</span>
+          <span class="star" onclick="setRating(4)">★</span>
+          <span class="star" onclick="setRating(5)">★</span>
+        </div>
+        <textarea id="reviewNote" placeholder="Write a note (optional)" rows="2" style="font-size:12px;"></textarea>
+        <button onclick="submitReview('${data.orderId}', '${phone}')" style="margin-top:5px; font-size:12px;">Submit Review</button>
+      </div>
+    `;
   }
-}
-function renderMyOrder(data){
+
   document.getElementById("myOrders").innerHTML = `
     <b>Order ID:</b> ${data.orderId}<br>
     <b>Status:</b> ${data.orderStatus}<br>
     <b>Total:</b> ₹${data.total}<br>
     <div id="orderTimeline" style="margin-top:10px;"></div>
+    ${reviewHtml}
   `;
   renderTimeline(data.orderStatus);
+}
+
+let currentRating = 0;
+function setRating(r){
+  currentRating = r;
+  const stars = document.querySelectorAll("#starRating .star");
+  stars.forEach((s, i) => {
+    if(i < r) s.classList.add("active");
+    else s.classList.remove("active");
+  });
+}
+
+async function submitReview(orderId, phone){
+  const note = document.getElementById("reviewNote").value.trim();
+  
+  if(currentRating === 0){
+    alert("Please select a star rating");
+    return;
+  }
+
+  checkoutLoader.style.display = "flex";
+
+  try {
+    const res = await fetch(PRODUCT_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "REVIEW",
+        orderId: orderId,
+        phone: phone,
+        stars: currentRating,
+        note: note
+      })
+    });
+
+    const result = await res.json();
+    checkoutLoader.style.display = "none";
+
+    if(result.status === "SUCCESS"){
+      alert("Thank you for your review!");
+      // Hide review form
+      document.getElementById("myOrders").querySelector("div").style.display = "none";
+    } else {
+      alert(result.message || "Failed to submit review");
+    }
+
+  } catch(e) {
+    checkoutLoader.style.display = "none";
+    alert("Error submitting review");
+  }
 }
 
 function renderTimeline(status){
@@ -1933,16 +2072,56 @@ function renderTimeline(status){
   document.getElementById("orderTimeline").innerHTML = html;
 }
 
-    btn.disabled = false;
-    
+// ===== POPUP LOGIC =====
+(function(){
+  // Check if popup was closed in last 24 hours
+  const lastClosed = localStorage.getItem("popupClosedTime");
+  if(lastClosed && (Date.now() - lastClosed < 24 * 60 * 60 * 1000)){
+    return; // Don't show popup
+  }
+
+  // Show popup after 3 minutes (180 seconds)
+  setTimeout(() => {
+    document.getElementById("discountPopup").style.display = "flex";
+  }, 180000); // 180000ms = 3 mins
+})();
+
+function closePopup(){
+  document.getElementById("discountPopup").style.display = "none";
 }
 
-function shouldHideDelivered(deliveryDate){
-  if(!deliveryDate) return false;
-  return Date.now() - new Date(deliveryDate).getTime() > 7*24*60*60*1000;
+function maybeLater(){
+  localStorage.setItem("popupClosedTime", Date.now());
+  closePopup();
 }
 
+async function submitPopup(){
+  const phone = document.getElementById("popupPhone").value.trim();
+  const err = document.getElementById("popupError");
 
+  if(!/^[6-9]\d{9}$/.test(phone)){
+    err.innerText = "Please enter a valid 10-digit number";
+    return;
+  }
+
+  err.innerText = "";
+  
+  // Save to PopupLeads
+  fetch(PRODUCT_API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: "POPUP_LEAD",
+      phone: phone
+    })
+  }).catch(e => console.log(e));
+
+  // Show Coupon
+  document.getElementById("popupPhone").style.display = "none";
+  document.querySelector("#discountPopup button").style.display = "none";
+  document.querySelector("#discountPopup p[onclick]").style.display = "none";
+  document.getElementById("couponResult").style.display = "block";
+}
 
 </script>
 
