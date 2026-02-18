@@ -420,31 +420,30 @@ footer{
 
 .loaderCard{
   background:#fff;
-  padding:30px 26px;
+  padding:20px;
   border-radius:14px;
   text-align:center;
-  width:260px;
+  width:200px;
   box-shadow:0 10px 40px rgba(0,0,0,0.35);
   animation: popIn 0.4s ease;
 }
 
 .loaderCard h3{
-  margin:14px 0 6px;
-  font-size:18px;
+  margin:0 0 15px 0;
+  font-size:16px;
   letter-spacing:1px;
 }
 
 .loaderCard p{
-  font-size:13px;
-  color:#666;
+  display:none;
 }
 
 .ring{
-  width:56px;
-  height:56px;
+  width:40px;
+  height:40px;
   border-radius:50%;
-  border:4px solid #ddd;
-  border-top:4px solid #000;
+  border:3px solid #ddd;
+  border-top:3px solid #000;
   margin:auto;
   animation: spin 1s linear infinite;
 }
@@ -539,9 +538,8 @@ select:focus{
     <!-- 🔄 PRODUCT LOADER -->
 <div id="loaderWrap">
   <div class="loaderCard">
-    <div class="ring"></div>
     <h3>AK FASHION HUB</h3>
-    <p>Loading premium products…</p>
+    <div class="ring"></div>
   </div>
 </div>
 
@@ -852,8 +850,8 @@ let products = [];
     const PRODUCT_CACHE_KEY = "akfh_products_cache";
 const PRODUCT_CACHE_TIME = 1000 * 60 * 10; // 10 minutes
 
-// ✅ UPDATED API URL
-const PRODUCT_API = "https://script.google.com/macros/s/AKfycbwKvTS8KxHTVPe-1J0OhrT8lWO-TRGzXihHeVE1aA0oNC_uujIGVtP7I8nrU21l0H7H/exec";
+// ✅ NAYA URL YAHAN PASTE KARO (STEP 3)
+const PRODUCT_API = "https://script.google.com/macros/s/AKfycbyxYTgZeO78uB2XKwCDXgPNm42e9L1AqoLHP5sJtEQEI9BPZlRD7haLUBwUJiOmqZN2/exec";
 
    
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -1499,15 +1497,19 @@ Address: ${addr.address}, ${addr.city}
 document.getElementById("checkoutLoader").style.display = "none";
 window.__checkoutInProgress = false;
 
- location.href =
-  "https://wa.me/919599497909?text=" + encodeURIComponent(msg);
+// ✅ Open WhatsApp in new tab
+window.open("https://wa.me/919599497909?text=" + encodeURIComponent(msg), '_blank');
 
 cart = [];
 localStorage.removeItem("cart");
 renderProducts();
 updateCart();
 
-  alert("Order Placed Successfully!\nOrder ID: " + orderId);
+closeAddressModal(); // Close address panel
+toggleCart(); // Close cart panel
+
+alert("Congratulations! Order Placed Successfully.\nOrder ID: " + orderId);
+
 }
 
 // ===== SMART CLOSE FUNCTION (FIX FOR D) =====
@@ -1637,10 +1639,10 @@ if(
   return;
 }
 
+
   localStorage.setItem("address", JSON.stringify(data));
   
   // ✅ SAVE TO coscart SHEET (CHECKOUT LEAD)
-  // This runs in background, doesn't stop user
   fetch(PRODUCT_API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -1918,18 +1920,9 @@ window.openTerms = function(){
   justify-content:center;
   z-index:999999;
 ">
-  <div style="
-    background:#fff;
-    padding:26px;
-    border-radius:12px;
-    text-align:center;
-    width:260px;
-  ">
+  <div class="loaderCard">
+    <h3>Placing Order</h3>
     <div class="ring"></div>
-    <h3 style="margin:12px 0 6px;">Placing Order</h3>
-    <p style="font-size:13px;color:#555;">
-      Please wait, do not refresh…
-    </p>
   </div>
 </div>
     <script>
