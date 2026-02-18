@@ -1376,9 +1376,12 @@ if(window.__checkoutInProgress){
   document.getElementById("checkoutLoader").style.display = "flex";
 
   try{
-      const res = await fetch(PRODUCT_API, {
+          const res = await fetch(PRODUCT_API, {
       method: "POST",
-    body: JSON.stringify({
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
   orderId: orderId,
   name: addr.name,
   phone: addr.phone,
@@ -1389,7 +1392,6 @@ if(window.__checkoutInProgress){
   totalAmount: finalTotal,
   address: `${addr.address}, ${addr.city}, ${addr.state} - ${addr.pincode}`
 })
-
     });
 
     const result = await res.json();
