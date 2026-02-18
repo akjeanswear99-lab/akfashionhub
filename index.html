@@ -221,22 +221,21 @@ footer{
   
 #toast{
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background: #000;
   color: #fff;
   padding: 12px 18px;
   border-radius: 6px;
   font-size: 14px;
   opacity: 0;
-  transform: translateY(-10px);
   transition: all 0.3s ease;
   z-index: 10000;
 }
 
 #toast.show{
   opacity: 1;
-  transform: translateY(0);
 }
 
 #cartOverlay{
@@ -319,14 +318,14 @@ footer{
   position: fixed;
   top: 18px;
   left: 18px;
-  background: #000;
-  color: #fff;
+  background: transparent;
+  color: #000;
   padding: 10px 12px;
   border-radius: 50%;
   font-size: 20px;
   cursor: pointer;
   z-index: 10050;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  box-shadow: none;
 }
 
 
@@ -536,7 +535,7 @@ select:focus{
 
   <div style="display:flex; justify-content:space-between; align-items:center;">
     <h3>Your Cart</h3>
-    <span onclick="toggleCart()" style="cursor:pointer;font-size:22px;">✖</span>
+    <span onclick="smartClose()" style="cursor:pointer;font-size:22px;">✖</span>
   </div>
 
   <div id="cartItems"></div>
@@ -608,7 +607,6 @@ select:focus{
     <div id="myOrders" style="margin-top:10px;"></div>
 
     <button
-     
    onclick="
   document.getElementById('myOrdersSection').style.display='none';
   document.getElementById('myOrders').innerHTML = '';
@@ -619,9 +617,16 @@ select:focus{
   document.getElementById('couponBox').style.display='block';
   document.getElementById('myOrdersBtn').style.display='block';
 "
-
-      ← BACK TO CHECKOUT
-    </button>
+  style="
+    margin-top:12px;
+    background:#fff;
+    color:#000;
+    border:1px solid #000;
+    font-weight:bold;
+  "
+  >
+  ← BACK TO CHECKOUT
+</button>
   </div>
 
   <button
@@ -1436,6 +1441,22 @@ updateCart();
   alert("Order Placed Successfully!\nOrder ID: " + orderId);
 }
 
+// ===== SMART CLOSE FUNCTION (FIX FOR D) =====
+function smartClose(){
+  const ordersSection = document.getElementById("myOrdersSection");
+  if(ordersSection.style.display === "block"){
+    ordersSection.style.display = "none";
+    document.getElementById("checkoutSection").style.display='block';
+    document.getElementById("cartItems").style.display='block';
+    document.getElementById('total').style.display='block';
+    document.getElementById('priceBreakup').style.display='block';
+    document.getElementById('couponBox').style.display='block';
+    document.getElementById('myOrdersBtn').style.display='block';
+    document.getElementById('myOrders').innerHTML = '';
+  } else {
+    toggleCart();
+  }
+}
 
 function toggleCart(){
   const floating = document.getElementById("floatingCart");
@@ -1795,23 +1816,12 @@ window.openTerms = function(){
   if(!cart) return;
 
   cart.addEventListener("wheel", function(e){
-    const atTop = cart.scrollTop === 0;
-    const atBottom =
-      cart.scrollTop + cart.clientHeight >= cart.scrollHeight - 1;
-
-    if (
-      (e.deltaY < 0 && atTop) ||
-      (e.deltaY > 0 && atBottom)
-    ){
-      return; // allow page scroll
-    }
-
-    e.preventDefault(); // lock scroll inside cart
-  }, { passive:false });
+    e.stopPropagation();
+  }, { passive:true });
 
   cart.addEventListener("touchmove", function(e){
     e.stopPropagation();
-  }, { passive:false });
+  }, { passive:true });
 })();
 
 </script>
