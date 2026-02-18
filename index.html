@@ -542,7 +542,7 @@ select:focus{
   <div id="cartItems"></div>
   <h3 id="total"></h3>
    
-<div style="margin:12px 0;">
+<div id="couponBox" style="margin:12px 0;">
 
     <input
   id="couponInput"
@@ -567,36 +567,29 @@ select:focus{
 
 <div id="checkoutSection">
 
+  <button onclick="openAddressModal()" style="margin-top:8px;">
+    ➕ Add / Edit Delivery Address
+  </button>
+
   <div style="
     background:#f9f9f9;
     padding:10px;
     border-radius:6px;
-    display:flex;
-    flex-direction:column;
-    gap:6px;
+    margin-top:10px;
   ">
-
-<div style="font-size:14px; margin-top:6px;">
-  <label>
-    <input type="checkbox" id="terms">
-    I agree to the
-    <span
-      onclick="openTerms()"
-      style="color:#007bff; text-decoration:underline; cursor:pointer;"
-    >
-      Terms & Conditions
-    </span>
-  </label>
-</div>
-
-
-      <button onclick="openAddressModal()" style="margin-top:8px;">
-  ➕ Add / Edit Delivery Address
-</button>
-
+    <div style="font-size:14px; display:flex; align-items:center; gap:6px;">
+      <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+        <input type="checkbox" id="terms">
+        I agree to the
+        <span
+          onclick="openTerms()"
+          style="color:#007bff; text-decoration:underline; cursor:pointer; white-space:nowrap;"
+        >
+          Terms & Conditions
+        </span>
+      </label>
+    </div>
   </div>
-
- 
   
    <button id="placeOrderBtn" onclick="checkout()" style="margin-top:10px;">
   Place Order (WhatsApp)
@@ -618,10 +611,13 @@ select:focus{
      
    onclick="
   document.getElementById('myOrdersSection').style.display='none';
-        document.getElementById("myOrders").innerHTML = "";
+  document.getElementById('myOrders').innerHTML = '';
   document.getElementById('checkoutSection').style.display='block';
+  document.getElementById('cartItems').style.display='block';
+  document.getElementById('total').style.display='block';
+  document.getElementById('priceBreakup').style.display='block';
+  document.getElementById('couponBox').style.display='block';
   document.getElementById('myOrdersBtn').style.display='block';
-  document.getElementById('productSection').style.display='block';
 "
 
       ← BACK TO CHECKOUT
@@ -1129,6 +1125,9 @@ function updateCart(){
       <div style="border-bottom:1px solid #ddd;padding:10px 0;">
         <b>${c.name}</b><br>
         Size: ${c.size} | Color: ${c.color}<br>
+        <p style="margin:4px 0; font-size:13px;">
+          Price: ₹${c.price} × ${c.qty} = <b>₹${Number(c.price) * c.qty}</b>
+        </p>
 
         Qty:
         <div class="qty-box">
@@ -1318,10 +1317,7 @@ async function checkout(){
     return;
   }
 
-  document.getElementById("checkoutLoader").style.display = "flex";
-
  if(!document.getElementById("terms").checked){
-  document.getElementById("checkoutLoader").style.display = "none";
   alert("Please agree to Terms & Conditions");
   return;
 }
@@ -1339,33 +1335,46 @@ if(
   !addr.pincode ||
   String(addr.pincode).length !== 6
 ){
-  document.getElementById("checkoutLoader").style.display = "none";
   alert("Please fill complete delivery address");
   return;
 }
 
 
 if(window.__checkoutInProgress){
-  document.getElementById("checkoutLoader").style.display = "none";
   return;
 }
 
+  // ===== CALCULATIONS MOVED HERE (FIX) =====
+  const orderId = generateOrderId();
+  let subtotal = 0;
+  cart.forEach(c => subtotal += Number(c.price) * c.qty);
+
+  const totalWeight = calculateTotalWeight();
+  const delivery = calculateDeliveryCharge(totalWeight, subtotal);
+
+  let discount = 0;
+  if(appliedCoupon){
+    const rule = COUPONS[appliedCoupon];
+    if(rule){
+      if(rule.type === "FREE_DELIVERY") discount += delivery;
+      if(rule.type === "FLAT") discount += rule.value;
+    }
+  }else{
+    if(subtotal >= AUTO_OFFER.minAmount){
+      discount += AUTO_OFFER.discount;
+    }
+  }
+
+  const finalTotal = Math.max(subtotal + delivery - discount, 0);
  
   window.__checkoutInProgress = true;
+  document.getElementById("checkoutLoader").style.display = "flex";
 
   try{
-      const orderId = generateOrderId();
-let subtotal = 0;
-cart.forEach(c => subtotal += Number(c.price) * c.qty);
-
-const totalWeight = calculateTotalWeight();
-const delivery = calculateDeliveryCharge(totalWeight, subtotal);
-const finalTotal = Math.max(subtotal + delivery, 0);
-
-    const res = await fetch(PRODUCT_API, {
+      const res = await fetch(PRODUCT_API, {
       method: "POST",
     body: JSON.stringify({
-  orderId,
+  orderId: orderId,
   name: addr.name,
   phone: addr.phone,
   products: cart.map(c => `${c.name} (${c.size}, ${c.color}) × ${c.qty}`).join(", "),
@@ -1394,39 +1403,7 @@ const finalTotal = Math.max(subtotal + delivery, 0);
   return;
 }
 
-  // ===== PRICE FROM SHEET =====
- let subtotal = 0;
-cart.forEach(c => {
-  subtotal += Number(c.price) * c.qty;
-});
-
-
-  const totalWeight = calculateTotalWeight();
-  const delivery = calculateDeliveryCharge(totalWeight, subtotal);
-
-let discount = 0;
-
-if(appliedCoupon){
-  const rule = COUPONS[appliedCoupon];
-
-  if(rule){
-    if(rule.type === "FREE_DELIVERY") discount += delivery;
-    if(rule.type === "FLAT") discount += rule.value;
-  }else{
-    appliedCoupon = null;
-  }
-
-}else{
-  if(subtotal >= AUTO_OFFER.minAmount){
-    discount += AUTO_OFFER.discount;
-  }
-}
-
-
-  const finalTotal = Math.max(subtotal + delivery - discount, 0);
-
   // ===== ORDER SAVE =====
-  const orderId = generateOrderId();
 localStorage.setItem("activeOrder", JSON.stringify({
   orderId: orderId,
   phone: addr.phone,
@@ -1652,18 +1629,16 @@ cartOverlay.onclick = toggleCart;
 
 function openMyOrders(){
     document.getElementById("myOrders").innerHTML = "";
-  document.getElementById("checkoutSection").style.display = "none";
-  document.getElementById("myOrdersSection").style.display = "block";
-  document.getElementById("myOrdersBtn").style.display = "none";
-
-  document.getElementById("productSection").style.display = "none";
+    document.getElementById("checkoutSection").style.display="none";
+    document.getElementById("cartItems").style.display="none";
+    document.getElementById("total").style.display="none";
+    document.getElementById("priceBreakup").style.display="none";
+    document.getElementById("couponBox").style.display="none";
+    document.getElementById("myOrdersSection").style.display="block";
+    document.getElementById("myOrdersBtn").style.display="none";
 }
 
-if(active){
-  orderPhone.value = active.phone;
-  orderIdCheck.value = active.orderId;
-}
-if(active.phone && active.orderId){
+if(active && active.phone && active.orderId){
   trackMyOrder();
 }
 
@@ -1950,6 +1925,8 @@ function renderTimeline(status){
 
     btn.disabled = false;
     
+}
+
 function shouldHideDelivered(deliveryDate){
   if(!deliveryDate) return false;
   return Date.now() - new Date(deliveryDate).getTime() > 7*24*60*60*1000;
