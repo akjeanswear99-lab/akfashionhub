@@ -5,417 +5,123 @@
 <title>AK FASHION HUB</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-* {
-  box-sizing: border-box;
-  max-width: 100%;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  width: 100%;
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  color: #333;
-}
-
-header {
-  background: linear-gradient(135deg, #000000, #1a1a1a);
-  color: #fff;
-  padding: 28px 20px 24px;
-  text-align: center;
-  position: relative;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 38px;
-  letter-spacing: 3px;
-  font-weight: 800;
-}
-
-header .tagline {
-  margin: 8px 0 4px;
-  font-size: 13px;
-  letter-spacing: 1.2px;
-  font-weight: 500;
-  opacity: 0.85;
-}
-
-header .address {
-  margin-top: 6px;
-  font-size: 10px;
-  letter-spacing: 0.6px;
-  opacity: 0.6;
-}
-
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-}
-
-.products {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 18px;
-}
-
-.card {
-  background: #fff;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.card img {
-  width: 100%;
-  height: 320px;
-  object-fit: contain;
-  border-radius: 6px;
-  background: #f7f7f7;
-}
-
-.slider {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-}
-
-.slider button {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0,0,0,0.5);
-  color: #fff;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-.slider .prev { left: 0; }
-.slider .next { right: 0; }
-.single-img button { display: none; }
-
-.product-img {
-  width: 100%;
-  max-height: 500px;
-  object-fit: contain;
-  display: block;
-}
-
-select, input, textarea, button {
-  width: 100%;
-  padding: 8px;
-  margin-top: 6px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-button {
-  background: #000;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-
-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.qty-box {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.qty-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1px solid #ccc;
-  background: #fff;
-  color: #000;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.qty-btn:hover {
-  background: #000;
-  color: #fff;
-  border-color: #000;
-}
-
-.qty-count {
-  min-width: 20px;
-  text-align: center;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-footer {
-  background: #000;
-  color: #fff;
-  text-align: center;
-  padding: 40px 15px;
-  margin-top: 40px;
-  width: 100%;
-}
-
-#cartPanel {
-  position: fixed;
-  top: 0;
-  right: -360px;
-  width: 340px;
-  height: 100%;
-  background: #fff;
-  padding: 20px;
-  box-shadow: -4px 0 10px rgba(0,0,0,0.3);
-  transition: 0.3s;
-  z-index: 10002;
-  overflow-y: auto;
-}
-
-#cartOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.3);
-  z-index: 10001;
-  display: none;
-}
-
-#floatingCart {
-  position: fixed;
-  top: 18px;
-  left: 18px;
-  background: transparent;
-  color: #fff;
-  padding: 10px;
-  font-size: 20px;
-  cursor: pointer;
-  z-index: 10050;
-}
-
-#toast {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #000;
-  color: #fff;
-  padding: 12px 18px;
-  border-radius: 6px;
-  font-size: 14px;
-  opacity: 0;
-  transition: all 0.3s ease;
-  z-index: 100000;
-}
-
-#toast.show { opacity: 1; }
-
-.opt-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.opt-box {
-  width: 36px;
-  height: 36px;
-  border: 1px solid #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  cursor: pointer;
-  border-radius: 4px;
-  background: #fff;
-  user-select: none;
-}
-
-.opt-box.selected {
-  background: #000;
-  color: #fff;
-  border-color: #000;
-}
-
-.opt-box:hover { border-color: #000; }
-
-#loaderWrap, #checkoutLoader, #errorBox {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(8px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999;
-  flex-direction: column;
-}
-
-.loader-text {
-  color: #fff;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-#discountPopup {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(8px);
-  z-index: 999999;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.popup-card {
-  background: #fff;
-  padding: 30px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-  position: relative;
-}
-
-.popup-close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  cursor: pointer;
-  color: #999;
-}
-
-#addressModal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: none;
-  z-index: 60000;
-  align-items: center;
-  justify-content: center;
-}
-
-#confirmBox {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 10005;
-}
-
-@media (max-width: 768px) {
-  header h1 { font-size: 24px; letter-spacing: 1px; }
-  .products { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .card img { height: auto; aspect-ratio: 3/4; }
-  #cartPanel { width: 100%; right: -100%; }
-  #floatingCart { top: 14px; left: 14px; font-size: 18px; }
-}
+*{box-sizing:border-box;max-width:100%}
+html,body{margin:0;padding:0;overflow-x:hidden;width:100%;font-family:Arial,sans-serif;background:#f4f4f4;color:#333}
+header{background:linear-gradient(135deg,#000,#1a1a1a);color:#fff;padding:28px 20px 24px;text-align:center;position:relative}
+header h1{margin:0;font-size:38px;letter-spacing:3px;font-weight:800}
+header .tagline{margin:8px 0 4px;font-size:13px;letter-spacing:1.2px;opacity:.85}
+header .address{margin-top:6px;font-size:10px;opacity:.6}
+.container{max-width:1200px;margin:auto;padding:20px}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.card{background:#fff;border-radius:8px;padding:15px;box-shadow:0 4px 8px rgba(0,0,0,0.1)}
+.card img{width:100%;height:320px;object-fit:contain;border-radius:6px;background:#f7f7f7}
+.slider{position:relative;width:100%;overflow:hidden}
+.slider button{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);color:#fff;border:none;padding:5px 10px;cursor:pointer;font-size:18px}
+.slider .prev{left:0}.slider .next{right:0}
+.single-img button{display:none}
+.product-img{width:100%;max-height:500px;object-fit:contain;display:block}
+select,input,textarea,button{width:100%;padding:8px;margin-top:6px;border-radius:4px;border:1px solid #ccc}
+button{background:#000;color:#fff;border:none;cursor:pointer}
+button:disabled{background:#ccc;cursor:not-allowed}
+.qty-box{display:inline-flex;align-items:center;gap:8px;margin-top:4px}
+.qty-btn{width:28px;height:28px;border-radius:50%;border:1px solid #ccc;background:#fff;color:#000;font-size:16px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+.qty-btn:hover{background:#000;color:#fff;border-color:#000}
+.qty-count{min-width:20px;text-align:center;font-size:14px;font-weight:600}
+footer{background:#000;color:#fff;text-align:center;padding:40px 15px;margin-top:40px;width:100%}
+#cartPanel{position:fixed;top:0;right:-360px;width:340px;height:100%;background:#fff;padding:20px;box-shadow:-4px 0 10px rgba(0,0,0,0.3);transition:0.3s;z-index:10002;overflow-y:auto}
+#cartOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:10001;display:none}
+#floatingCart{position:fixed;top:18px;left:18px;background:transparent;color:#fff;padding:10px;font-size:20px;cursor:pointer;z-index:10050}
+#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#000;color:#fff;padding:12px 18px;border-radius:6px;font-size:14px;opacity:0;transition:all 0.3s ease;z-index:100000}
+#toast.show{opacity:1}
+.opt-container{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.opt-box{width:36px;height:36px;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;border-radius:4px;background:#fff;user-select:none}
+.opt-box.selected{background:#000;color:#fff;border-color:#000}
+.opt-box:hover{border-color:#000}
+#loaderWrap,#checkoutLoader,#errorBox{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:99999;flex-direction:column}
+.loader-text{color:#fff;font-size:18px;font-weight:700}
+#discountPopup{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:999999;display:none;align-items:center;justify-content:center}
+.popup-card{background:#fff;padding:30px;border-radius:16px;width:90%;max-width:400px;text-align:center;box-shadow:0 15px 40px rgba(0,0,0,0.4);position:relative}
+.popup-close{position:absolute;top:10px;right:15px;font-size:24px;cursor:pointer;color:#999}
+#addressModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;z-index:60000;align-items:center;justify-content:center}
+#confirmBox{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:10005}
+@media (max-width:768px){header h1{font-size:24px;letter-spacing:1px}.products{grid-template-columns:repeat(2,1fr);gap:10px}.card img{height:auto;aspect-ratio:3/4}#cartPanel{width:100%;right:-100%}#floatingCart{top:14px;left:14px;font-size:18px}}
 </style>
 </head>
 <body>
 
-<!-- LOADER -->
 <div id="loaderWrap"><div class="loader-text">AK FASHION HUB...</div></div>
 <div id="checkoutLoader"><div class="loader-text">Processing...</div></div>
 
-<!-- ERROR BOX -->
 <div id="errorBox">
   <h3 style="color:#fff;">Something went wrong</h3>
-  <button onclick="location.reload()" style="background:#fff; color:#000; width:auto; padding:10px 20px;">Refresh</button>
+  <button onclick="location.reload()" style="background:#fff;color:#000;width:auto;padding:10px 20px">Refresh</button>
 </div>
 
-<!-- POPUP -->
 <div id="discountPopup">
   <div class="popup-card">
     <span class="popup-close" onclick="closePopup()">&times;</span>
-    <h3 style="margin-bottom:10px;">Exclusive Offer!</h3>
-    <p style="font-size:14px; color:#555; margin-bottom:15px;">Enter mobile to unlock coupon</p>
+    <h3 style="margin-bottom:10px">Exclusive Offer!</h3>
+    <p style="font-size:14px;color:#555;margin-bottom:15px">Enter mobile to unlock coupon</p>
     <input id="popupPhone" type="tel" maxlength="10" placeholder="Mobile Number">
-    <p id="popupError" style="color:red; font-size:12px; margin:0;"></p>
-    <button onclick="submitPopup()" style="margin-top:10px;">UNLOCK</button>
-    <p onclick="maybeLater()" style="margin-top:15px; font-size:12px; color:#999; cursor:pointer;">Maybe Later</p>
-    <div id="couponResult" style="display:none; margin-top:15px; background:#f0fff0; padding:10px; border-radius:8px; border:1px solid #0f0;">
-      <b style="color:green;">Coupon: SAVE100</b>
-      <p style="font-size:12px; margin-top:5px;">Apply at checkout!</p>
+    <p id="popupError" style="color:red;font-size:12px;margin:0"></p>
+    <button onclick="submitPopup()" style="margin-top:10px">UNLOCK</button>
+    <p onclick="maybeLater()" style="margin-top:15px;font-size:12px;color:#999;cursor:pointer">Maybe Later</p>
+    <div id="couponResult" style="display:none;margin-top:15px;background:#f0fff0;padding:10px;border-radius:8px;border:1px solid #0f0">
+      <b style="color:green">Coupon: SAVE100</b>
+      <p style="font-size:12px;margin-top:5px">Apply at checkout!</p>
     </div>
   </div>
 </div>
 
-<!-- OVERLAYS -->
 <div id="cartOverlay" onclick="toggleCart()"></div>
 <div id="floatingCart" onclick="toggleCart()">🛒</div>
 
-<!-- HEADER -->
 <header>
   <h1>AK FASHION HUB</h1>
   <div class="tagline">PREMIUM MEN & WOMEN FASHION WEAR</div>
   <div class="address">KESHAV NAGAR, SWARG AASHRAM ROAD, HAPUR 245101</div>
 </header>
 
-<!-- CART PANEL -->
 <div id="cartPanel">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
+  <div style="display:flex;justify-content:space-between;align-items:center">
     <h3>Your Cart</h3>
-    <span onclick="smartClose()" style="cursor:pointer; font-size:22px;">✖</span>
+    <span onclick="smartClose()" style="cursor:pointer;font-size:22px">✖</span>
   </div>
   <div id="cartItems"></div>
   <h3 id="total"></h3>
   
-  <div id="couponBox" style="margin:12px 0;">
+  <div id="couponBox" style="margin:12px 0">
     <input id="couponInput" placeholder="Enter coupon code" oninput="autoApplyCoupon()">
-    <p id="couponMsg" style="font-size:13px; margin-top:6px;"></p>
+    <p id="couponMsg" style="font-size:13px;margin-top:6px"></p>
   </div>
 
-  <div id="priceBreakup" style="font-size:14px; margin-top:10px;"></div>
+  <div id="priceBreakup" style="font-size:14px;margin-top:10px"></div>
 
   <div id="checkoutSection">
     <button onclick="openAddressModal()">➕ Add / Edit Address</button>
-    <div style="background:#f9f9f9; padding:10px; border-radius:6px; margin-top:10px;">
-      <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:14px;">
+    <div style="background:#f9f9f9;padding:10px;border-radius:6px;margin-top:10px">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px">
         <input type="checkbox" id="terms">
-        I agree to <span onclick="openTerms()" style="color:#007bff; text-decoration:underline;">Terms & Conditions</span>
+        I agree to <span onclick="openTerms()" style="color:#007bff;text-decoration:underline">Terms & Conditions</span>
       </label>
     </div>
-    <button id="placeOrderBtn" onclick="checkout()" style="margin-top:10px;">Place Order (WhatsApp)</button>
+    <button id="placeOrderBtn" onclick="checkout()" style="margin-top:10px">Place Order (WhatsApp)</button>
   </div>
 
-  <div id="myOrdersSection" style="display:none; margin-top:12px;">
+  <div id="myOrdersSection" style="display:none;margin-top:12px">
     <input id="orderPhone" placeholder="Phone Number" maxlength="10">
     <input id="orderIdCheck" placeholder="Order ID">
     <button id="trackBtn" onclick="trackMyOrder()">TRACK ORDER</button>
-    <div id="myOrders" style="margin-top:10px;"></div>
-    <button onclick="backToCart()" style="margin-top:12px; background:#fff; color:#000; border:1px solid #000;">← BACK</button>
+    <div id="myOrders" style="margin-top:10px"></div>
+    <button onclick="backToCart()" style="margin-top:12px;background:#fff;color:#000;border:1px solid #000">← BACK</button>
   </div>
 
-  <button id="myOrdersBtn" onclick="openMyOrders()" style="margin-top:12px; background:#fff; color:#000; border:1px solid #000;">MY ORDERS</button>
+  <button id="myOrdersBtn" onclick="openMyOrders()" style="margin-top:12px;background:#fff;color:#000;border:1px solid #000">MY ORDERS</button>
 </div>
 
-<!-- PRODUCTS -->
 <div class="container" id="productSection">
   <h2>Products</h2>
-  <div style="margin-bottom:20px; display:flex; gap:10px;">
+  <div style="margin-bottom:20px;display:flex;gap:10px">
     <button onclick="filterProducts('All')">All</button>
     <button onclick="filterProducts('Men')">Men</button>
     <button onclick="filterProducts('Women')">Women</button>
@@ -423,40 +129,36 @@ footer {
   <div class="products" id="products"></div>
 </div>
 
-<!-- FOOTER -->
 <footer>
-  <p>Return Policy: <span style="color:#4da3ff; cursor:pointer; text-decoration:underline;" onclick="openTerms()">Terms & Conditions Apply</span></p>
-  <p style="margin:15px 0 10px; font-size:14px;"><b>Follow us</b></p>
-  <div style="display:flex; justify-content:center; gap:12px;">
-    <a href="https://www.instagram.com/a_k_fashion_hub_/" target="_blank" style="background:#E1306C; color:#fff; padding:10px 18px; border-radius:25px; text-decoration:none;">Instagram</a>
-    <a href="https://wa.me/919599497909" target="_blank" style="background:#25D366; color:#fff; padding:10px 18px; border-radius:25px; text-decoration:none;">WhatsApp</a>
+  <p>Return Policy: <span style="color:#4da3ff;cursor:pointer;text-decoration:underline" onclick="openTerms()">Terms & Conditions Apply</span></p>
+  <div style="display:flex;justify-content:center;gap:12px;margin-top:15px">
+     <a href="https://www.instagram.com/a_k_fashion_hub_/" target="_blank" style="background:#E1306C;color:#fff;padding:10px 18px;border-radius:25px;text-decoration:none">Instagram</a>
+     <a href="https://wa.me/919599497909" target="_blank" style="background:#25D366;color:#fff;padding:10px 18px;border-radius:25px;text-decoration:none">WhatsApp</a>
   </div>
 </footer>
 
-<!-- ADDRESS MODAL -->
-<div id="addressModal" onclick="if(event.target===this) closeAddressModal()">
-  <div style="background:#fff; width:90%; max-width:420px; border-radius:10px; padding:20px; position:relative;">
-    <span onclick="closeAddressModal()" style="position:absolute; top:12px; left:12px; font-size:20px; cursor:pointer;">❌</span>
-    <h3 style="text-align:center;">Delivery Address</h3>
+<div id="addressModal" onclick="if(event.target===this)closeAddressModal()">
+  <div style="background:#fff;width:90%;max-width:420px;border-radius:10px;padding:20px;position:relative">
+    <span onclick="closeAddressModal()" style="position:absolute;top:12px;left:12px;font-size:20px;cursor:pointer">❌</span>
+    <h3 style="text-align:center">Delivery Address</h3>
     <input id="addr_name" placeholder="Full Name *">
     <input id="addr_phone" placeholder="Mobile Number *" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
     <textarea id="addr_address" rows="2" placeholder="House No, Street, Area *"></textarea>
-    <div style="display:flex; gap:6px;">
+    <div style="display:flex;gap:6px">
       <input id="addr_city" placeholder="City *">
       <input id="addr_pincode" placeholder="Pincode *" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
     </div>
     <input id="addr_state" placeholder="State *">
     <textarea id="addr_note" rows="2" placeholder="Note (optional)"></textarea>
-    <button onclick="saveAddress()" style="margin-top:10px;">✅ Save Address</button>
+    <button onclick="saveAddress()" style="margin-top:10px">✅ Save Address</button>
   </div>
 </div>
 
-<!-- CONFIRM BOX -->
 <div id="confirmBox">
-  <div style="background:#fff; padding:20px; width:90%; max-width:320px; border-radius:8px; text-align:center;">
-    <p id="confirmText" style="margin-bottom:15px; font-weight:bold;"></p>
-    <button onclick="confirmYes()" style="width:45%; margin-right:5%;">OK</button>
-    <button onclick="confirmNo()" style="width:45%; background:#ccc; color:#000;">Cancel</button>
+  <div style="background:#fff;padding:20px;width:90%;max-width:320px;border-radius:8px;text-align:center">
+    <p id="confirmText" style="margin-bottom:15px;font-weight:bold"></p>
+    <button onclick="confirmYes()" style="width:45%;margin-right:5%">OK</button>
+    <button onclick="confirmNo()" style="width:45%;background:#ccc;color:#000">Cancel</button>
   </div>
 </div>
 
@@ -473,13 +175,34 @@ let currentFilter = "All";
 window.pState = {};
 
 const AUTO_OFFER = { minAmount: 1499, discount: 100 };
-const COUPONS = {
-  "FREEDEL": { type: "FREE_DELIVERY" },
-  "SAVE100": { type: "FLAT", value: 100 }
-};
+const COUPONS = { "FREEDEL": { type: "FREE_DELIVERY" }, "SAVE100": { type: "FLAT", value: 100 } };
 let appliedCoupon = null;
 let removeIndex = null;
 let currentRating = 0;
+
+// ===== CORE HELPERS =====
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+async function apiPost(payload) {
+  // FIX: Using text/plain to avoid CORS preflight issues
+  const res = await fetch(PRODUCT_API, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" }, 
+    body: JSON.stringify(payload)
+  });
+  const text = await res.text(); // Read as text first
+  try {
+    return JSON.parse(text); // Then parse
+  } catch(e) {
+    console.error("JSON Parse Error:", text);
+    return { status: "ERROR", message: "Server response error" };
+  }
+}
 
 // ===== RENDER PRODUCTS =====
 function renderProducts() {
@@ -517,29 +240,20 @@ function renderProducts() {
           <img id="img${i}" src="${(p.img && p.img[0]) ? p.img[0] : 'https://dummyimage.com/600x800/eee/000&text=No+Image'}" class="product-img" onclick="openImage(this.src)">
           <button class="next" onclick="changeImage(${i},1)">›</button>
         </div>
-        <p style="font-size:12px; color:#666">${p.gender}</p>
+        <p style="font-size:12px;color:#666">${p.gender}</p>
         <h3>${p.name}</h3>
         <p>SKU: ${p.id}</p>
         <p style="font-weight:bold">Price: ₹${p.variants[0].price}</p>
-        <p>${p.category}</p>
         <p style="font-size:12px">${p.description}</p>
-        <p style="font-size:12px"><b>Measurements:</b> ${p.measure}</p>
-
-        <p style="font-size:12px; margin-bottom:2px;"><b>Size:</b></p>
+        <p style="font-size:12px"><b>Size:</b></p>
         <div class="opt-container">
-          ${availableSizes.map(s => `
-            <div class="opt-box ${selectedSize === s ? 'selected' : ''}" onclick="selectSize(${i}, '${s}')">${s}</div>
-          `).join("")}
+          ${availableSizes.map(s => `<div class="opt-box ${selectedSize === s ? 'selected' : ''}" onclick="selectSize(${i}, '${s}')">${s}</div>`).join("")}
         </div>
-
-        <p style="font-size:12px; margin-bottom:2px; margin-top:8px;"><b>Color:</b></p>
+        <p style="font-size:12px;margin-top:8px"><b>Color:</b></p>
         <div class="opt-container">
-          ${availableColors.map(c => `
-            <div class="opt-box ${selectedColor === c ? 'selected' : ''}" onclick="selectColor(${i}, '${c}')">${c}</div>
-          `).join("")}
+          ${availableColors.map(c => `<div class="opt-box ${selectedColor === c ? 'selected' : ''}" onclick="selectColor(${i}, '${c}')">${c}</div>`).join("")}
         </div>
-
-        <p id="stockMsg${i}" style="font-size:12px; font-weight:bold; color:green; min-height:16px;">${stockMsg}</p>
+        <p id="stockMsg${i}" style="font-size:12px;font-weight:bold;color:green;min-height:16px">${stockMsg}</p>
         <button id="btn${i}" onclick="addToCart(${i})" ${canAdd ? "" : "disabled"}>Add to Cart</button>
       </div>
     `;
@@ -548,9 +262,7 @@ function renderProducts() {
 
 async function loadProductsFromSheet() {
   const loader = document.getElementById("loaderWrap");
-  const errorBox = document.getElementById("errorBox");
   loader.style.display = "flex";
-
   const cached = localStorage.getItem(PRODUCT_CACHE_KEY);
   if (cached) {
     try {
@@ -573,9 +285,9 @@ async function fetchFreshProducts(showLoader) {
   if (showLoader) loader.style.display = "flex";
 
   try {
-    const res = await fetch(PRODUCT_API, { cache: "no-store" });
-    if (!res.ok) throw new Error("Network");
-    const data = await res.json();
+    const res = await fetch(PRODUCT_API + "?t=" + Date.now(), { cache: "no-store" });
+    const text = await res.text();
+    const data = JSON.parse(text);
     
     if (!Array.isArray(data) || data.length === 0) throw new Error("Empty");
 
@@ -589,94 +301,66 @@ async function fetchFreshProducts(showLoader) {
   }
 }
 
-function filterProducts(type) {
-  currentFilter = type;
-  renderProducts();
-}
+function filterProducts(type) { currentFilter = type; renderProducts(); }
 
 function selectSize(idx, size) {
-  const p = products[idx];
-  if (!p) return;
-  
+  const p = products[idx]; if(!p) return;
   if (window.pState[p.id]?.size === size) delete window.pState[p.id].size;
-  else {
-    if (!window.pState[p.id]) window.pState[p.id] = {};
-    window.pState[p.id].size = size;
-    delete window.pState[p.id].color;
-  }
+  else { if (!window.pState[p.id]) window.pState[p.id] = {}; window.pState[p.id].size = size; delete window.pState[p.id].color; }
   renderProducts();
 }
 
 function selectColor(idx, color) {
-  const p = products[idx];
-  if (!p) return;
-
+  const p = products[idx]; if(!p) return;
   if (window.pState[p.id]?.color === color) delete window.pState[p.id].color;
-  else {
-    if (!window.pState[p.id]) window.pState[p.id] = {};
-    window.pState[p.id].color = color;
-  }
+  else { if (!window.pState[p.id]) window.pState[p.id] = {}; window.pState[p.id].color = color; }
   renderProducts();
 }
 
 function changeImage(i, dir) {
-  const p = products[i];
-  if (!p || !p.img || p.img.length <= 1) return;
+  const p = products[i]; if(!p || !p.img || p.img.length <= 1) return;
   const imgEl = document.getElementById("img" + i);
-  let current = p.img.findIndex(src => imgEl.src.includes(src));
-  if (current === -1) current = 0;
+  let current = p.img.findIndex(src => imgEl.src.includes(src)); if(current===-1) current=0;
   current = (current + dir + p.img.length) % p.img.length;
   imgEl.src = p.img[current];
 }
 
-function showToast(msg) {
-  const t = document.getElementById("toast");
-  t.innerText = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2000);
+function openImage(src) {
+  let m = document.createElement("div");
+  m.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:99999;display:flex;align-items:center;justify-content:center";
+  m.innerHTML = `<img src="${src}" style="max-width:95%;max-height:95%">`;
+  m.onclick = () => m.remove();
+  document.body.appendChild(m);
 }
 
+// ===== CART LOGIC =====
 function addToCart(i) {
   const p = products[i];
   const state = window.pState[p.id] || {};
   const size = state.size;
   const color = state.color;
-
-  if (!size || !color) {
-    showToast("Select size & color");
-    return;
-  }
+  if (!size || !color) { showToast("Select size & color"); return; }
 
   const variant = p.variants.find(v => String(v.size) === String(size) && String(v.color).toLowerCase() === String(color).toLowerCase());
-  if (!variant || variant.stock <= 0) {
-    showToast("Out of stock");
-    return;
-  }
+  if (!variant || variant.stock <= 0) { showToast("Out of stock"); return; }
 
   let existing = cart.find(item => item.id === p.id && item.size === size && item.color === color);
-
   if (existing) {
     if (existing.qty < existing.maxStock) existing.qty++;
     else { showToast("Stock limit reached"); return; }
   } else {
-    cart.push({
-      id: p.id, name: p.name, size, color,
-      qty: 1, maxStock: variant.stock,
-      price: variant.price, weight: variant.weight || 500
-    });
+    cart.push({ id: p.id, name: p.name, size, color, qty: 1, maxStock: variant.stock, price: variant.price, weight: variant.weight || 500 });
   }
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCart();
   showToast("Item added");
 }
 
-// ===== CART LOGIC =====
 function updateCart() {
   let subtotal = 0;
   const box = document.getElementById("cartItems");
   box.innerHTML = "";
 
-  // Loop backwards for safe removal
   for (let i = cart.length - 1; i >= 0; i--) {
     const c = cart[i];
     if (!c.price || isNaN(c.price)) { cart.splice(i, 1); continue; }
@@ -685,16 +369,16 @@ function updateCart() {
 
   cart.forEach((c, index) => {
     box.innerHTML += `
-      <div style="border-bottom:1px solid #ddd; padding:10px 0;">
+      <div style="border-bottom:1px solid #ddd;padding:10px 0">
         <b>${c.name}</b><br>
         Size: ${c.size} | Color: ${c.color}<br>
-        <p style="margin:4px 0; font-size:13px;">Price: ₹${c.price} × ${c.qty} = <b>₹${Number(c.price) * c.qty}</b></p>
+        <p style="margin:4px 0;font-size:13px">Price: ₹${c.price} × ${c.qty} = <b>₹${Number(c.price) * c.qty}</b></p>
         <div class="qty-box">
           <button class="qty-btn" onclick="changeQty(${index},-1)">−</button>
           <span class="qty-count">${c.qty}</span>
           <button class="qty-btn" onclick="changeQty(${index},1)">+</button>
         </div>
-        <button onclick="askRemove(${index})" style="margin-top:6px; background:#eee; color:#000; font-size:12px; padding:4px;">Remove</button>
+        <button onclick="askRemove(${index})" style="margin-top:6px;background:#eee;color:#000;font-size:12px;padding:4px">Remove</button>
       </div>
     `;
   });
@@ -720,494 +404,210 @@ function updateCart() {
       offerMsg = `Coupon ${appliedCoupon} applied`;
     }
   } else {
-    if (subtotal >= AUTO_OFFER.minAmount) {
-      discount += AUTO_OFFER.discount;
-      offerMsg = `🎉 ₹${AUTO_OFFER.discount} OFF`;
-    } else {
-      offerMsg = `Add ₹${AUTO_OFFER.minAmount - subtotal} more for ₹${AUTO_OFFER.discount} OFF`;
-    }
+    if (subtotal >= AUTO_OFFER.minAmount) { discount += AUTO_OFFER.discount; offerMsg = `🎉 ₹${AUTO_OFFER.discount} OFF`; }
+    else { offerMsg = `Add ₹${AUTO_OFFER.minAmount - subtotal} more for ₹${AUTO_OFFER.discount} OFF`; }
   }
 
   const finalTotal = Math.max(subtotal + delivery - discount, 0);
-  
   document.getElementById("priceBreakup").innerText = offerMsg + (appliedCoupon ? " 🎟️" : "");
-  document.getElementById("total").innerHTML = `
-    <div>Subtotal: ₹${subtotal}</div>
-    <div>Delivery: ₹${delivery}</div>
-    <div>Discount: −₹${discount}</div>
-    <hr><b>Total: ₹${finalTotal}</b>
-  `;
-
+  document.getElementById("total").innerHTML = `<div>Subtotal: ₹${subtotal}</div><div>Delivery: ₹${delivery}</div><div>Discount: −₹${discount}</div><hr><b>Total: ₹${finalTotal}</b>`;
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCartBadge();
   updateBottomBar(finalTotal);
 }
 
-function calculateTotalWeight() {
-  return cart.reduce((sum, item) => sum + ((item.weight || 500) * item.qty), 0);
-}
+function calculateTotalWeight() { return cart.reduce((sum, item) => sum + ((item.weight || 500) * item.qty), 0); }
 
 function calculateDeliveryCharge(weight, orderValue) {
-  if (weight <= 0) return 0;
-  if (weight > 5000) return 200;
-  
+  if (weight <= 0) return 0; if (weight > 5000) return 200;
   const roundedWeight = Math.ceil(weight / 50) * 50;
-  let delivery = (roundedWeight / 50) * 7; // Base rate
-
+  let delivery = (roundedWeight / 50) * 7;
   if (orderValue >= 1200) delivery -= 70;
   else if (orderValue >= 999) delivery -= 50;
-  else {
-    const extraWeight = Math.max(0, weight - 500);
-    delivery -= Math.floor(extraWeight / 500) * 35;
-  }
-
+  else { const extraWeight = Math.max(0, weight - 500); delivery -= Math.floor(extraWeight / 500) * 35; }
   delivery = Math.max(70, delivery);
-  delivery = Math.ceil(delivery / 5) * 5; // Round to 5
-  return Math.max(delivery, 70 + Math.floor(weight / 1000) * 10); // Safety
+  delivery = Math.ceil(delivery / 5) * 5;
+  return Math.max(delivery, 70 + Math.floor(weight / 1000) * 10);
 }
 
 function changeQty(index, diff) {
   const item = cart[index];
-  if (diff === -1) {
-    item.qty--;
-    if (item.qty <= 0) cart.splice(index, 1);
-  }
-  if (diff === 1) {
-    if (item.qty < item.maxStock) item.qty++;
-    else { showToast("Max stock limit"); return; }
-  }
+  if (diff === -1) { item.qty--; if (item.qty <= 0) cart.splice(index, 1); }
+  if (diff === 1) { if (item.qty < item.maxStock) item.qty++; else { showToast("Max stock limit"); return; } }
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCart();
 }
 
-function askRemove(index) {
-  removeIndex = index;
-  const item = cart[index];
-  document.getElementById("confirmText").innerText = `Remove "${item.name}"?`;
-  document.getElementById("confirmBox").style.display = "flex";
-}
-
-function confirmYes() {
-  cart.splice(removeIndex, 1);
-  localStorage.setItem("cart", JSON.stringify(cart));
-  document.getElementById("confirmBox").style.display = "none";
-  showToast("Item removed");
-  updateCart();
-  renderProducts();
-}
-
-function confirmNo() {
-  document.getElementById("confirmBox").style.display = "none";
-}
+function askRemove(index) { removeIndex = index; document.getElementById("confirmText").innerText = `Remove "${cart[index].name}"?`; document.getElementById("confirmBox").style.display = "flex"; }
+function confirmYes() { cart.splice(removeIndex, 1); localStorage.setItem("cart", JSON.stringify(cart)); document.getElementById("confirmBox").style.display = "none"; showToast("Item removed"); updateCart(); renderProducts(); }
+function confirmNo() { document.getElementById("confirmBox").style.display = "none"; }
 
 function toggleCart() {
   const panel = document.getElementById("cartPanel");
   const overlay = document.getElementById("cartOverlay");
   const floating = document.getElementById("floatingCart");
   const isOpen = panel.style.right === "0px";
-
-  if (isOpen) {
-    panel.style.right = window.innerWidth < 768 ? "-100%" : "-360px";
-    overlay.style.display = "none";
-    floating.style.display = "block";
-    document.body.style.overflow = "";
-  } else {
-    panel.style.right = "0px";
-    overlay.style.display = "block";
-    floating.style.display = "none";
-    document.body.style.overflow = "hidden";
-  }
+  if (isOpen) { panel.style.right = window.innerWidth < 768 ? "-100%" : "-360px"; overlay.style.display = "none"; floating.style.display = "block"; document.body.style.overflow = ""; }
+  else { panel.style.right = "0px"; overlay.style.display = "block"; floating.style.display = "none"; document.body.style.overflow = "hidden"; }
 }
-
-function smartClose() {
-  const ordersSection = document.getElementById("myOrdersSection");
-  if (ordersSection.style.display === "block") {
-    backToCart();
-  } else {
-    toggleCart();
-  }
-}
-
-function backToCart() {
-  document.getElementById("myOrdersSection").style.display = "none";
-  document.getElementById("checkoutSection").style.display = "block";
-  document.getElementById("cartItems").style.display = "block";
-  document.getElementById("total").style.display = "block";
-  document.getElementById("priceBreakup").style.display = "block";
-  document.getElementById("couponBox").style.display = "block";
-  document.getElementById("myOrdersBtn").style.display = "block";
-  document.getElementById("myOrders").innerHTML = "";
-}
-
+function smartClose() { const ordersSection = document.getElementById("myOrdersSection"); if (ordersSection.style.display === "block") backToCart(); else toggleCart(); }
+function backToCart() { document.getElementById("myOrdersSection").style.display = "none"; document.getElementById("checkoutSection").style.display = "block"; document.getElementById("cartItems").style.display = "block"; document.getElementById("total").style.display = "block"; document.getElementById("priceBreakup").style.display = "block"; document.getElementById("couponBox").style.display = "block"; document.getElementById("myOrdersBtn").style.display = "block"; document.getElementById("myOrders").innerHTML = ""; }
 function autoApplyCoupon() {
   const code = document.getElementById("couponInput").value.trim().toUpperCase();
   const msg = document.getElementById("couponMsg");
-
-  if (code.length < 4) {
-    msg.innerText = "";
-    appliedCoupon = null;
-    updateCart();
-    return;
-  }
-
-  if (!COUPONS[code]) {
-    msg.innerText = "❌ Invalid";
-    msg.style.color = "red";
-    appliedCoupon = null;
-  } else {
-    appliedCoupon = code;
-    msg.innerText = "✅ Applied";
-    msg.style.color = "green";
-  }
+  if (code.length < 4) { msg.innerText = ""; appliedCoupon = null; updateCart(); return; }
+  if (!COUPONS[code]) { msg.innerText = "❌ Invalid"; msg.style.color = "red"; appliedCoupon = null; }
+  else { appliedCoupon = code; msg.innerText = "✅ Applied"; msg.style.color = "green"; }
   updateCart();
 }
 
 // ===== CHECKOUT =====
-function generateOrderId() {
-  const d = new Date();
-  const date = d.getFullYear().toString() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
-  return `AKFH-${date}-${Math.floor(1000 + Math.random() * 9000)}`;
-}
+function generateOrderId() { const d = new Date(); return `AKFH-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}-${Math.floor(1000 + Math.random() * 9000)}`; }
 
 async function checkout() {
   if (!cart || cart.length === 0) { alert("Cart empty"); return; }
   if (!document.getElementById("terms").checked) { alert("Please agree to Terms"); return; }
-
   const addr = JSON.parse(localStorage.getItem("address"));
-  if (!addr || !addr.name || !/^[6-9]\d{9}$/.test(addr.phone) || !addr.address || !addr.city || !addr.state || String(addr.pincode).length !== 6) {
-    alert("Please fill complete delivery address");
-    return;
-  }
-
+  if (!addr || !addr.name || !/^[6-9]\d{9}$/.test(addr.phone) || !addr.address || !addr.city || !addr.state || String(addr.pincode).length !== 6) { alert("Please fill complete delivery address"); return; }
   if (window.__checkoutInProgress) return;
   window.__checkoutInProgress = true;
   document.getElementById("checkoutLoader").style.display = "flex";
 
   const orderId = generateOrderId();
-  let subtotal = 0;
-  cart.forEach(c => subtotal += Number(c.price) * c.qty);
-
+  let subtotal = 0; cart.forEach(c => subtotal += Number(c.price) * c.qty);
   const totalWeight = calculateTotalWeight();
   const delivery = calculateDeliveryCharge(totalWeight, subtotal);
   let discount = 0;
-  
-  if (appliedCoupon) {
-    const rule = COUPONS[appliedCoupon];
-    if (rule) {
-      if (rule.type === "FREE_DELIVERY") discount += delivery;
-      if (rule.type === "FLAT") discount += rule.value;
-    }
-  } else {
-    if (subtotal >= AUTO_OFFER.minAmount) discount += AUTO_OFFER.discount;
-  }
-
+  if (appliedCoupon) { const rule = COUPONS[appliedCoupon]; if (rule) { if (rule.type === "FREE_DELIVERY") discount += delivery; if (rule.type === "FLAT") discount += rule.value; } }
+  else { if (subtotal >= AUTO_OFFER.minAmount) discount += AUTO_OFFER.discount; }
   const finalTotal = Math.max(subtotal + delivery - discount, 0);
 
   try {
-    const res = await fetch(PRODUCT_API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "PLACE_ORDER",
-        orderId: orderId,
-        name: addr.name,
-        phone: addr.phone,
-        products: cart.map(c => `${c.name} (${c.size}, ${c.color}) × ${c.qty}`).join(", "),
-        totalQty: cart.reduce((s, i) => s + i.qty, 0),
-        productsPrice: subtotal,
-        deliveryCharge: delivery,
-        totalAmount: finalTotal,
-        address: `${addr.address}, ${addr.city}, ${addr.state} - ${addr.pincode}`
-      })
+    // FIX: Using apiPost helper function
+    const result = await apiPost({
+      type: "PLACE_ORDER",
+      orderId: orderId,
+      name: addr.name,
+      phone: addr.phone,
+      products: cart.map(c => `${c.name} (${c.size}, ${c.color}) × ${c.qty}`).join(", "),
+      totalQty: cart.reduce((s, i) => s + i.qty, 0),
+      productsPrice: subtotal,
+      deliveryCharge: delivery,
+      totalAmount: finalTotal,
+      address: `${addr.address}, ${addr.city}, ${addr.state} - ${addr.pincode}`
     });
 
-    const result = await res.json();
-    if (!result || result.status !== "SUCCESS") {
-      window.__checkoutInProgress = false;
-      document.getElementById("checkoutLoader").style.display = "none";
-      alert(result?.message || "Order failed");
-      return;
-    }
+    window.__checkoutInProgress = false;
+    document.getElementById("checkoutLoader").style.display = "none";
+
+    if (!result || result.status !== "SUCCESS") { alert(result?.message || "Order failed"); return; }
 
     localStorage.setItem("activeOrder", JSON.stringify({ orderId: orderId, phone: addr.phone }));
-
     let msg = `AK FASHION HUB\nOrder ID: ${orderId}\nTOTAL: ₹${finalTotal}\nCustomer: ${addr.name}\nPhone: ${addr.phone}\nAddress: ${addr.address}, ${addr.city}`;
-    
     window.open("https://wa.me/919599497909?text=" + encodeURIComponent(msg), '_blank');
-    
-    cart = [];
-    localStorage.removeItem("cart");
-    renderProducts();
-    updateCart();
-    closeAddressModal();
-    toggleCart();
+    cart = []; localStorage.removeItem("cart");
+    renderProducts(); updateCart(); closeAddressModal(); toggleCart();
     alert("Order Placed! ID: " + orderId);
 
   } catch (e) {
-    alert("Connection error");
-  } finally {
     window.__checkoutInProgress = false;
     document.getElementById("checkoutLoader").style.display = "none";
+    alert("Connection Error. Please check internet.");
   }
 }
 
 // ===== ADDRESS =====
-function openAddressModal() {
-  document.getElementById("addressModal").style.display = "flex";
-  document.body.style.overflow = "hidden";
-  const saved = JSON.parse(localStorage.getItem("address"));
-  if (saved) {
-    addr_name.value = saved.name || "";
-    addr_phone.value = saved.phone || "";
-    addr_address.value = saved.address || "";
-    addr_city.value = saved.city || "";
-    addr_pincode.value = saved.pincode || "";
-    addr_state.value = saved.state || "";
-  }
-}
-
-function closeAddressModal() {
-  document.getElementById("addressModal").style.display = "none";
-  document.body.style.overflow = "";
-}
+function openAddressModal() { document.getElementById("addressModal").style.display = "flex"; document.body.style.overflow = "hidden"; const saved = JSON.parse(localStorage.getItem("address")); if (saved) { addr_name.value = saved.name || ""; addr_phone.value = saved.phone || ""; addr_address.value = saved.address || ""; addr_city.value = saved.city || ""; addr_pincode.value = saved.pincode || ""; addr_state.value = saved.state || ""; } }
+function closeAddressModal() { document.getElementById("addressModal").style.display = "none"; document.body.style.overflow = ""; }
 
 async function saveAddress() {
-  const data = {
-    name: addr_name.value.trim(),
-    phone: addr_phone.value.trim(),
-    address: addr_address.value.trim(),
-    city: addr_city.value.trim(),
-    pincode: addr_pincode.value.trim(),
-    state: addr_state.value.trim()
-  };
-
+  const data = { name: addr_name.value.trim(), phone: addr_phone.value.trim(), address: addr_address.value.trim(), city: addr_city.value.trim(), pincode: addr_pincode.value.trim(), state: addr_state.value.trim() };
   if (!/^[6-9]\d{9}$/.test(data.phone)) { alert("Invalid phone"); return; }
-  if (!data.name || !data.address || !data.city || !data.state || data.pincode.length !== 6) {
-    alert("Fill all fields"); return;
-  }
-
+  if (!data.name || !data.address || !data.city || !data.state || data.pincode.length !== 6) { alert("Fill all fields"); return; }
   localStorage.setItem("address", JSON.stringify(data));
   
-  // Save Lead
-  fetch(PRODUCT_API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      type: "CHECKOUT_LEAD",
-      phone: data.phone,
-      name: data.name,
-      address: `${data.address}, ${data.city}, ${data.state}`,
-      cart: JSON.stringify(cart),
-      total: document.getElementById("total").innerText
-    })
-  }).catch(e => {});
+  apiPost({ type: "CHECKOUT_LEAD", phone: data.phone, name: data.name, address: `${data.address}, ${data.city}`, cart: JSON.stringify(cart), total: document.getElementById("total").innerText }).catch(e=>{}); // Fire and forget
 
   closeAddressModal();
   alert("Address saved");
 }
 
 // ===== MY ORDERS =====
-function openMyOrders() {
-  document.getElementById("myOrders").innerHTML = "";
-  document.getElementById("checkoutSection").style.display = "none";
-  document.getElementById("cartItems").style.display = "none";
-  document.getElementById("total").style.display = "none";
-  document.getElementById("priceBreakup").style.display = "none";
-  document.getElementById("couponBox").style.display = "none";
-  document.getElementById("myOrdersSection").style.display = "block";
-  document.getElementById("myOrdersBtn").style.display = "none";
-}
+function openMyOrders() { document.getElementById("myOrders").innerHTML = ""; document.getElementById("checkoutSection").style.display = "none"; document.getElementById("cartItems").style.display = "none"; document.getElementById("total").style.display = "none"; document.getElementById("priceBreakup").style.display = "none"; document.getElementById("couponBox").style.display = "none"; document.getElementById("myOrdersSection").style.display = "block"; document.getElementById("myOrdersBtn").style.display = "none"; }
 
 async function trackMyOrder() {
-  const btn = document.getElementById("trackBtn");
-  btn.disabled = true;
+  const btn = document.getElementById("trackBtn"); btn.disabled = true;
   const phone = orderPhone.value.trim();
   const orderId = orderIdCheck.value.trim();
-  
-  if(!/^[6-9]\d{9}$/.test(phone) || !orderId) {
-    btn.disabled = false;
-    return;
-  }
-
+  if(!/^[6-9]\d{9}$/.test(phone) || !orderId) { btn.disabled = false; return; }
   document.getElementById("checkoutLoader").style.display = "flex";
   
   try {
+    // GET Request fix
     const res = await fetch(PRODUCT_API + `?phone=${phone}&orderId=${orderId}`);
-    const data = await res.json();
-
+    const text = await res.text();
+    const data = JSON.parse(text);
+    
     document.getElementById("checkoutLoader").style.display = "none";
-
-    if (data.status !== "SUCCESS") {
-      document.getElementById("myOrders").innerHTML = "<p style='color:red; text-align:center;'>Order not found</p>";
-    } else {
-      renderMyOrder(data);
-    }
-  } catch(e) {
-    document.getElementById("checkoutLoader").style.display = "none";
-  }
+    if (data.status !== "SUCCESS") document.getElementById("myOrders").innerHTML = "<p style='color:red;text-align:center'>Order not found</p>";
+    else renderMyOrder(data);
+  } catch(e) { document.getElementById("checkoutLoader").style.display = "none"; alert("Error fetching order"); }
   btn.disabled = false;
 }
 
 function renderMyOrder(data) {
   let reviewHtml = "";
   if (data.reviewAllowed && data.orderStatus === "Delivered") {
-    reviewHtml = `
-      <div style="margin-top:15px; padding:10px; background:#f9f9f9; border-radius:8px;">
-        <p style="font-weight:bold; margin-bottom:5px;">Rate Order</p>
-        <div id="starRating" style="font-size:24px; color:#ddd; cursor:pointer;">
-          <span class="star" onclick="setRating(1)">★</span>
-          <span class="star" onclick="setRating(2)">★</span>
-          <span class="star" onclick="setRating(3)">★</span>
-          <span class="star" onclick="setRating(4)">★</span>
-          <span class="star" onclick="setRating(5)">★</span>
-        </div>
-        <textarea id="reviewNote" placeholder="Note (optional)" rows="2" style="font-size:12px;"></textarea>
-        <button onclick="submitReview('${data.orderId}', '${data.phone}')" style="margin-top:5px; font-size:12px;">Submit</button>
-      </div>
-    `;
+    reviewHtml = `<div style="margin-top:15px;padding:10px;background:#f9f9f9;border-radius:8px"><p style="font-weight:bold;margin-bottom:5px">Rate Order</p><div id="starRating" style="font-size:24px;color:#ddd;cursor:pointer"><span onclick="setRating(1)">★</span><span onclick="setRating(2)">★</span><span onclick="setRating(3)">★</span><span onclick="setRating(4)">★</span><span onclick="setRating(5)">★</span></div><textarea id="reviewNote" placeholder="Note (optional)" rows="2" style="font-size:12px"></textarea><button onclick="submitReview('${data.orderId}', '${data.phone}')" style="margin-top:5px;font-size:12px">Submit</button></div>`;
   }
-
-  document.getElementById("myOrders").innerHTML = `
-    <b>Order ID:</b> ${data.orderId}<br>
-    <b>Status:</b> ${data.orderStatus}<br>
-    <b>Total:</b> ₹${data.total}<br>
-    <div id="orderTimeline" style="margin-top:10px;"></div>
-    ${reviewHtml}
-  `;
+  document.getElementById("myOrders").innerHTML = `<b>Order ID:</b> ${data.orderId}<br><b>Status:</b> ${data.orderStatus}<br><b>Total:</b> ₹${data.total}<br><div id="orderTimeline" style="margin-top:10px"></div>${reviewHtml}`;
   renderTimeline(data.orderStatus);
 }
 
 function renderTimeline(status) {
   const steps = ["Order Placed", "Dispatched", "Out for Delivery", "Delivered"];
-  let html = "";
   const currentIdx = steps.indexOf(status);
-  steps.forEach((s, i) => {
-    const done = i <= currentIdx;
-    html += `<div style="margin:6px 0; font-weight:${done ? 'bold' : 'normal'}; color:${done ? 'green' : '#999'};">
-      ${done ? "✔️" : "⏳"} ${s}
-    </div>`;
-  });
+  let html = "";
+  steps.forEach((s, i) => { const done = i <= currentIdx; html += `<div style="margin:6px 0;font-weight:${done?'bold':'normal'};color:${done?'green':'#999'}">${done?"✔️":"⏳"} ${s}</div>`; });
   document.getElementById("orderTimeline").innerHTML = html;
 }
 
-function setRating(r) {
-  currentRating = r;
-  const stars = document.querySelectorAll("#starRating .star");
-  stars.forEach((s, i) => {
-    s.style.color = i < r ? "#ffc107" : "#ddd";
-  });
-}
+function setRating(r) { currentRating = r; const stars = document.querySelectorAll("#starRating span"); stars.forEach((s, i) => { s.style.color = i < r ? "#ffc107" : "#ddd"; }); }
 
 async function submitReview(orderId, phone) {
   if (currentRating === 0) { alert("Select stars"); return; }
   const note = document.getElementById("reviewNote").value.trim();
-  
   document.getElementById("checkoutLoader").style.display = "flex";
   try {
-    const res = await fetch(PRODUCT_API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "REVIEW", orderId, phone, stars: currentRating, note
-      })
-    });
-    const result = await res.json();
-    if (result.status === "SUCCESS") {
-      alert("Thanks!");
-      document.getElementById("myOrders").querySelector("div").style.display = "none";
-    } else {
-      alert("Failed");
-    }
-  } catch(e) {
-    alert("Error");
-  }
+    const result = await apiPost({ type: "REVIEW", orderId, phone, stars: currentRating, note });
+    if (result.status === "SUCCESS") { alert("Thanks!"); document.getElementById("myOrders").querySelector("div").style.display = "none"; }
+    else alert("Failed");
+  } catch(e) { alert("Error"); }
   document.getElementById("checkoutLoader").style.display = "none";
 }
 
-// ===== HELPERS =====
-function updateCartBadge() {
-  let badge = document.getElementById("cartCount");
-  if (!badge) {
-    badge = document.createElement("span");
-    badge.id = "cartCount";
-    badge.style.cssText = "background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px; margin-left:6px;";
-    document.getElementById("floatingCart").appendChild(badge);
-  }
-  badge.innerText = cart.reduce((s, i) => s + i.qty, 0);
-}
-
-function updateBottomBar(total) {
-  let bar = document.getElementById("bottomCartBar");
-  if (!bar) {
-    bar = document.createElement("div");
-    bar.id = "bottomCartBar";
-    bar.style.cssText = "position:fixed; bottom:0; left:0; width:100%; background:#000; color:#fff; padding:12px; display:none; justify-content:space-between; z-index:9999;";
-    bar.onclick = toggleCart;
-    document.body.appendChild(bar);
-  }
-  if (window.innerWidth < 768 && cart.length > 0) {
-    bar.style.display = "flex";
-    bar.innerHTML = `🛒 View Cart (${cart.length}) <b>₹${total}</b>`;
-  } else {
-    bar.style.display = "none";
-  }
-}
-
-function openImage(src) {
-  let modal = document.createElement("div");
-  modal.style.cssText = "position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:99999; display:flex; align-items:center; justify-content:center;";
-  modal.innerHTML = `<img src="${src}" style="max-width:95%; max-height:95%;">`;
-  modal.onclick = () => modal.remove();
-  document.body.appendChild(modal);
-}
+// ===== MISC =====
+function updateCartBadge() { let badge = document.getElementById("cartCount"); if (!badge) { badge = document.createElement("span"); badge.id = "cartCount"; badge.style.cssText = "background:red;color:white;border-radius:50%;padding:2px 6px;font-size:12px;margin-left:6px"; document.getElementById("floatingCart").appendChild(badge); } badge.innerText = cart.reduce((s, i) => s + i.qty, 0); }
+function updateBottomBar(total) { let bar = document.getElementById("bottomCartBar"); if (!bar) { bar = document.createElement("div"); bar.id = "bottomCartBar"; bar.style.cssText = "position:fixed;bottom:0;left:0;width:100%;background:#000;color:#fff;padding:12px;display:none;justify-content:space-between;z-index:9999"; bar.onclick = toggleCart; document.body.appendChild(bar); } if (window.innerWidth < 768 && cart.length > 0) { bar.style.display = "flex"; bar.innerHTML = `🛒 View Cart (${cart.length}) <b>₹${total}</b>`; } else { bar.style.display = "none"; } }
 
 window.openTerms = function() {
   document.body.style.overflow = "hidden";
-  let modal = document.createElement("div");
-  modal.style.cssText = "position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:50000; display:flex; align-items:center; justify-content:center;";
-  modal.innerHTML = `
-    <div style="background:#fff; padding:20px; width:90%; max-width:520px; max-height:85%; overflow:auto; border-radius:8px;">
-      <h3>Terms & Conditions</h3>
-      <p style="font-size:14px; line-height:1.6;">
-        • Delivery: 4-6 working days.<br><br>
-        • Cancellation (Before Dispatch): Full refund within 12 hours.<br><br>
-        • Cancellation (After Dispatch): Not allowed. Full payment required.<br><br>
-        • Images: May vary slightly due to screen resolution.<br><br>
-        • Returns: Request within 3 days of delivery. Unboxing video mandatory.<br><br>
-        • Refunds: Only for incorrect/damaged items. Size issues: Replacement only.
-      </p>
-      <button id="agreeBtn" style="width:100%; margin-top:15px;">I Agree</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  modal.querySelector("#agreeBtn").onclick = () => {
-    document.getElementById("terms").checked = true;
-    modal.remove();
-    document.body.style.overflow = "";
-  };
-  modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+  let m = document.createElement("div");
+  m.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:50000;display:flex;align-items:center;justify-content:center";
+  m.innerHTML = `<div style="background:#fff;padding:20px;width:90%;max-width:520px;max-height:85%;overflow:auto;border-radius:8px"><h3>Terms & Conditions</h3><p style="font-size:14px;line-height:1.6">• Delivery: 4-6 working days.<br><br>• Cancellation (Before Dispatch): Full refund within 12 hours.<br><br>• Returns: Request within 3 days. Unboxing video mandatory.</p><button id="agreeBtn" style="width:100%;margin-top:15px">I Agree</button></div>`;
+  document.body.appendChild(m);
+  m.querySelector("#agreeBtn").onclick = () => { document.getElementById("terms").checked = true; m.remove(); document.body.style.overflow = ""; };
+  m.onclick = (e) => { if(e.target === m) m.remove(); };
 };
 
-// ===== POPUP LOGIC =====
-(function(){
-  const lastClosed = localStorage.getItem("popupClosedTime");
-  if(lastClosed && (Date.now() - lastClosed < 24 * 60 * 60 * 1000)) return;
-  setTimeout(() => { document.getElementById("discountPopup").style.display = "flex"; }, 180000);
-})();
-
+// ===== POPUP =====
+(function(){ const lastClosed = localStorage.getItem("popupClosedTime"); if(lastClosed && (Date.now() - lastClosed < 24 * 60 * 60 * 1000)) return; setTimeout(() => { document.getElementById("discountPopup").style.display = "flex"; }, 180000); })();
 function closePopup() { document.getElementById("discountPopup").style.display = "none"; }
 function maybeLater() { localStorage.setItem("popupClosedTime", Date.now()); closePopup(); }
-
 async function submitPopup() {
   const phone = document.getElementById("popupPhone").value.trim();
   if(!/^[6-9]\d{9}$/.test(phone)) { document.getElementById("popupError").innerText = "Invalid number"; return; }
-  
-  fetch(PRODUCT_API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ type: "POPUP_LEAD", phone: phone })
-  }).catch(e => {});
-
+  apiPost({ type: "POPUP_LEAD", phone: phone }).catch(e=>{}); // Fire and forget
   document.getElementById("popupPhone").style.display = "none";
   document.querySelector("#discountPopup button").style.display = "none";
   document.querySelector("#discountPopup p[onclick]").style.display = "none";
@@ -1218,12 +618,8 @@ async function submitPopup() {
 updateCart();
 loadProductsFromSheet();
 updateCartBadge();
-
 const active = JSON.parse(localStorage.getItem("activeOrder"));
-if(active) {
-  orderPhone.value = active.phone;
-  orderIdCheck.value = active.orderId;
-}
+if(active) { orderPhone.value = active.phone; orderIdCheck.value = active.orderId; }
 </script>
 </body>
 </html>
