@@ -338,147 +338,76 @@ footer{
 .address-box .row input{
   width:50%;
 }
-/* ===== PRODUCT LOADER ===== */
-#loaderWrap{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:40px 10px;
-}
 
-.loader{
-  width:42px;
-  height:42px;
-  border:4px solid #ddd;
-  border-top:4px solid #000;
-  border-radius:50%;
-  animation:spin 0.9s linear infinite;
-  margin-bottom:12px;
-}
-
-@keyframes spin{
-  to{ transform:rotate(360deg); }
-}
-
-.loader-text{
-  font-size:15px;
-  font-weight:600;
-  color:#444;
-  animation:pulse 1.4s ease-in-out infinite;
-}
-
-@keyframes pulse{
-  0%,100%{ opacity:0.4; }
-  50%{ opacity:1; }
-}
-
-/* ===== LOAD ERROR ===== */
-#errorBox{
-  display:none;
-  text-align:center;
-  padding:30px 10px;
-  animation:shake 0.4s ease;
-}
-
-@keyframes shake{
-  0%{ transform:translateX(0); }
-  25%{ transform:translateX(-6px); }
-  50%{ transform:translateX(6px); }
-  75%{ transform:translateX(-6px); }
-  100%{ transform:translateX(0); }
-}
-
-#errorBox .icon{
-  font-size:26px;
-  margin-bottom:8px;
-}
-
-#errorBox .msg{
-  font-size:15px;
-  font-weight:600;
-  color:#c0392b;
-}
-
-#errorBox .hint{
-  margin-top:6px;
-  font-size:13px;
-  color:#555;
-}
-/* ===== FULL SCREEN LOADER ===== */
+/* ===== FULL SCREEN LOADER (NO BOX, BLUR BACKGROUND) ===== */
 #loaderWrap,
 #errorBox{
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(6px);
+  background: rgba(0,0,0,0.6); /* Dark Blur */
+  backdrop-filter: blur(8px);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 99999;
+  flex-direction: column;
 }
 
-.loaderCard{
-  background:#fff;
-  padding:20px;
-  border-radius:14px;
-  text-align:center;
-  width:200px;
-  box-shadow:0 10px 40px rgba(0,0,0,0.35);
-  animation: popIn 0.4s ease;
+/* Text Style */
+.loader-text{
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-.loaderCard h3{
-  margin:0 0 15px 0;
-  font-size:16px;
-  letter-spacing:1px;
-}
-
-.loaderCard p{
-  display:none;
-}
-
+/* Ring Animation */
 .ring{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  border:3px solid #ddd;
-  border-top:3px solid #000;
-  margin:auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.2);
+  border-top: 3px solid #ffffff;
   animation: spin 1s linear infinite;
-}
-
-#errorBox button{
-  margin-top:12px;
-  padding:8px 14px;
-  background:#000;
-  color:#fff;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
 }
 
 @keyframes spin{
   to{ transform: rotate(360deg); }
 }
 
-@keyframes popIn{
-  from{ transform: scale(0.85); opacity:0; }
-  to{ transform: scale(1); opacity:1; }
+/* Error Box specific */
+#errorBox h3{
+  color: #fff;
+  font-size: 16px;
+  margin: 0 0 15px 0;
+  text-align: center;
 }
-/* ===== FIX: Checkbox alignment & ghost focus box ===== */
+
+#errorBox button{
+  margin-top: 0;
+  padding: 10px 20px;
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* FIX: Checkbox alignment */
 #checkoutSection label{
   display:flex;
   align-items:center;
   gap:6px;
 }
 
-
 label input[type="checkbox"]{
   margin:0;
 }
 
-/* REMOVE GHOST / LIGHT FOCUS BOX */
+/* REMOVE GHOST FOCUS */
 button:focus,
 input:focus,
 textarea:focus,
@@ -487,7 +416,7 @@ select:focus{
   box-shadow:none !important;
 }
 
-/* ===== POPUP STYLES ===== */
+/* POPUP STYLES */
 #discountPopup {
   position: fixed;
   inset: 0;
@@ -509,6 +438,11 @@ select:focus{
   box-shadow: 0 15px 40px rgba(0,0,0,0.4);
   animation: popIn 0.4s ease;
   position: relative;
+}
+
+@keyframes popIn{
+  from{ transform: scale(0.85); opacity:0; }
+  to{ transform: scale(1); opacity:1; }
 }
 
 .popup-close {
@@ -535,21 +469,16 @@ select:focus{
 </head>
 
 <body>
-    <!-- 🔄 PRODUCT LOADER -->
+    <!-- 🔄 PRODUCT LOADER (NO BOX) -->
 <div id="loaderWrap">
-  <div class="loaderCard">
-    <h3>AK FASHION HUB</h3>
-    <div class="ring"></div>
-  </div>
+  <div class="loader-text">AK FASHION HUB...</div>
+  <div class="ring"></div>
 </div>
 
-<!-- ❌ LOAD ERROR -->
+<!-- ❌ LOAD ERROR (NO BOX) -->
 <div id="errorBox">
-  <div class="loaderCard">
-    <h3>Something went wrong</h3>
-    <p>Please refresh the page</p>
-    <button onclick="location.reload()">↻ Refresh</button>
-  </div>
+  <h3>Something went wrong</h3>
+  <button onclick="location.reload()">↻ Refresh</button>
 </div>
 
 <!-- 🎁 DISCOUNT POPUP -->
@@ -850,8 +779,8 @@ let products = [];
     const PRODUCT_CACHE_KEY = "akfh_products_cache";
 const PRODUCT_CACHE_TIME = 1000 * 60 * 10; // 10 minutes
 
-// ✅ NAYA URL YAHAN PASTE KARO (STEP 3)
-const PRODUCT_API = "https://script.google.com/macros/s/AKfycbyxYTgZeO78uB2XKwCDXgPNm42e9L1AqoLHP5sJtEQEI9BPZlRD7haLUBwUJiOmqZN2/exec";
+
+const PRODUCT_API = "https://script.google.com/macros/s/AKfycbwgj7Xt1HNNjZzp4_5SiiJAZasrDXhwAc0_IQDZjN2YkQTD4rm9pL8PMAJCmtqWAbnN/exec";
 
    
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -1920,10 +1849,8 @@ window.openTerms = function(){
   justify-content:center;
   z-index:999999;
 ">
-  <div class="loaderCard">
-    <h3>Placing Order</h3>
-    <div class="ring"></div>
-  </div>
+  <div class="loader-text">Placing Order...</div>
+  <div class="ring"></div>
 </div>
     <script>
 
