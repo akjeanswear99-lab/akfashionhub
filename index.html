@@ -339,12 +339,13 @@ footer{
   width:50%;
 }
 
-/* ===== FULL SCREEN LOADER (NO BOX, BLUR BACKGROUND) ===== */
+/* ===== FULL SCREEN LOADER (TEXT ONLY) ===== */
 #loaderWrap,
+#checkoutLoader,
 #errorBox{
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6); /* Dark Blur */
+  background: rgba(0,0,0,0.6);
   backdrop-filter: blur(8px);
   display: none;
   align-items: center;
@@ -353,31 +354,14 @@ footer{
   flex-direction: column;
 }
 
-/* Text Style */
 .loader-text{
   color: #fff;
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 1px;
-  margin-bottom: 20px;
   text-align: center;
 }
 
-/* Ring Animation */
-.ring{
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 3px solid rgba(255,255,255,0.2);
-  border-top: 3px solid #ffffff;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin{
-  to{ transform: rotate(360deg); }
-}
-
-/* Error Box specific */
 #errorBox h3{
   color: #fff;
   font-size: 16px;
@@ -394,6 +378,41 @@ footer{
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+  width: auto;
+}
+
+/* ===== SIZE & COLOR BOXES ===== */
+.opt-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.opt-box {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  background: #fff;
+  user-select: none;
+}
+
+.opt-box.selected {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+  font-weight: bold;
+}
+
+.opt-box:hover {
+  border-color: #000;
 }
 
 /* FIX: Checkbox alignment */
@@ -436,13 +455,7 @@ select:focus{
   max-width: 400px;
   text-align: center;
   box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-  animation: popIn 0.4s ease;
   position: relative;
-}
-
-@keyframes popIn{
-  from{ transform: scale(0.85); opacity:0; }
-  to{ transform: scale(1); opacity:1; }
 }
 
 .popup-close {
@@ -469,13 +482,12 @@ select:focus{
 </head>
 
 <body>
-    <!-- 🔄 PRODUCT LOADER (NO BOX) -->
+    <!-- 🔄 PRODUCT LOADER (TEXT ONLY) -->
 <div id="loaderWrap">
   <div class="loader-text">AK FASHION HUB...</div>
-  <div class="ring"></div>
 </div>
 
-<!-- ❌ LOAD ERROR (NO BOX) -->
+<!-- ❌ LOAD ERROR -->
 <div id="errorBox">
   <h3>Something went wrong</h3>
   <button onclick="location.reload()">↻ Refresh</button>
@@ -779,12 +791,14 @@ let products = [];
     const PRODUCT_CACHE_KEY = "akfh_products_cache";
 const PRODUCT_CACHE_TIME = 1000 * 60 * 10; // 10 minutes
 
-// ⚠️ URL CHANGE KARO (New Deployment ka URL yahan lagao)
+// ⚠️ URL CHANGE KARO
 const PRODUCT_API = "https://script.google.com/macros/s/AKfycbyfrFwgN0Dv_mOpVoY-cDJYTx9H2nG2Jq4f0xcsGDMhx1NP2pZel6n3IAL3vVO48Sp8/exec";
 
    
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
+// Store user selections for products
+window.pState = {};
 
   const AUTO_OFFER = {
   minAmount: 1499,  
@@ -806,23 +820,74 @@ function filterProducts(type){
   currentFilter = type;
   renderProducts();
 }
+
+function selectSize(idx, size){
+  const p = products[idx];
+  if(!p) return;
+  
+  // Toggle selection
+  if(window.pState[p.id]?.size === size){
+     delete window.pState[p.id].size;
+  } else {
+     if(!window.pState[p.id]) window.pState[p.id] = {};
+     window.pState[p.id].size = size;
+     delete window.pState[p.id].color; // Reset color on size change
+  }
+  
+  renderProducts();
+  // Scroll back to card if needed (optional)
+}
+
+function selectColor(idx, color){
+  const p = products[idx];
+  if(!p) return;
+
+  if(window.pState[p.id]?.color === color){
+     delete window.pState[p.id].color;
+  } else {
+     if(!window.pState[p.id]) window.pState[p.id] = {};
+     window.pState[p.id].color = color;
+  }
+  
+  renderProducts();
+}
+
     function renderProducts(){
         
   const box = document.getElementById("products");
-        
-
   box.innerHTML = "";
 
   products.forEach((p, i) => {
-if(!p.variants || p.variants.length === 0){
-  return;
-}
+    if(!p.variants || p.variants.length === 0){
+      return;
+    }
 
     if(currentFilter !== "All" && p.gender !== currentFilter) return;
 
-    // sizes & colors from variants
-    const sizes = [...new Set(p.variants.map(v => v.size))];
-    const colors = [...new Set(p.variants.map(v => v.color))];
+    // Get available sizes (stock > 0)
+    const availableSizes = [...new Set(p.variants.filter(v => Number(v.stock) > 0).map(v => v.size))];
+    
+    // Get State
+    const state = window.pState[p.id] || {};
+    const selectedSize = state.size;
+    const selectedColor = state.color;
+
+    // Get available colors based on selected size
+    let availableColors = [];
+    if(selectedSize){
+      availableColors = [...new Set(p.variants.filter(v => Number(v.stock) > 0 && v.size === selectedSize).map(v => v.color))];
+    }
+
+    // Check if Add to Cart should be enabled
+    let canAdd = false;
+    let stockMsg = "";
+    if(selectedSize && selectedColor){
+       const variant = p.variants.find(v => v.size === selectedSize && v.color === selectedColor);
+       if(variant && Number(variant.stock) > 0){
+         canAdd = true;
+         stockMsg = `Only ${variant.stock} left`;
+       }
+    }
 
     box.innerHTML += `
       <div class="card">
@@ -857,19 +922,23 @@ if(!p.variants || p.variants.length === 0){
         <p style="font-size:12px">${p.description}</p>
         <p style="font-size:12px"><b>Measurements:</b> ${p.measure}</p>
 
-        <select id="size${i}" onchange="updateStockMsg(${i})">
-          <option value="">Select Size</option>
-          ${sizes.map(s => `<option>${s}</option>`).join("")}
-        </select>
+        <p style="font-size:12px; margin-bottom:2px;"><b>Size:</b></p>
+        <div class="opt-container">
+          ${availableSizes.map(s => `
+            <div class="opt-box ${selectedSize === s ? 'selected' : ''}" onclick="selectSize(${i}, '${s}')">${s}</div>
+          `).join("")}
+        </div>
 
-        <select id="color${i}" onchange="updateStockMsg(${i})">
-          <option value="">Select Color</option>
-          ${colors.map(c => `<option>${c}</option>`).join("")}
-        </select>
+        <p style="font-size:12px; margin-bottom:2px; margin-top:8px;"><b>Color:</b></p>
+        <div class="opt-container">
+          ${availableColors.map(c => `
+            <div class="opt-box ${selectedColor === c ? 'selected' : ''}" onclick="selectColor(${i}, '${c}')">${c}</div>
+          `).join("")}
+        </div>
 
-        <p id="stockMsg${i}" style="font-size:12px;font-weight:bold;"></p>
+        <p id="stockMsg${i}" style="font-size:12px;font-weight:bold; color:green; min-height:16px;">${stockMsg}</p>
 
-        <button id="btn${i}" onclick="addToCart(${i})" disabled>
+        <button id="btn${i}" onclick="addToCart(${i})" ${canAdd ? "" : "disabled"}>
           Add to Cart
         </button>
       </div>
@@ -882,9 +951,6 @@ async function loadProductsFromSheet(){
 const loader = document.getElementById("loaderWrap");
 const errorBox = document.getElementById("errorBox");
 loader.style.display = "flex";
-
-
-  loader.style.display = "flex";
 
   // 🔹 STEP A — CACHE CHECK
   const cached = localStorage.getItem(PRODUCT_CACHE_KEY);
@@ -968,35 +1034,7 @@ errorBox.style.display = "flex";
   }
 }
 
-function updateStockMsg(i){
-  const size = document.getElementById("size"+i).value;
-  const color = document.getElementById("color"+i).value;
-  const msg = document.getElementById("stockMsg"+i);
-  const btn = document.getElementById("btn"+i);
-
-  btn.disabled = true;
-  msg.innerText = "";
-
-  if(!size || !color) return;
-
-  const p = products[i];
-
-  const variant = p.variants.find(v =>
-    String(v.size).trim() === String(size).trim() &&
-    String(v.color).toLowerCase().trim() === String(color).toLowerCase().trim()
-  );
-
-  if(variant && Number(variant.stock) > 0){
-    msg.innerText = `Only ${variant.stock} left`;
-    msg.style.color = "green";
-    btn.disabled = false;   // 🔥 THIS IS IMPORTANT
-  }else{
-    msg.innerText = "Out of stock";
-    msg.style.color = "red";
-    btn.disabled = true;
-  }
-}
-
+// Removed updateStockMsg as it's handled inside renderProducts now
 
 function changeImage(i, dir){
   const p = products[i];
@@ -1049,15 +1087,15 @@ function openImage(src){
 }
 
 function addToCart(i){
-  const size = document.getElementById("size"+i).value;
-  const color = document.getElementById("color"+i).value;
+  const p = products[i];
+  const state = window.pState[p.id] || {};
+  const size = state.size;
+  const color = state.color;
 
   if(!size || !color){
     showToast("Select size & color");
     return;
   }
-
-  const p = products[i];
 
   const variant = p.variants.find(v =>
     String(v.size) === String(size) &&
@@ -1849,8 +1887,7 @@ window.openTerms = function(){
   justify-content:center;
   z-index:999999;
 ">
-  <div class="loader-text">Placing Order...</div>
-  <div class="ring"></div>
+  <div class="loader-text">AK FASHION HUB...</div>
 </div>
     <script>
 
