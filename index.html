@@ -1383,40 +1383,35 @@ if(window.__checkoutInProgress){
   document.getElementById("checkoutLoader").style.display = "flex";
 
   try{
-      const res = await fetch(PRODUCT_API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-  orderId: orderId,
-  name: addr.name,
-  phone: addr.phone,
-  products: cart.map(c => `${c.name} (${c.size}, ${c.color}) × ${c.qty}`).join(", "),
-  totalQty: cart.reduce((s,i)=>s+i.qty,0),
-  productsPrice: subtotal,
-  deliveryCharge: delivery,
-  totalAmount: finalTotal,
-  address: `${addr.address}, ${addr.city}, ${addr.state} - ${addr.pincode}`
-})
+   const res = await fetch(PRODUCT_API, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    type: "PLACE_ORDER",
+    orderId: orderId,
+    name: addr.name,
+    phone: addr.phone,
+    products: cart.map(c => `${c.name} (${c.size}, ${c.color}) × ${c.qty}`).join(", "),
+    totalQty: cart.reduce((s,i)=>s+i.qty,0),
+    productsPrice: subtotal,
+    deliveryCharge: delivery,
+    totalAmount: finalTotal,
+    address: `${addr.address}, ${addr.city}, ${addr.state} - ${addr.pincode}`
+  })
+});
 
-    });
+const result = await res.json();
+console.log("Order API response:", result); // ✅ DEBUG LINE
 
-    const result = await res.json();
-
-   if(!result || result.status !== "SUCCESS"){
+if(!result || result.status !== "SUCCESS"){
   window.__checkoutInProgress = false;
   document.getElementById("checkoutLoader").style.display = "none";
-  alert("Order failed. Please try again.");
+  alert(result?.message || "Order failed. Please try again.");
   return;
 }
 
- }catch(e){
-  window.__checkoutInProgress = false;
-  document.getElementById("checkoutLoader").style.display = "none";
-  alert("Server error. Please try again.");
-  return;
-}
 
   // ===== ORDER SAVE =====
 localStorage.setItem("activeOrder", JSON.stringify({
