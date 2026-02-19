@@ -792,7 +792,7 @@ let products = [];
 const PRODUCT_CACHE_TIME = 1000 * 60 * 10; // 10 minutes
 
 // ⚠️ URL CHANGE KARO
-const PRODUCT_API = "https://script.google.com/macros/s/AKfycbyVwGDmY-wQF6fL0Gjgd4HZFcD3V9u7YW1ZyzZCQiczr7IBmAN2IiQRVKUG2cDoBjYf/exec";
+const PRODUCT_API = "https://script.google.com/macros/s/AKfycbwT2z1d8-xXTLOab-q_sJ-Irp5SiQn1F8R33FNfGhc3QAloChVcaoyq5WInQ6vuRnC7/exec";
 
    
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -998,9 +998,9 @@ async function fetchFreshProducts(showLoader){
       throw new Error("Empty");
     }
 
-    const freshProducts = data.map(p => ({
+       const freshProducts = data.map(p => ({
       id: p.id,
-      name: p.id,
+      name: p.name,   // ✅ FIXED
       gender: p.gender,
       category: p.category,
       measure: p.measure,
@@ -1008,7 +1008,6 @@ async function fetchFreshProducts(showLoader){
       img: p.img,
       variants: p.variants
     }));
-
     // 🔐 SAVE TO CACHE
     localStorage.setItem(
       PRODUCT_CACHE_KEY,
