@@ -878,11 +878,12 @@ function updateCart() {
                 <div style="font-weight:bold">${c.name}</div>
                 <div style="font-size:12px; color:#666; margin-bottom:5px">${c.size} / ${c.color}</div>
                 <div style="display:flex; justify-content:space-between; align-items:center">
-                    <div class="qty-box">
-                        <button class="qty-btn" onclick="chgQty(${i}, -1)">−</button>
-                        <span>${c.qty}</span>
-                        <button class="qty-btn" onclick="chgQty(${i}, 1)">+</button>
-                    </div>
+                   <div class="qty-box">
+    <button class="qty-btn" onclick="chgQty(${i}, -1)">−</button>
+    <span>${c.qty}</span>
+    <button class="qty-btn" onclick="chgQty(${i}, 1)">+</button>
+</div>
+<button onclick="askRemove(${i})" style="margin-top:6px;font-size:12px;background:#eee;color:#000">Remove</button>
                     <b>₹${c.price * c.qty}</b>
                 </div>
             </div>
@@ -925,6 +926,16 @@ function updateCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
     updBadge(total);
 }
+    let removeIndex = null;
+
+function askRemove(i) {
+    removeIndex = i;
+    if (confirm("Remove item?")) {
+        cart.splice(removeIndex, 1);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        updateCart();
+    }
+}
 
 function calcWeight() { return cart.reduce((s, i) => s + ((i.weight || 500) * i.qty), 0); }
 function calcDel(w, val) {
@@ -937,11 +948,20 @@ function calcDel(w, val) {
 }
 
 function chgQty(i, d) {
-    if (d === -1) { cart[i].qty--; if (cart[i].qty <= 0) cart.splice(i, 1); }
-    if (d === 1 && cart[i].qty < cart[i].maxStock) cart[i].qty++;
+    const item = cart[i];
+
+    if (d === -1) {
+        item.qty--;
+        if (item.qty <= 0) cart.splice(i, 1);
+    }
+
+    if (d === 1) {
+        if (item.qty < item.maxStock) item.qty++;
+        else { showToast("Stock limit reached"); return; }
+    }
+
     updateCart();
 }
-
 function applyCoupon() {
     const code = document.getElementById("couponInput").value.trim().toUpperCase();
     const msg = document.getElementById("couponMsg");
