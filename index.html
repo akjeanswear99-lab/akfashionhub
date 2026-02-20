@@ -25,8 +25,9 @@
         user-select: none;
     }
 
+    /* Removed padding-bottom to remove bottom strip */
     body {
-        padding-bottom: 70px;
+        
     }
 
     input, textarea {
@@ -198,11 +199,11 @@
         color: #fff;
     }
 
+    /* Removed padding-bottom to remove white strip */
     #productModal .content {
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
-        padding-bottom: 80px;
         width: 100%;
     }
 
@@ -353,6 +354,7 @@
         margin-top: 40px;
         border-top: 1px solid #eee;
         padding-top: 20px;
+        padding-bottom: 80px; /* Added padding here to prevent cart strip hiding content */
     }
 
     .similar-grid {
@@ -382,7 +384,7 @@
     /* Floating Cart */
     #floatingCart {
         position: fixed;
-        top: 30px;
+        top: 35px; /* Slightly lowered */
         left: 10px;
         background: transparent;
         color: #555;
@@ -571,8 +573,8 @@
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.8);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
         display: none;
         align-items: center;
         justify-content: center;
@@ -882,7 +884,7 @@
 <div id="toast"></div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbw5TID63QkdJbJDRtRmg7ICQFOH-FUzzVU1QDvJZ7rV8gpvEsPEO43Hpek0OVWbezqZKw/exec";
+const API = "https://script.google.com/macros/s/AKfycbx5TcsppzxxTES6at8PfmpPwWdbuab7GLjPR-Kmrp1NwZMHDYhchxFOaYmZkoetoL1eLg/exec"; // Replace with your Script URL
 const SESSION_KEY = "akfh_session";
 const SESSION_DAYS = 30;
 const RETURN_WINDOW_DAYS = 3;
@@ -1325,7 +1327,8 @@ function updBadge(t) {
     if (!b) {
         b = document.createElement("span");
         b.id = "cartCount";
-        b.style.cssText = "background:red; color:#fff; border-radius:50%; padding:2px 6px; font-size:12px; position:absolute; top:-5px; right:-5px";
+        /* REMOVED BACKGROUND, CIRCLE, BORDER - ONLY PLAIN TEXT */
+        b.style.cssText = "background:transparent; color:#e74c3c; font-size:12px; position:absolute; top:-10px; right:-10px; font-weight:bold;";
         document.getElementById("floatingCart").appendChild(b);
     }
     b.innerText = cart.reduce((s, i) => s + i.qty, 0);
