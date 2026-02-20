@@ -631,9 +631,9 @@
 <!-- Products Container -->
 <div class="container">
     <div class="filter-bar">
-        <button class="filter-btn active" onclick="filterProds('All')">All</button>
-        <button class="filter-btn" onclick="filterProds('Men')">Men</button>
-        <button class="filter-btn" onclick="filterProds('Women')">Women</button>
+      <button class="filter-btn active" onclick="filterProds(this,'All')">All</button>
+<button class="filter-btn" onclick="filterProds(this,'Men')">Men</button>
+<button class="filter-btn" onclick="filterProds(this,'Women')">Women</button>
     </div>
     <div class="products" id="productsGrid"></div>
 </div>
@@ -681,9 +681,13 @@ async function apiPost(data) {
         headers: { "Content-Type": "text/plain" },
         body: JSON.stringify(data)
     });
-    return JSON.parse(await res.text());
+    const txt = await res.text();
+    try {
+        return JSON.parse(txt);
+    } catch {
+        return { status: "ERROR", message: "Server error" };
+    }
 }
-
 function calculateDiscount(price) {
     let mrp = Math.round(price * 1.2); 
     return { mrp: mrp, final: price };
@@ -717,13 +721,11 @@ function renderProducts() {
     });
 }
 
-function filterProds(type) {
+function filterProds(btn, type) {
     document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-    event.target.classList.add("active");
+    btn.classList.add("active");
     renderProducts();
 }
-
-/* ============ MODAL LOGIC ============*/
 
 function openModal(index) {
     currentProdIndex = index;
@@ -926,14 +928,15 @@ function updateCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
     updBadge(total);
 }
-    let removeIndex = null;
+
+let removeIndex = null;
 
 function askRemove(i) {
-    removeIndex = i;
     if (confirm("Remove item?")) {
-        cart.splice(removeIndex, 1);
+        cart.splice(i, 1);
         localStorage.setItem("cart", JSON.stringify(cart));
         updateCart();
+        renderProducts();
     }
 }
 
