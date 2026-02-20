@@ -599,33 +599,66 @@
         <button onclick="checkout()">PLACE ORDER (WhatsApp)</button>
     </div>
 
-    <div id="myOrdersSection" style="padding:20px; display:none">
-        <div id="orderInputArea">
-            <input id="orderPhone" placeholder="Phone" maxlength="10">
-            <input id="orderOid" placeholder="Order ID">
-            <button onclick="trackOrder()">FIND ORDER</button>
-        </div>
-        <div id="orderList" style="margin-top:15px"></div>
-        <button onclick="backToCart()" style="background:#fff; color:#000; border:1px solid #000; margin-top:10px">← BACK</button>
-    </div>
-    <button id="myOrdersBtn" onclick="openMyOrders()" style="margin:0 20px 20px; background:#fff; color:#000; border:1px solid #000">MY ORDERS</button>
-</div>
+   <div id="myOrdersSection" style="padding:20px; display:none">
 
+  <h3 style="margin-bottom:10px">Your Cart</h3>
+
+  <input id="orderPhone" placeholder="Phone Number">
+  <input id="orderOid" placeholder="Order ID">
+
+  <button onclick="trackOrder()" style="
+    width:100%;
+    background:#000;
+    color:#fff;
+    padding:12px;
+    margin:10px 0">
+    TRACK ORDER
+  </button>
+
+  <div id="orderList" style="margin-top:10px"></div>
+
+  <button onclick="backToCart()" style="
+    width:100%;
+    background:#fff;
+    border:1px solid #000;
+    padding:10px">
+    ← BACK
+  </button>
+
+</div>
 <!-- Address Modal -->
 <div id="addressModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; z-index:60000; align-items:center; justify-content:center">
-    <div style="background:#fff; padding:20px; width:90%; max-width:400px; border-radius:10px; position:relative">
-        <span onclick="closeAddress()" style="position:absolute; top:10px; left:10px; cursor:pointer; font-size:20px">❌</span>
-        <h3 style="text-align:center; margin-bottom:15px">Delivery Address</h3>
-        <input id="aName" placeholder="Full Name *">
-        <input id="aPhone" placeholder="Mobile *" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-        <textarea id="aAddr" rows="2" placeholder="Address *"></textarea>
-        <div style="display:flex; gap:10px">
-            <input id="aCity" placeholder="City *">
-            <input id="aPin" placeholder="Pincode *" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-        </div>
-        <input id="aState" placeholder="State *">
-        <button onclick="saveAddress()" style="margin-top:10px">SAVE ADDRESS</button>
+  <div style="background:#fff;padding:20px;width:90%;max-width:400px;border-radius:12px;position:relative">
+
+    <span onclick="closeAddress()"
+      style="position:absolute;top:12px;left:12px;cursor:pointer;font-size:22px">✕</span>
+
+    <h3 style="text-align:center;margin-bottom:15px">Delivery Address</h3>
+
+    <input id="aName" placeholder="Full Name *">
+    <input id="aPhone" placeholder="Mobile Number *" maxlength="10">
+
+    <textarea id="aAddr" rows="2" placeholder="House No, Street, Area *"></textarea>
+
+    <div style="display:flex;gap:10px">
+      <input id="aCity" placeholder="City *">
+      <input id="aPin" placeholder="Pincode *">
     </div>
+
+    <input id="aState" placeholder="State *">
+    <textarea placeholder="Note (optional)"></textarea>
+
+    <button onclick="saveAddress()" style="
+      width:100%;
+      margin-top:12px;
+      background:#000;
+      color:#fff;
+      padding:12px;
+      border-radius:8px">
+      ✔ Save Address
+    </button>
+
+  </div>
 </div>
 
 <!-- Products Container -->
@@ -703,7 +736,10 @@ function renderProducts() {
         if (!p.variants || p.variants.length === 0) return;
         
         const gender = document.querySelector(".filter-btn.active").innerText;
-        if (gender !== "All" && p.gender !== gender) return;
+      if (
+  gender !== "All" &&
+  String(p.gender).toLowerCase() !== gender.toLowerCase()
+) return;
 
         const img = (p.img && p.img[0]) ? p.img[0] : "https://dummyimage.com/400x500/eee/000&text=AK+FASHION";
         const priceInfo = calculateDiscount(p.variants[0].price);
@@ -874,23 +910,35 @@ function updateCart() {
         sub += Number(cart[i].price) * cart[i].qty;
     }
 
-    cart.forEach((c, i) => {
-        box.innerHTML += `
-            <div class="cart-item">
-                <div style="font-weight:bold">${c.name}</div>
-                <div style="font-size:12px; color:#666; margin-bottom:5px">${c.size} / ${c.color}</div>
-                <div style="display:flex; justify-content:space-between; align-items:center">
-                   <div class="qty-box">
-    <button class="qty-btn" onclick="chgQty(${i}, -1)">−</button>
-    <span>${c.qty}</span>
-    <button class="qty-btn" onclick="chgQty(${i}, 1)">+</button>
-</div>
-<button onclick="askRemove(${i})" style="margin-top:6px;font-size:12px;background:#eee;color:#000">Remove</button>
-                    <b>₹${c.price * c.qty}</b>
-                </div>
-            </div>
-        `;
-    });
+   cart.forEach((c, i) => {
+    box.innerHTML += `
+    <div class="cart-item">
+        <div style="font-size:15px;font-weight:600">${c.name}</div>
+
+        <div style="font-size:13px;color:#555;margin:4px 0">
+            Size: ${c.size} | Color: ${c.color}
+        </div>
+
+        <div style="font-size:14px;margin-bottom:6px">
+            Price: ₹${c.price} × ${c.qty} =
+            <b>₹${c.price * c.qty}</b>
+        </div>
+
+        <div class="qty-box">
+            <button class="qty-btn" onclick="chgQty(${i},-1)">−</button>
+            <span>${c.qty}</span>
+            <button class="qty-btn" onclick="chgQty(${i},1)">+</button>
+        </div>
+
+        <button onclick="askRemove(${i})"
+            style="width:100%;margin-top:8px;
+            padding:8px;border:none;
+            background:#eee;border-radius:6px">
+            Remove
+        </button>
+    </div>
+    `;
+});
 
     if (cart.length === 0) {
         document.getElementById("cartTotal").innerHTML = "Your cart is empty";
@@ -1215,11 +1263,37 @@ function openTerms() {
     d.innerHTML = `
         <div style="background:#fff; padding:20px; max-width:400px; border-radius:10px; max-height:80vh; overflow-y:auto">
             <h3 style="margin-bottom:10px">Terms & Conditions</h3>
-            <p style="font-size:13px; line-height:1.6">
-                • Delivery: 4-6 Days.<br><br>
-                • Returns: Within 3 days with video proof.<br><br>
-                • Stock is limited and auto-updates.
-            </p>
+           <p style="font-size:13px; line-height:1.6">
+
+<b>Terms & Conditions – AK FASHION HUB</b><br><br>
+
+• <b>Delivery Time:</b> Orders will be delivered within 4–6 working days after the order is confirmed. Delivery timelines may vary depending on location, courier partner, and operational conditions.<br><br>
+
+• <b>Cancellation & Refund (Before Dispatch):</b> Orders cancelled within 12 hours of placing the order are eligible for a full refund. The refund amount will be processed and credited within 2–3 working days after cancellation confirmation.<br><br>
+
+• <b>Cancellation Policy (After Dispatch):</b> Once the order has been dispatched, cancellation will not be allowed. In such cases, the customer is required to make full payment for the order.<br><br>
+
+• <b>Product Images Disclaimer:</b> All product images displayed on this website are captured using professional camera equipment or generated/enhanced using AI technology. Due to variations in screen resolution, lighting conditions, camera settings, and pixel density, there may be slight differences in color, texture, or appearance between the images shown and the actual product received.<br><br>
+
+• <b>Return & Replacement Request:</b> Any return or replacement request must be raised within 3 days from the date of product delivery.<br><br>
+
+• <b>Mandatory Proof:</b> A clear unboxing video along with clear photos of the received product is mandatory for all return or replacement requests. Requests without proper video and photo proof will not be accepted under any circumstances.<br><br>
+
+• <b>Product Condition:</b> The product must be unused, unwashed, undamaged, and in original condition. Products that are worn, washed, dirty, altered, or damaged will not be eligible for return or replacement.<br><br>
+
+• <b>Invoice Requirement:</b> The original invoice/bill provided with the product must be submitted at the time of return or replacement. Requests without the original invoice will not be processed.<br><br>
+
+• <b>Refund Eligibility:</b> Refunds will be issued only in cases where an incorrect or damaged product has been delivered by AK FASHION HUB.<br><br>
+
+• <b>Size & Fit Issues:</b> In case of size or fitting issues, only replacement will be provided. Refunds are not applicable for size or fitting concerns.<br><br>
+
+• <b>Shipping Charges:</b> For size or fitting replacements, the customer is required to pay one-side delivery/shipping charges.<br><br>
+
+• <b>Color Variation Disclaimer:</b> Minor color differences may occur due to screen brightness, display settings, and lighting conditions. Such variations shall not be considered a defect.<br><br>
+
+• <b>Agreement:</b> By placing an order, the customer confirms that they have read, understood, and agreed to all the above Terms & Conditions.
+
+</p>
             <button onclick="this.parentElement.parentElement.remove()" style="margin-top:15px; width:100%">OK</button>
         </div>
     `;
