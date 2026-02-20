@@ -25,6 +25,10 @@
         user-select: none;
     }
 
+    body {
+        padding-bottom: 70px;
+    }
+
     input, textarea {
         -webkit-user-select: text;
         -moz-user-select: text;
@@ -41,14 +45,21 @@
     }
 
     header h1 {
-        font-size: 30px;
-        letter-spacing: 2px;
+        font-size: 32px;
+        letter-spacing: 3px;
         margin-bottom: 5px;
+        font-weight: 900;
+        text-transform: uppercase;
+        background: linear-gradient(45deg, #ffffff, #aaaaaa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0px 2px 4px rgba(0,0,0,0.3);
     }
 
     header .tagline {
         font-size: 12px;
         opacity: 0.8;
+        letter-spacing: 1px;
     }
 
     header .address {
@@ -167,25 +178,31 @@
     #productModal .top-bar {
         position: sticky;
         top: 0;
-        background: #fff;
+        background: #000;
         padding: 15px 20px;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #000;
         display: flex;
         justify-content: space-between;
         align-items: center;
         z-index: 10;
     }
 
+    #productModal .top-bar h3 {
+        color: #fff;
+    }
+
     #productModal .close-btn {
         font-size: 28px;
         cursor: pointer;
-        font-weight: 300;
+        font-weight: bold;
+        color: #fff;
     }
 
     #productModal .content {
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
+        padding-bottom: 80px;
         width: 100%;
     }
 
@@ -238,7 +255,7 @@
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.95);
-        z-index: 99999;
+        z-index: 999999;
         display: none;
         align-items: center;
         justify-content: center;
@@ -365,14 +382,15 @@
     /* Floating Cart */
     #floatingCart {
         position: fixed;
-        top: 20px;
-        left: 20px;
+        top: 30px;
+        left: 10px;
         background: transparent;
-        color: #000;
+        color: #555;
         padding: 10px;
         font-size: 22px;
         cursor: pointer;
         z-index: 99999;
+        opacity: 0.7;
     }
 
     /* Cart Panel */
@@ -401,6 +419,11 @@
         justify-content: space-between;
         align-items: center;
         flex-shrink: 0;
+    }
+
+    .cart-header span {
+        font-weight: bold;
+        color: #000;
     }
 
     /* Scrollable Cart Body */
@@ -680,7 +703,7 @@
 </div>
 
 <!-- Zoom Overlay -->
-<div id="zoomOverlay" onclick="this.style.display='none'">
+<div id="zoomOverlay" onclick="closeZoom()">
     <img id="zoomImg" src="" alt="Zoom">
 </div>
 
@@ -691,9 +714,9 @@
 <div id="leadModal">
     <div style="background:#fff; padding:25px; width:90%; max-width:350px; border-radius:10px; text-align:center">
         <h3 style="margin-bottom:10px; font-size:18px">Unlock Exclusive Offers</h3>
-        <p style="font-size:13px; color:#666; margin-bottom:15px">Enter your mobile number to receive special deals and order updates directly on WhatsApp.</p>
+        <p style="font-size:13px; color:#666; margin-bottom:15px">Verify your mobile number to access exclusive member offers and receive important order updates.</p>
         <input id="leadPhone" placeholder="Enter Mobile Number" maxlength="10" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:6px; margin-bottom:10px; font-size:16px; text-align:center" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-        <button onclick="saveLeadNumber()" style="width:100%; padding:12px; background:#25D366; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:16px">SUBMIT</button>
+        <button onclick="saveLeadNumber()" style="width:100%; padding:12px; background:#25D366; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:16px">VERIFY NOW</button>
         <div onclick="document.getElementById('leadModal').style.display='none'" style="margin-top:10px; font-size:12px; color:#999; cursor:pointer">No thanks</div>
     </div>
 </div>
@@ -822,10 +845,10 @@
 <!-- Address Modal -->
 <div id="addressModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; z-index:60000; align-items:center; justify-content:center">
     <div style="background:#fff; padding:20px; width:90%; max-width:400px; border-radius:10px; position:relative">
-        <span onclick="closeAddress()" style="position:absolute; top:10px; left:10px; cursor:pointer; font-size:20px">❌</span>
+        <span onclick="closeAddress()" style="position:absolute; top:10px; left:10px; cursor:pointer; font-size:20px; font-weight:bold; color:#000;">❌</span>
         <h3 style="text-align:center; margin-bottom:15px">Delivery Address</h3>
         <input id="aName" placeholder="Full Name *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
-        <input id="aPhone" type="tel" placeholder="Mobile Number *" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+        <input id="aPhone" type="tel" placeholder="Mobile Number" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
         <textarea id="aAddr" rows="2" placeholder="House No., Street, Landmark, Famous Place *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px"></textarea>
         <input id="aCity" placeholder="City *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
         <input id="aPin" type="tel" placeholder="Pincode *" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
@@ -849,10 +872,9 @@
     <p style="cursor:pointer; text-decoration:underline; color:#4da3ff; font-size:12px;" onclick="openTerms()">TERMS AND CONDITION APPLY</p>
     
     <div class="footer-links">
-        <a href="https://share.google/8JRpNGPiXwctpAMf3" target="_blank" style="background:#4285F4">Google Review</a>
         <div class="social-row">
-            <a href="https://www.instagram.com/a_k_fashion_hub_/" target="_blank" style="background:#E1306C">Instagram</a>
-            <a href="https://wa.me/919599497909" target="_blank" style="background:#25D366">HELP & SUPPORT</a>
+            <a href="https://www.instagram.com/a_k_fashion_hub_/" target="_blank" title="" style="background:#E1306C">Instagram</a>
+            <a href="https://wa.me/919599497909" target="_blank" title="" style="background:#25D366">HELP & SUPPORT</a>
         </div>
     </div>
 </footer>
@@ -860,9 +882,9 @@
 <div id="toast"></div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbwDpn4C7oLy1TP-VTuKcBFQRRbu5Tle-4UwuWuGhG-o5czkL8qC-VT9Zr4op4vw_hMWHw/exec";
+const API = "https://script.google.com/macros/s/AKfycbw5TID63QkdJbJDRtRmg7ICQFOH-FUzzVU1QDvJZ7rV8gpvEsPEO43Hpek0OVWbezqZKw/exec";
 const SESSION_KEY = "akfh_session";
-const SESSION_DAYS = 7;
+const SESSION_DAYS = 30;
 const RETURN_WINDOW_DAYS = 3;
 
 let products = [];
@@ -923,10 +945,12 @@ function isReturnWindowOpen(deliveryDate) {
 
 function initLeadPopup() {
     const timeLimit = 240000;
-    const addr = JSON.parse(localStorage.getItem("addr"));
+    if(localStorage.getItem("lead_verified")) return;
     
+    const addr = JSON.parse(localStorage.getItem("addr"));
     if (!addr || !addr.phone) {
         setTimeout(() => {
+            if(localStorage.getItem("lead_verified")) return;
             const checkAddr = JSON.parse(localStorage.getItem("addr"));
             if (!checkAddr || !checkAddr.phone) {
                 document.getElementById("leadModal").style.display = "flex";
@@ -939,18 +963,13 @@ function saveLeadNumber() {
     const phone = document.getElementById("leadPhone").value.trim();
     if (!/^[6-9]\d{9}$/.test(phone)) { alert("Invalid number"); return; }
 
-    const storedAddr = JSON.parse(localStorage.getItem("addr"));
-    if (storedAddr && storedAddr.phone === phone) {
-        document.getElementById("leadModal").style.display = "none";
-        return;
-    }
-
     const d = { phone: phone };
     localStorage.setItem("addr", JSON.stringify(d));
+    localStorage.setItem("lead_verified", "true");
     apiPost({ type: "CHECKOUT_LEAD", phone: d.phone, name: "Lead User", address: "Website Popup Lead", cart: "Popup Lead", total: "0" }).catch(e=>{});
     
     document.getElementById("leadModal").style.display = "none";
-    showToast("Number saved!");
+    showToast("Number verified!");
 }
 
 function renderProducts() {
@@ -963,7 +982,9 @@ function renderProducts() {
         const gender = document.querySelector(".filter-btn.active").innerText;
         if (gender !== "All" && p.gender !== gender) return;
 
-        const img = (p.img && p.img[0]) ? p.img[0] : "https://dummyimage.com/400x500/eee/000&text=AK+FASHION";
+        const img = (p.img && p.img[0]) ? p.img[0] : "";
+        if(!img) return;
+        
         const priceInfo = getPriceInfo(p.variants[0]);
 
         grid.innerHTML += `
@@ -1012,11 +1033,24 @@ function openModal(index) {
 
     document.getElementById("productModal").style.display = "flex";
     document.body.style.overflow = "hidden";
+    document.getElementById('floatingCart').style.display = 'none';
 }
 
 function openZoom(src) {
     document.getElementById("zoomOverlay").style.display = "flex";
     document.getElementById("zoomImg").src = src;
+    document.getElementById('floatingCart').style.display = 'none';
+}
+
+function closeZoom() {
+    document.getElementById("zoomOverlay").style.display = "none";
+    const modal = document.getElementById("productModal");
+    const icon = document.getElementById('floatingCart');
+    const panel = document.getElementById("cartPanel");
+    
+    if (modal.style.display !== 'flex' && !panel.classList.contains("open")) {
+        icon.style.display = 'block';
+    }
 }
 
 function changeImg(src, el) {
@@ -1094,6 +1128,11 @@ function renderSimilar(p) {
 function closeModal() {
     document.getElementById("productModal").style.display = "none";
     document.body.style.overflow = "";
+    const icon = document.getElementById('floatingCart');
+    const panel = document.getElementById("cartPanel");
+    if (!panel.classList.contains("open")) {
+        icon.style.display = 'block';
+    }
 }
 
 function addToCartFromModal() {
@@ -1253,11 +1292,15 @@ function toggleCart() {
     const panel = document.getElementById("cartPanel");
     const over = document.getElementById("cartOverlay");
     const icon = document.getElementById("floatingCart");
+    const modal = document.getElementById("productModal");
     const isOpen = panel.classList.contains("open");
+    
     if (isOpen) {
         panel.classList.remove("open");
         over.style.display = "none";
-        icon.style.display = "block";
+        if (modal.style.display !== 'flex') {
+            icon.style.display = "block";
+        }
         document.body.style.overflow = "";
     } else {
         panel.classList.add("open");
@@ -1422,7 +1465,7 @@ async function confirmOrderYes() {
             return;
         }
 
-        localStorage.setItem(SESSION_KEY, JSON.stringify({ phone: addr.phone, time: Date.now() }));
+        localStorage.setItem(SESSION_KEY, JSON.stringify({ phone: addr.phone, lastOid: oid, time: Date.now() }));
         
         cart = [];
         localStorage.removeItem("cart");
@@ -1432,7 +1475,7 @@ async function confirmOrderYes() {
         document.getElementById("thankYouModal").style.display = "flex";
         setTimeout(() => {
             document.getElementById("thankYouModal").style.display = "none";
-        }, 5000);
+        }, 10000);
 
         loadProds();
 
@@ -1448,7 +1491,7 @@ function openAddress() {
     const s = JSON.parse(localStorage.getItem("addr"));
     if (s) {
         document.getElementById("aName").value = s.name || "";
-        document.getElementById("aPhone").value = s.phone || "";
+        document.getElementById("aPhone").value = "";
         document.getElementById("aAddr").value = s.address || "";
         document.getElementById("aCity").value = s.city || "";
         document.getElementById("aPin").value = s.pin || "";
@@ -1492,9 +1535,10 @@ function openMyOrders() {
     document.getElementById("myOrdersView").style.display = "block";
     
     const sess = JSON.parse(localStorage.getItem(SESSION_KEY));
-    if (sess && sess.phone && (Date.now() - sess.time < SESSION_DAYS * 24 * 60 * 60 * 1000)) {
+    
+    if (sess && sess.phone && sess.lastOid && (Date.now() - sess.time < SESSION_DAYS * 24 * 60 * 60 * 1000)) {
         document.getElementById("orderInputArea").style.display = "none";
-        fetchOrders(sess.phone);
+        fetchOrders(sess.phone, sess.lastOid);
     } else {
         localStorage.removeItem(SESSION_KEY);
         document.getElementById("orderInputArea").style.display = "block";
@@ -1502,17 +1546,20 @@ function openMyOrders() {
     }
 }
 
-async function fetchOrders(phone) {
+async function fetchOrders(phone, oid) {
     document.getElementById("checkoutLoader").style.display = "flex";
     try {
-        const res = await fetch(API + "?phone=" + phone);
+        let url = API + "?phone=" + phone;
+        if(oid) url += "&orderId=" + oid;
+        
+        const res = await fetch(url);
         const d = JSON.parse(await res.text());
         document.getElementById("checkoutLoader").style.display = "none";
         if (d.status === "SUCCESS" && d.orders && d.orders.length) {
             allOrders = d.orders;
             renderOrders(d.orders);
         } else {
-            document.getElementById("orderList").innerHTML = "<p style='text-align:center; color:#666; padding:20px'>No orders found</p>";
+            document.getElementById("orderList").innerHTML = `<p style='text-align:center; color:#666; padding:20px'>${d.message || 'No orders found'}</p>`;
         }
     } catch(e) {
         document.getElementById("checkoutLoader").style.display = "none";
@@ -1775,11 +1822,11 @@ async function trackOrder() {
         const d = JSON.parse(await res.text());
         document.getElementById("checkoutLoader").style.display = "none";
         if (d.status === "SUCCESS") {
-            localStorage.setItem(SESSION_KEY, JSON.stringify({ phone: phone, time: Date.now() }));
+            localStorage.setItem(SESSION_KEY, JSON.stringify({ phone: phone, lastOid: oid, time: Date.now() }));
             document.getElementById("orderInputArea").style.display = "none";
-            fetchOrders(phone);
+            fetchOrders(phone, oid);
         } else {
-            alert("Order not found");
+            alert(d.message || "Order not found");
         }
     } catch(e) {
         document.getElementById("checkoutLoader").style.display = "none";
