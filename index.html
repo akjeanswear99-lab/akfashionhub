@@ -6,12 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 
-    /* Basic Reset */
+    /* Basic Reset & Body */
     * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-        -webkit-tap-highlight-color: transparent;
     }
 
     html, body {
@@ -84,7 +83,7 @@
         gap: 20px;
     }
 
-    /* Product Card - Made Longer */
+    /* Product Card */
     .card {
         position: relative;
         background: #fff;
@@ -101,13 +100,13 @@
 
     .card img {
         width: 100%;
-        height: 480px; /* Made Longer Here */
+        height: 420px;
         object-fit: cover;
         display: block;
         background: #f9f9f9;
     }
 
-    /* Price Overlay */
+    /* Price Overlay Inside Photo */
     .price-overlay {
         position: absolute;
         bottom: 0;
@@ -140,7 +139,7 @@
         text-overflow: ellipsis;
     }
 
-    /* Modal */
+    /* Modal (Product Popup) */
     #productModal {
         position: fixed;
         top: 0;
@@ -148,7 +147,7 @@
         width: 100%;
         height: 100%;
         background: #fff;
-        z-index: 9990; /* Lower than cart icon */
+        z-index: 9990;
         display: none;
         flex-direction: column;
         overflow-y: auto;
@@ -179,12 +178,14 @@
         width: 100%;
     }
 
+    /* Big Image in Modal */
     .main-image-box {
         width: 100%;
         background: #f9f9f9;
         border-radius: 8px;
         overflow: hidden;
         text-align: center;
+        position: relative;
     }
 
     .main-image-box img {
@@ -192,8 +193,10 @@
         max-width: 100%;
         max-height: 500px;
         object-fit: contain;
+        cursor: zoom-in;
     }
 
+    /* Thumbnails */
     .thumbs {
         display: flex;
         gap: 10px;
@@ -211,6 +214,7 @@
         border: 2px solid transparent;
         cursor: pointer;
         opacity: 0.6;
+        flex-shrink: 0;
     }
 
     .thumb.active, .thumb:hover {
@@ -218,6 +222,24 @@
         opacity: 1;
     }
 
+    /* Zoom Overlay */
+    #zoomOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.95);
+        z-index: 99999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: zoom-out;
+    }
+    #zoomOverlay img {
+        max-width: 95%;
+        max-height: 95%;
+        object-fit: contain;
+    }
+
+    /* Details Section */
     .details .price-big {
         font-size: 24px;
         font-weight: bold;
@@ -231,6 +253,7 @@
         margin-bottom: 15px;
     }
 
+    /* Options */
     .opt-group {
         margin-bottom: 15px;
     }
@@ -261,6 +284,15 @@
         background: #000;
         color: #fff;
         border-color: #000;
+    }
+
+    /* Size Info Display */
+    .size-info-text {
+        font-size: 12px;
+        color: #555;
+        margin-top: 5px;
+        font-style: italic;
+        min-height: 18px;
     }
 
     .stock-msg {
@@ -319,19 +351,17 @@
         margin-top: 5px;
     }
 
-    /* Floating Cart - Highest Z-Index */
+    /* Floating Cart */
     #floatingCart {
         position: fixed;
         top: 20px;
         left: 20px;
-        background: #000;
-        color: #fff;
-        padding: 10px 14px;
-        border-radius: 50%;
-        font-size: 20px;
+        background: transparent;
+        color: #000;
+        padding: 10px;
+        font-size: 22px;
         cursor: pointer;
-        z-index: 99999; /* Always on top */
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        z-index: 99999;
     }
 
     /* Cart Panel */
@@ -362,12 +392,11 @@
         flex-shrink: 0;
     }
 
-    /* Scrollable Cart Body with Trap */
+    /* Scrollable Cart Body */
     .cart-body {
         flex: 1;
         overflow-y: auto;
         padding: 20px;
-        overscroll-behavior: contain; /* Stops scroll passing to body */
     }
 
     .cart-item {
@@ -401,11 +430,71 @@
         color: #fff;
     }
 
+    /* Individual Remove Button Style */
+    .remove-item-btn {
+        background: none;
+        border: none;
+        color: #e74c3c;
+        font-size: 12px;
+        cursor: pointer;
+        padding: 2px 5px;
+        text-decoration: underline;
+    }
+    .remove-item-btn:hover {
+        color: #c0392b;
+    }
+
     .cart-footer {
         padding: 20px;
         border-top: 1px solid #eee;
         background: #fff;
         flex-shrink: 0;
+    }
+
+    /* Order Detail & Return Form Styles */
+    
+    .order-card {
+        background: #f9f9f9;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        border: 1px solid #eee;
+        cursor: pointer;
+    }
+    .order-card:hover { border-color: #000; }
+
+    .order-status-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+    .status-placed { background: #fff3cd; color: #856404; }
+    .status-dispatched { background: #cce5ff; color: #004085; }
+    .status-delivered { background: #d4edda; color: #155724; }
+
+    .return-section {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 2px solid #000;
+    }
+    
+    .return-section input, 
+    .return-section select, 
+    .return-section textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+
+    .return-section input:read-only {
+        background: #f5f5f5;
+        color: #777;
     }
 
     /* Footer */
@@ -487,10 +576,22 @@
         z-index: 100000;
         transition: opacity 0.3s;
         pointer-events: none;
+        text-align: center;
     }
 
     #toast.show {
         opacity: 1;
+    }
+
+    /* Lead Capture Popup Style */
+    #leadModal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        z-index: 99998;
+        display: none;
+        align-items: center;
+        justify-content: center;
     }
 
     /* Responsive */
@@ -500,7 +601,7 @@
             gap: 10px;
         }
         .card img {
-            height: 320px; /* Mobile height */
+            height: 280px;
         }
         #productModal .main-image-box img {
             max-height: 350px;
@@ -520,11 +621,27 @@
     <div class="loader-text">AK FASHION HUB...</div>
 </div>
 <div id="checkoutLoader">
-    <div class="loader-text">Placing Order...</div>
+    <div class="loader-text">Processing...</div>
+</div>
+
+<!-- Zoom Overlay -->
+<div id="zoomOverlay" onclick="this.style.display='none'">
+    <img id="zoomImg" src="" alt="Zoom">
 </div>
 
 <!-- Floating Cart -->
 <div id="floatingCart" onclick="toggleCart()">🛒</div>
+
+<!-- Lead Capture Modal (4 Minute Popup) -->
+<div id="leadModal">
+    <div style="background:#fff; padding:25px; width:90%; max-width:350px; border-radius:10px; text-align:center">
+        <h3 style="margin-bottom:10px; font-size:18px">Get Updates on WhatsApp</h3>
+        <p style="font-size:13px; color:#666; margin-bottom:15px">Enter your number to receive order updates & offers.</p>
+        <input id="leadPhone" placeholder="Enter Mobile Number" maxlength="10" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:6px; margin-bottom:10px; font-size:16px; text-align:center" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        <button onclick="saveLeadNumber()" style="width:100%; padding:12px; background:#25D366; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:16px">SUBMIT</button>
+        <div onclick="document.getElementById('leadModal').style.display='none'" style="margin-top:10px; font-size:12px; color:#999; cursor:pointer">No thanks</div>
+    </div>
+</div>
 
 <!-- Product Modal -->
 <div id="productModal">
@@ -534,7 +651,7 @@
     </div>
     <div class="content">
         <div class="main-image-box">
-            <img id="modalMainImg" src="" alt="Product">
+            <img id="modalMainImg" src="" alt="Product" onclick="openZoom(this.src)">
         </div>
         
         <div class="thumbs" id="modalThumbs"></div>
@@ -547,6 +664,7 @@
             <div class="opt-group">
                 <div class="opt-title">Select Size</div>
                 <div class="opt-box" id="modalSizes"></div>
+                <div id="sizeInfoDisplay" class="size-info-text"></div>
             </div>
 
             <div class="opt-group">
@@ -584,103 +702,86 @@
     </div>
     
     <!-- Scrollable Body -->
-    <div class="cart-body" id="cartItems"></div>
-    
-    <!-- Footer -->
-    <div class="cart-footer">
-        <div id="cartTotal" style="font-weight:bold; margin-bottom:10px"></div>
-        <input id="couponInput" placeholder="Enter Coupon Code" style="margin-bottom:5px" oninput="applyCoupon()">
-        <small id="couponMsg" style="color:green"></small>
-        <div id="priceBreak" style="font-size:12px; color:#666; margin:10px 0"></div>
-        <button onclick="openAddress()" style="background:#444; margin-bottom:10px">Add / Edit Address</button>
-        <label style="font-size:12px; display:flex; align-items:center; gap:5px; margin-bottom:10px">
-            <input type="checkbox" id="termsCheck"> I agree to <span onclick="openTerms()" style="color:#007bff; text-decoration:underline; cursor:pointer">Terms</span>
-        </label>
-        <button onclick="checkout()">PLACE ORDER (WhatsApp)</button>
+    <div class="cart-body" id="cartBodyContent">
+        <!-- Default Cart Items -->
+        <div id="cartItemsView">
+            <div id="cartItems"></div>
+
+            <!-- Cart Total -->
+            <div id="cartTotal" style="font-size: 16px; font-weight:bold; margin:15px 0 12px 0; color:#000"></div>
+            
+            <input id="couponInput" placeholder="Enter Coupon Code" style="margin-bottom:5px; width:100%; padding:10px; border:1px solid #ccc; border-radius:6px" oninput="applyCoupon()">
+            <small id="couponMsg" style="color:green"></small>
+            
+            <!-- Price Break -->
+            <div id="priceBreak" style="font-size:15px; color:#333; margin:15px 0; line-height:1.8; background:#f9f9f9; padding:12px; border-radius:8px"></div>
+            
+            <div style="display:flex; flex-direction:column; gap:8px">
+                <button onclick="openAddress()" style="background:#444; color:#fff; padding:12px; border:none; border-radius:6px; font-weight:bold; cursor:pointer">Add / Edit Address</button>
+                
+                <!-- Return Policy Checkbox -->
+                <label style="font-size:12px; display:flex; align-items:center; gap:5px; margin:5px 0">
+                    <input type="checkbox" id="termsCheck"> I agree to <span onclick="openTerms()" style="color:#007bff; text-decoration:underline; cursor:pointer">Return Policy</span>
+                </label>
+                
+                <!-- Place Order Button Text -->
+                <button onclick="checkout()" style="background:#000; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:16px">PLACE YOUR ORDER</button>
+                
+                <button onclick="openMyOrders()" style="background:#fff; color:#000; border:1px solid #000; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:5px">MY ORDERS</button>
+            </div>
+        </div>
+
+        <!-- My Orders View -->
+        <div id="myOrdersView" style="display:none">
+            <div id="orderInputArea">
+                <input id="orderPhone" placeholder="Phone Number" maxlength="10" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-bottom:8px">
+                <input id="orderOid" placeholder="Order ID" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-bottom:8px">
+                <button onclick="trackOrder()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">TRACK ORDER</button>
+            </div>
+            
+            <div id="orderList" style="margin-top:15px"></div>
+            
+            <button onclick="backToCart()" style="width:100%; background:#fff; color:#000; border:1px solid #000; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:15px">← BACK</button>
+        </div>
     </div>
-
-   <div id="myOrdersSection" style="padding:20px; display:none">
-
-  <h3 style="margin-bottom:10px">Your Cart</h3>
-
-  <input id="orderPhone" placeholder="Phone Number">
-  <input id="orderOid" placeholder="Order ID">
-
-  <button onclick="trackOrder()" style="
-    width:100%;
-    background:#000;
-    color:#fff;
-    padding:12px;
-    margin:10px 0">
-    TRACK ORDER
-  </button>
-
-  <div id="orderList" style="margin-top:10px"></div>
-
-  <button onclick="backToCart()" style="
-    width:100%;
-    background:#fff;
-    border:1px solid #000;
-    padding:10px">
-    ← BACK
-  </button>
-
 </div>
+
 <!-- Address Modal -->
 <div id="addressModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; z-index:60000; align-items:center; justify-content:center">
-  <div style="background:#fff;padding:20px;width:90%;max-width:400px;border-radius:12px;position:relative">
-
-    <span onclick="closeAddress()"
-      style="position:absolute;top:12px;left:12px;cursor:pointer;font-size:22px">✕</span>
-
-    <h3 style="text-align:center;margin-bottom:15px">Delivery Address</h3>
-
-    <input id="aName" placeholder="Full Name *">
-    <input id="aPhone" placeholder="Mobile Number *" maxlength="10">
-
-    <textarea id="aAddr" rows="2" placeholder="House No, Street, Area *"></textarea>
-
-    <div style="display:flex;gap:10px">
-      <input id="aCity" placeholder="City *">
-      <input id="aPin" placeholder="Pincode *">
+    <div style="background:#fff; padding:20px; width:90%; max-width:400px; border-radius:10px; position:relative">
+        <span onclick="closeAddress()" style="position:absolute; top:10px; left:10px; cursor:pointer; font-size:20px">❌</span>
+        <h3 style="text-align:center; margin-bottom:15px">Delivery Address</h3>
+        <input id="aName" placeholder="Full Name *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+        <input id="aPhone" placeholder="Mobile *" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+        <textarea id="aAddr" rows="2" placeholder="Address *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px"></textarea>
+        <div style="display:flex; gap:10px">
+            <input id="aCity" placeholder="City *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+            <input id="aPin" placeholder="Pincode *" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+        </div>
+        <input id="aState" placeholder="State *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+        <button onclick="saveAddress()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">SAVE ADDRESS</button>
     </div>
-
-    <input id="aState" placeholder="State *">
-    <textarea placeholder="Note (optional)"></textarea>
-
-    <button onclick="saveAddress()" style="
-      width:100%;
-      margin-top:12px;
-      background:#000;
-      color:#fff;
-      padding:12px;
-      border-radius:8px">
-      ✔ Save Address
-    </button>
-
-  </div>
 </div>
 
 <!-- Products Container -->
 <div class="container">
     <div class="filter-bar">
-      <button class="filter-btn active" onclick="filterProds(this,'All')">All</button>
-<button class="filter-btn" onclick="filterProds(this,'Men')">Men</button>
-<button class="filter-btn" onclick="filterProds(this,'Women')">Women</button>
+        <button class="filter-btn active" onclick="filterProds('All')">All</button>
+        <button class="filter-btn" onclick="filterProds('Men')">Men</button>
+        <button class="filter-btn" onclick="filterProds('Women')">Women</button>
     </div>
     <div class="products" id="productsGrid"></div>
 </div>
 
 <!-- Footer -->
 <footer>
-    <p>Return Policy: <span style="color:#4da3ff; cursor:pointer; text-decoration:underline" onclick="openTerms()">Terms & Conditions Apply</span></p>
+    <p style="cursor:pointer; text-decoration:underline; color:#4da3ff" onclick="openTerms()">TERMS & CONDITIONS APPLY</p>
     
     <div class="footer-links">
         <a href="https://share.google/8JRpNGPiXwctpAMf3" target="_blank" style="background:#4285F4">Google Review</a>
-        
         <div class="social-row">
             <a href="https://www.instagram.com/a_k_fashion_hub_/" target="_blank" style="background:#E1306C">Instagram</a>
-            <a href="https://wa.me/919599497909" target="_blank" style="background:#25D366">WhatsApp</a>
+            <a href="https://wa.me/919599497909" target="_blank" style="background:#25D366">HELP & SUPPORT</a>
         </div>
     </div>
 </footer>
@@ -688,16 +789,29 @@
 <div id="toast"></div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbzE1I3-iT4cU7a8Uuf9qO4ubEiKnTjW8kPpYK5UI-apKS48POdpP3igiie2ZM9guRyE/exec";
+const API = "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE"; // Replace with your URL
 const SESSION_KEY = "akfh_session";
+const SESSION_DAYS = 7;
+const RETURN_WINDOW_DAYS = 3;
+
 let products = [];
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let currentProdIndex = null;
+let allOrders = [];
+let currentOrderDetail = null;
 window.pState = {};
 
 const OFFER = { min: 1499, disc: 100 };
 const COUPONS = { "FREEDEL": { type: "FREE_DELIVERY" }, "SAVE100": { type: "FLAT", val: 100 } };
 let appliedCoup = null;
+
+const RETURN_REASONS = [
+    "Size not fit",
+    "Wrong product received",
+    "Damaged product",
+    "Color different from image",
+    "Other issue"
+];
 
 /* ============ CORE FUNCTIONS ============*/
 
@@ -705,7 +819,7 @@ function showToast(msg) {
     const t = document.getElementById("toast");
     t.innerText = msg;
     t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 2000);
+    setTimeout(() => t.classList.remove("show"), 2500);
 }
 
 async function apiPost(data) {
@@ -714,16 +828,56 @@ async function apiPost(data) {
         headers: { "Content-Type": "text/plain" },
         body: JSON.stringify(data)
     });
-    const txt = await res.text();
-    try {
-        return JSON.parse(txt);
-    } catch {
-        return { status: "ERROR", message: "Server error" };
+    return JSON.parse(await res.text());
+}
+
+function getPriceInfo(variant) {
+    let final = variant.price;
+    let mrp = variant.mrp ? variant.mrp : Math.round(variant.price * 1.2);
+    return { mrp: mrp, final: final };
+}
+
+function isReturnWindowOpen(deliveryDate) {
+    if (!deliveryDate) return false;
+    const delivery = new Date(deliveryDate);
+    const now = new Date();
+    const diffDays = Math.floor((now - delivery) / (1000 * 60 * 60 * 24));
+    return diffDays <= RETURN_WINDOW_DAYS;
+}
+
+function getDaysSinceDelivery(deliveryDate) {
+    if (!deliveryDate) return 999;
+    const delivery = new Date(deliveryDate);
+    const now = new Date();
+    return Math.floor((now - delivery) / (1000 * 60 * 60 * 24));
+}
+
+/* ============ 4 MINUTE POPUP LOGIC ============*/
+
+function initLeadPopup() {
+    const timeLimit = 240000; // 4 minutes
+    const addr = JSON.parse(localStorage.getItem("addr"));
+    
+    if (!addr || !addr.phone) {
+        setTimeout(() => {
+            const checkAddr = JSON.parse(localStorage.getItem("addr"));
+            if (!checkAddr || !checkAddr.phone) {
+                document.getElementById("leadModal").style.display = "flex";
+            }
+        }, timeLimit);
     }
 }
-function calculateDiscount(price) {
-    let mrp = Math.round(price * 1.2); 
-    return { mrp: mrp, final: price };
+
+function saveLeadNumber() {
+    const phone = document.getElementById("leadPhone").value.trim();
+    if (!/^[6-9]\d{9}$/.test(phone)) { alert("Invalid number"); return; }
+
+    const d = { phone: phone };
+    localStorage.setItem("addr", JSON.stringify(d));
+    apiPost({ type: "CHECKOUT_LEAD", phone: d.phone, name: "Lead User", address: "Website Popup Lead", cart: "Popup Lead", total: "0" }).catch(e=>{});
+    
+    document.getElementById("leadModal").style.display = "none";
+    showToast("Number saved!");
 }
 
 /* ============ RENDER PRODUCTS ============*/
@@ -736,13 +890,10 @@ function renderProducts() {
         if (!p.variants || p.variants.length === 0) return;
         
         const gender = document.querySelector(".filter-btn.active").innerText;
-      if (
-  gender !== "All" &&
-  String(p.gender).toLowerCase() !== gender.toLowerCase()
-) return;
+        if (gender !== "All" && p.gender !== gender) return;
 
         const img = (p.img && p.img[0]) ? p.img[0] : "https://dummyimage.com/400x500/eee/000&text=AK+FASHION";
-        const priceInfo = calculateDiscount(p.variants[0].price);
+        const priceInfo = getPriceInfo(p.variants[0]);
 
         grid.innerHTML += `
             <div class="card" onclick="openModal(${i})">
@@ -757,11 +908,13 @@ function renderProducts() {
     });
 }
 
-function filterProds(btn, type) {
+function filterProds(type) {
     document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+    event.target.classList.add("active");
     renderProducts();
 }
+
+/* ============ MODAL LOGIC ============*/
 
 function openModal(index) {
     currentProdIndex = index;
@@ -771,7 +924,7 @@ function openModal(index) {
     document.getElementById("modalDesc").innerText = p.description || "Premium Quality Product.";
     document.getElementById("modalMeasure").innerText = p.measure ? "Measurements: " + p.measure : "";
     
-    const priceInfo = calculateDiscount(p.variants[0].price);
+    const priceInfo = getPriceInfo(p.variants[0]);
     document.getElementById("modalPrice").innerHTML = `<span style="text-decoration:line-through; font-size:14px; color:#999">MRP ₹${priceInfo.mrp}</span> ₹${priceInfo.final}`;
 
     const mainImg = document.getElementById("modalMainImg");
@@ -786,10 +939,15 @@ function openModal(index) {
     }
 
     renderModalOpts(p);
-    renderSimilar(p);
+    renderSimilar(p); 
 
     document.getElementById("productModal").style.display = "flex";
-    document.body.style.overflow = "hidden"; // Lock background scroll
+    document.body.style.overflow = "hidden";
+}
+
+function openZoom(src) {
+    document.getElementById("zoomOverlay").style.display = "flex";
+    document.getElementById("zoomImg").src = src;
 }
 
 function changeImg(src, el) {
@@ -825,14 +983,19 @@ function renderModalOpts(p) {
     document.getElementById("modalStock").innerText = stockMsg;
     document.getElementById("modalStock").style.color = canAdd ? "green" : "red";
     
-    const btn = document.getElementById("modalAddBtn");
-    btn.disabled = !canAdd;
+    const sizeInfoDiv = document.getElementById("sizeInfoDisplay");
+    if (state.size && p.sizeChart && p.sizeChart[state.size]) {
+        sizeInfoDiv.innerText = `${state.size}: ${p.sizeChart[state.size]}`;
+    } else {
+        sizeInfoDiv.innerText = "";
+    }
+
+    document.getElementById("modalAddBtn").disabled = !canAdd;
 }
 
 function selOpt(type, val) {
     const p = products[currentProdIndex];
     if (!window.pState[p.id]) window.pState[p.id] = {};
-    
     const cur = window.pState[p.id];
     
     if (type === 'size') {
@@ -843,43 +1006,32 @@ function selOpt(type, val) {
         if (cur.color === val) delete cur.color;
         else cur.color = val;
     }
-    
     renderModalOpts(p);
 }
 
 function renderSimilar(p) {
     const box = document.getElementById("similarGrid");
-    const sims = products.filter(x => x.id !== p.id && (x.category === p.category || x.gender === p.gender)).slice(0, 4);
+    const sims = products.filter(x => x.id !== p.id && x.gender === p.gender).slice(0, 4);
+    
     box.innerHTML = sims.map(s => {
         const idx = products.findIndex(x => x.id === s.id);
-        return `
-            <div class="sim-item" onclick="openModal(${idx})">
-                <img src="${s.img && s.img[0] ? s.img[0] : ''}">
-                <p>${s.name}</p>
-            </div>
-        `;
+        return `<div class="sim-item" onclick="openModal(${idx})"><img src="${s.img && s.img[0] ? s.img[0] : ''}"><p>${s.name}</p></div>`;
     }).join("");
 }
 
 function closeModal() {
     document.getElementById("productModal").style.display = "none";
-    document.body.style.overflow = ""; // Unlock background scroll
+    document.body.style.overflow = "";
 }
 
 function addToCartFromModal() {
     const p = products[currentProdIndex];
     const state = window.pState[p.id] || {};
     
-    if (!state.size || !state.color) {
-        showToast("Please select size and color");
-        return;
-    }
+    if (!state.size || !state.color) { showToast("Please select size and color"); return; }
 
     const v = p.variants.find(x => x.size === state.size && x.color === state.color);
-    if (!v || v.stock <= 0) {
-        showToast("Out of stock");
-        return;
-    }
+    if (!v || v.stock <= 0) { showToast("Out of stock"); return; }
 
     let existing = cart.find(x => x.id === p.id && x.size === state.size && x.color === state.color);
     if (existing) {
@@ -895,7 +1047,6 @@ function addToCartFromModal() {
     localStorage.setItem("cart", JSON.stringify(cart));
     updateCart();
     showToast("Added to cart!");
-    closeModal();
 }
 
 /* ============ CART & CHECKOUT ============*/
@@ -910,35 +1061,25 @@ function updateCart() {
         sub += Number(cart[i].price) * cart[i].qty;
     }
 
-   cart.forEach((c, i) => {
-    box.innerHTML += `
-    <div class="cart-item">
-        <div style="font-size:15px;font-weight:600">${c.name}</div>
-
-        <div style="font-size:13px;color:#555;margin:4px 0">
-            Size: ${c.size} | Color: ${c.color}
-        </div>
-
-        <div style="font-size:14px;margin-bottom:6px">
-            Price: ₹${c.price} × ${c.qty} =
-            <b>₹${c.price * c.qty}</b>
-        </div>
-
-        <div class="qty-box">
-            <button class="qty-btn" onclick="chgQty(${i},-1)">−</button>
-            <span>${c.qty}</span>
-            <button class="qty-btn" onclick="chgQty(${i},1)">+</button>
-        </div>
-
-        <button onclick="askRemove(${i})"
-            style="width:100%;margin-top:8px;
-            padding:8px;border:none;
-            background:#eee;border-radius:6px">
-            Remove
-        </button>
-    </div>
-    `;
-});
+    cart.forEach((c, i) => {
+        box.innerHTML += `
+            <div class="cart-item">
+                <div style="display:flex; justify-content:space-between; align-items:start">
+                    <div style="font-weight:bold; flex:1">${c.name}</div>
+                    <button class="remove-item-btn" onclick="removeItem(${i})">Remove</button>
+                </div>
+                <div style="font-size:12px; color:#666; margin-bottom:5px">Size: ${c.size} | Color: ${c.color}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <div class="qty-box">
+                        <button class="qty-btn" onclick="chgQty(${i}, -1)">−</button>
+                        <span>${c.qty}</span>
+                        <button class="qty-btn" onclick="chgQty(${i}, 1)">+</button>
+                    </div>
+                    <b>₹${c.price * c.qty}</b>
+                </div>
+            </div>
+        `;
+    });
 
     if (cart.length === 0) {
         document.getElementById("cartTotal").innerHTML = "Your cart is empty";
@@ -947,7 +1088,7 @@ function updateCart() {
         return;
     }
 
-    let del = calcDel(calcWeight(), sub);
+    let del = calcDel(); // FIXED 50
     let disc = 0;
     let msg = "";
 
@@ -969,50 +1110,32 @@ function updateCart() {
         Subtotal: ₹${sub}<br>
         Delivery: ₹${del}<br>
         Discount: −₹${disc}<br>
-        <b>Total: ₹${total}</b>
+        <b style="font-size:17px">Total: ₹${total}</b>
     `;
-    document.getElementById("cartTotal").innerHTML = `<span style="font-size:13px; color:green">${msg}</span>`;
+    document.getElementById("cartTotal").innerHTML = `<span style="font-size:14px; color:green">${msg}</span>`;
     
     localStorage.setItem("cart", JSON.stringify(cart));
     updBadge(total);
 }
 
-let removeIndex = null;
-
-function askRemove(i) {
-    if (confirm("Remove item?")) {
-        cart.splice(i, 1);
-        localStorage.setItem("cart", JSON.stringify(cart));
-        updateCart();
-        renderProducts();
-    }
-}
-
-function calcWeight() { return cart.reduce((s, i) => s + ((i.weight || 500) * i.qty), 0); }
-function calcDel(w, val) {
-    if (w <= 0) return 0;
-    let d = (Math.ceil(w / 50) * 50 / 50) * 7;
-    if (val >= 1200) d -= 70;
-    else if (val >= 999) d -= 50;
-    else d -= Math.floor(Math.max(0, w - 500) / 500) * 35;
-    return Math.max(70, Math.ceil(Math.max(70, d) / 5) * 5 + Math.floor(w / 1000) * 10);
+// FIXED DELIVERY CHARGE FUNCTION
+function calcDel() {
+    return 50;
 }
 
 function chgQty(i, d) {
-    const item = cart[i];
-
-    if (d === -1) {
-        item.qty--;
-        if (item.qty <= 0) cart.splice(i, 1);
-    }
-
-    if (d === 1) {
-        if (item.qty < item.maxStock) item.qty++;
-        else { showToast("Stock limit reached"); return; }
-    }
-
+    if (d === -1) { cart[i].qty--; if (cart[i].qty <= 0) cart.splice(i, 1); }
+    if (d === 1 && cart[i].qty < cart[i].maxStock) cart[i].qty++;
     updateCart();
 }
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCart();
+    showToast("Item removed");
+}
+
 function applyCoupon() {
     const code = document.getElementById("couponInput").value.trim().toUpperCase();
     const msg = document.getElementById("couponMsg");
@@ -1035,11 +1158,10 @@ function toggleCart() {
     if (isOpen) {
         panel.classList.remove("open");
         over.style.display = "none";
-        document.body.style.overflow = ""; // Unlock body scroll
     } else {
         panel.classList.add("open");
         over.style.display = "block";
-        document.body.style.overflow = "hidden"; // Lock body scroll
+        backToCart();
     }
 }
 
@@ -1076,7 +1198,7 @@ function genId() {
 
 async function checkout() {
     if (!cart.length) { alert("Cart empty"); return; }
-    if (!document.getElementById("termsCheck").checked) { alert("Please agree to terms"); return; }
+    if (!document.getElementById("termsCheck").checked) { alert("Please agree to Return Policy"); return; }
     
     const addr = JSON.parse(localStorage.getItem("addr"));
     if (!addr || !/^[6-9]\d{9}$/.test(addr.phone) || !addr.name || !addr.address || !addr.city || !addr.state || String(addr.pin).length !== 6) {
@@ -1088,7 +1210,7 @@ async function checkout() {
 
     const oid = genId();
     let sub = 0; cart.forEach(c => sub += Number(c.price) * c.qty);
-    const del = calcDel(calcWeight(), sub);
+    const del = calcDel(); // Fixed 50
     let disc = 0;
     if (appliedCoup) {
         const r = COUPONS[appliedCoup];
@@ -1162,16 +1284,13 @@ function saveAddress() {
 }
 
 /* ============ MY ORDERS ============*/
+
 function openMyOrders() {
-    document.getElementById("cartItems").style.display = "none";
-    document.getElementById("cartTotal").style.display = "none";
-    document.getElementById("priceBreak").style.display = "none";
-    document.getElementById("couponInput").style.display = "none";
-    document.getElementById("myOrdersBtn").style.display = "none";
-    document.getElementById("myOrdersSection").style.display = "block";
+    document.getElementById("cartItemsView").style.display = "none";
+    document.getElementById("myOrdersView").style.display = "block";
     
     const sess = JSON.parse(localStorage.getItem(SESSION_KEY));
-    if (sess && sess.phone && (Date.now() - sess.time < 7 * 24 * 60 * 60 * 1000)) {
+    if (sess && sess.phone && (Date.now() - sess.time < SESSION_DAYS * 24 * 60 * 60 * 1000)) {
         document.getElementById("orderInputArea").style.display = "none";
         fetchOrders(sess.phone);
     } else {
@@ -1186,35 +1305,185 @@ async function fetchOrders(phone) {
         const res = await fetch(API + "?phone=" + phone);
         const d = JSON.parse(await res.text());
         document.getElementById("checkoutLoader").style.display = "none";
-        if (d.status === "SUCCESS" && d.orders.length) {
+        if (d.status === "SUCCESS" && d.orders && d.orders.length) {
+            allOrders = d.orders;
             renderOrders(d.orders);
         } else {
-            document.getElementById("orderList").innerHTML = "<p style='text-align:center'>No orders found</p>";
+            document.getElementById("orderList").innerHTML = "<p style='text-align:center; color:#666; padding:20px'>No orders found</p>";
         }
     } catch(e) {
         document.getElementById("checkoutLoader").style.display = "none";
+        document.getElementById("orderList").innerHTML = "<p style='text-align:center; color:red'>Error loading orders</p>";
     }
 }
 
 function renderOrders(list) {
-    document.getElementById("orderList").innerHTML = list.map(o => `
-        <div style="background:#f9f9f9; padding:10px; border-radius:6px; margin-bottom:8px; border:1px solid #eee">
-            <div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:5px; margin-bottom:5px">
-                <b style="font-size:13px">${o.orderId}</b>
-                <span style="font-size:11px; color:#666">${o.date}</span>
+    document.getElementById("orderList").innerHTML = list.map((o, idx) => {
+        const statusClass = o.status === 'Delivered' ? 'status-delivered' : 
+                           o.status === 'Dispatched' ? 'status-dispatched' : 'status-placed';
+        return `
+            <div class="order-card" onclick="showOrderDetail(${idx})">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px">
+                    <b style="font-size:13px">${o.orderId}</b>
+                    <span style="font-size:11px; color:#666">${o.date || ''}</span>
+                </div>
+                <div style="font-size:12px; display:flex; justify-content:space-between; align-items:center">
+                    <span class="order-status-badge ${statusClass}">${o.status || 'Placed'}</span>
+                    <b>₹${o.total || o.totalAmount}</b>
+                </div>
             </div>
-            <div style="font-size:12px; display:flex; justify-content:space-between">
-                <span style="color:${o.status==='Delivered'?'green':'#000'}">${o.status}</span>
-                <b>₹${o.total}</b>
+        `;
+    }).join("");
+}
+
+function showOrderDetail(idx) {
+    const o = allOrders[idx];
+    currentOrderDetail = o;
+    
+    const statusClass = o.status === 'Delivered' ? 'status-delivered' : 
+                       o.status === 'Dispatched' ? 'status-dispatched' : 'status-placed';
+    
+    const isDelivered = o.status === 'Delivered';
+    const returnOpen = isDelivered && isReturnWindowOpen(o.deliveryDate);
+    
+    let itemsHTML = '';
+    if (o.items && Array.isArray(o.items)) {
+        itemsHTML = o.items.map(item => `
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f0f0f0; font-size:13px">
+                <span>${item.name} (${item.size}, ${item.color}) x${item.qty}</span>
+                <span>₹${item.price * item.qty}</span>
+            </div>
+        `).join("");
+    } else if (o.products) {
+        itemsHTML = `<div style="padding:8px 0; font-size:13px">${o.products}</div>`;
+    }
+    
+    let returnSectionHTML = '';
+    if (isDelivered) {
+        if (returnOpen) {
+            const sess = JSON.parse(localStorage.getItem(SESSION_KEY)) || {};
+            returnSectionHTML = `
+                <div class="return-section">
+                    <h4 style="margin-bottom:10px">Return / Replacement Request</h4>
+                    <input type="text" id="retPhone" value="${sess.phone || ''}" placeholder="Mobile Number *" maxlength="10" ${sess.phone ? 'readonly' : ''}>
+                    <input type="text" id="retOrderId" value="${o.orderId}" readonly>
+                    <select id="retReason">
+                        <option value="">Select Reason for Return *</option>
+                        ${RETURN_REASONS.map(r => `<option value="${r}">${r}</option>`).join("")}
+                    </select>
+                    <textarea id="retNote" placeholder="Additional note (optional)"></textarea>
+                    <button onclick="submitReturnRequest()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">SUBMIT RETURN REQUEST</button>
+                </div>
+            `;
+        } else {
+            returnSectionHTML = `
+                <div style="margin-top:15px; padding:10px; background:#f8d7da; color:#721c24; border-radius:6px; text-align:center; font-size:13px">
+                    Return window closed (3 days after delivery)
+                </div>
+            `;
+        }
+    }
+    
+    let similarHTML = '';
+    if (products.length > 0) {
+        const sims = products.slice(0, 4);
+        similarHTML = `
+            <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee">
+                <h4 style="margin-bottom:10px; font-size:14px">Similar Products</h4>
+                <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:8px">
+                    ${sims.map(s => {
+                        const sidx = products.findIndex(x => x.id === s.id);
+                        const img = (s.img && s.img[0]) ? s.img[0] : '';
+                        return `
+                            <div style="text-align:center; cursor:pointer" onclick="closeModal(); openModal(${sidx})">
+                                <img src="${img}" style="width:100%; height:50px; object-fit:cover; border-radius:4px">
+                                <p style="font-size:9px; margin-top:3px">${s.name}</p>
+                            </div>
+                        `;
+                    }).join("")}
+                </div>
+            </div>
+        `;
+    }
+    
+    document.getElementById("orderList").innerHTML = `
+        <div style="background:#f9f9f9; padding:12px; border-radius:8px; margin-bottom:10px">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+                <span class="order-status-badge ${statusClass}">${o.status || 'Placed'}</span>
+                <span style="font-size:11px; color:#666">${o.date || ''}</span>
+            </div>
+            <div style="font-size:12px; color:#666">Order ID: <b style="color:#000">${o.orderId}</b></div>
+        </div>
+        
+        <div style="background:#f9f9f9; padding:12px; border-radius:8px; margin-bottom:10px; font-size:12px">
+            <div style="color:#666; margin-bottom:3px">Delivery Address</div>
+            <div>${o.address || 'N/A'}</div>
+        </div>
+        
+        <div style="margin-bottom:10px">
+            <div style="font-size:11px; color:#666; margin-bottom:5px">Items</div>
+            ${itemsHTML}
+        </div>
+        
+        <div style="background:#f0f0f0; padding:12px; border-radius:8px">
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px">
+                <span>Subtotal:</span><span>₹${o.productsPrice || 0}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px">
+                <span>Delivery:</span><span>₹${o.deliveryCharge || 0}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:bold; margin-top:5px; padding-top:5px; border-top:1px solid #ddd">
+                <span>Total:</span><span>₹${o.total || o.totalAmount}</span>
             </div>
         </div>
-    `).join("");
+        
+        ${returnSectionHTML}
+        ${similarHTML}
+        
+        <button onclick="renderOrders(allOrders)" style="width:100%; background:#fff; color:#000; border:1px solid #000; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer; margin-top:15px">← BACK TO ORDERS</button>
+    `;
+}
+
+async function submitReturnRequest() {
+    const phone = document.getElementById("retPhone").value.trim();
+    const orderId = document.getElementById("retOrderId").value.trim();
+    const reason = document.getElementById("retReason").value;
+    const note = document.getElementById("retNote").value.trim();
+    
+    if (!/^[6-9]\d{9}$/.test(phone)) { showToast("Invalid phone"); return; }
+    if (!reason) { showToast("Select reason"); return; }
+    
+    document.getElementById("checkoutLoader").style.display = "flex";
+    
+    try {
+        const res = await apiPost({
+            type: "RETURN_REQUEST",
+            orderId: orderId,
+            phone: phone,
+            reason: reason,
+            note: note,
+            requestDate: new Date().toISOString(),
+            status: "Requested"
+        });
+        
+        document.getElementById("checkoutLoader").style.display = "none";
+        
+        if (res.status === "SUCCESS") {
+            showToast("Return request submitted.");
+            renderOrders(allOrders);
+        } else {
+            showToast(res.message || "Failed");
+        }
+    } catch(e) {
+        document.getElementById("checkoutLoader").style.display = "none";
+        showToast("Error");
+    }
 }
 
 async function trackOrder() {
     const phone = orderPhone.value.trim();
     const oid = orderOid.value.trim();
-    if (!/^[6-9]\d{9}$/.test(phone) || !oid) { alert("Enter valid details"); return; }
+    if (!/^[6-9]\d{9}$/.test(phone) || !oid) { alert("Invalid details"); return; }
     
     document.getElementById("checkoutLoader").style.display = "flex";
     try {
@@ -1230,16 +1499,13 @@ async function trackOrder() {
         }
     } catch(e) {
         document.getElementById("checkoutLoader").style.display = "none";
+        alert("Error");
     }
 }
 
 function backToCart() {
-    document.getElementById("myOrdersSection").style.display = "none";
-    document.getElementById("cartItems").style.display = "block";
-    document.getElementById("cartTotal").style.display = "block";
-    document.getElementById("priceBreak").style.display = "block";
-    document.getElementById("couponInput").style.display = "block";
-    document.getElementById("myOrdersBtn").style.display = "block";
+    document.getElementById("myOrdersView").style.display = "none";
+    document.getElementById("cartItemsView").style.display = "block";
 }
 
 /* ============ LOAD DATA ============*/
@@ -1261,40 +1527,21 @@ function openTerms() {
     let d = document.createElement("div");
     d.style.cssText = "position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999999; display:flex; align-items:center; justify-content:center; padding:20px";
     d.innerHTML = `
-        <div style="background:#fff; padding:20px; max-width:400px; border-radius:10px; max-height:80vh; overflow-y:auto">
-            <h3 style="margin-bottom:10px">Terms & Conditions</h3>
-           <p style="font-size:13px; line-height:1.6">
-
-<b>Terms & Conditions – AK FASHION HUB</b><br><br>
-
-• <b>Delivery Time:</b> Orders will be delivered within 4–6 working days after the order is confirmed. Delivery timelines may vary depending on location, courier partner, and operational conditions.<br><br>
-
-• <b>Cancellation & Refund (Before Dispatch):</b> Orders cancelled within 12 hours of placing the order are eligible for a full refund. The refund amount will be processed and credited within 2–3 working days after cancellation confirmation.<br><br>
-
-• <b>Cancellation Policy (After Dispatch):</b> Once the order has been dispatched, cancellation will not be allowed. In such cases, the customer is required to make full payment for the order.<br><br>
-
-• <b>Product Images Disclaimer:</b> All product images displayed on this website are captured using professional camera equipment or generated/enhanced using AI technology. Due to variations in screen resolution, lighting conditions, camera settings, and pixel density, there may be slight differences in color, texture, or appearance between the images shown and the actual product received.<br><br>
-
-• <b>Return & Replacement Request:</b> Any return or replacement request must be raised within 3 days from the date of product delivery.<br><br>
-
-• <b>Mandatory Proof:</b> A clear unboxing video along with clear photos of the received product is mandatory for all return or replacement requests. Requests without proper video and photo proof will not be accepted under any circumstances.<br><br>
-
-• <b>Product Condition:</b> The product must be unused, unwashed, undamaged, and in original condition. Products that are worn, washed, dirty, altered, or damaged will not be eligible for return or replacement.<br><br>
-
-• <b>Invoice Requirement:</b> The original invoice/bill provided with the product must be submitted at the time of return or replacement. Requests without the original invoice will not be processed.<br><br>
-
-• <b>Refund Eligibility:</b> Refunds will be issued only in cases where an incorrect or damaged product has been delivered by AK FASHION HUB.<br><br>
-
-• <b>Size & Fit Issues:</b> In case of size or fitting issues, only replacement will be provided. Refunds are not applicable for size or fitting concerns.<br><br>
-
-• <b>Shipping Charges:</b> For size or fitting replacements, the customer is required to pay one-side delivery/shipping charges.<br><br>
-
-• <b>Color Variation Disclaimer:</b> Minor color differences may occur due to screen brightness, display settings, and lighting conditions. Such variations shall not be considered a defect.<br><br>
-
-• <b>Agreement:</b> By placing an order, the customer confirms that they have read, understood, and agreed to all the above Terms & Conditions.
-
-</p>
-            <button onclick="this.parentElement.parentElement.remove()" style="margin-top:15px; width:100%">OK</button>
+        <div style="background:#fff; padding:25px; max-width:500px; border-radius:10px; max-height:80vh; overflow-y:auto; width:100%">
+            <h3 style="margin-bottom:15px; text-align:center">Terms & Conditions – AK FASHION HUB</h3>
+            <div style="font-size:13px; line-height:1.8; color:#333">
+                <b>• Delivery Time:</b> 4–6 working days.<br><br>
+                <b>• Cancellation (Before Dispatch):</b> Full refund within 12 hours.<br><br>
+                <b>• Cancellation (After Dispatch):</b> Not allowed.<br><br>
+                <b>• Images:</b> Slight color variations may occur.<br><br>
+                <b>• Return Request:</b> Within 3 days of delivery.<br><br>
+                <b>• Mandatory Proof:</b> Unboxing video + photos required.<br><br>
+                <b>• Product Condition:</b> Unused, unwashed, original tags intact.<br><br>
+                <b>• Refund Eligibility:</b> Incorrect/damaged products only.<br><br>
+                <b>• Size Issues:</b> Replacement only, no refund.<br><br>
+                <b>• Shipping Charges:</b> One-side charge for size replacements.
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" style="margin-top:20px; width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">OK, I AGREE</button>
         </div>
     `;
     d.onclick = (e) => { if(e.target === d) d.remove(); };
@@ -1304,6 +1551,7 @@ function openTerms() {
 // Initialize
 updateCart();
 loadProds();
+initLeadPopup();
 
 </script>
 </body>
