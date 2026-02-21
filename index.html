@@ -706,7 +706,20 @@
             right: -100%;
         }
     }
+.city-pin-row {
+  display: flex;
+  gap: 10px;
+}
 
+.city-pin-row input {
+  width: 50%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  height: 44px;
+}
 </style>
 </head>
 <body>
@@ -871,11 +884,17 @@
         <textarea id="aAddr" rows="2" placeholder="House No., Street, Landmark, Famous Place *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px"></textarea>
     <input id="aState" placeholder="State *">
 <div id="stateSuggest" style="border:1px solid #ccc; display:none; max-height:120px; overflow:auto; background:#fff"></div>
+<input id="aState" placeholder="State *">
 
-<input id="aCity" placeholder="City *" disabled>
+<div id="stateSuggest" style="border:1px solid #ccc; display:none; max-height:120px; overflow:auto; background:#fff"></div>
+
+<div class="city-pin-row">
+  <input id="aCity" placeholder="City *">
+  <input id="aPin" type="tel" placeholder="Pincode *" maxlength="6">
+</div>
+
 <div id="citySuggest" style="border:1px solid #ccc; display:none; max-height:120px; overflow:auto; background:#fff"></div>
 
-<input id="aPin" type="tel" placeholder="Pincode *" maxlength="6" disabled>
         <button onclick="saveAddress()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">SAVE ADDRESS</button>
     </div>
 </div>
