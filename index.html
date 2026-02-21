@@ -869,11 +869,13 @@
         <input id="aName" placeholder="Full Name *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
         <input id="aPhone" type="tel" placeholder="Mobile Number" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
         <textarea id="aAddr" rows="2" placeholder="House No., Street, Landmark, Famous Place *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px"></textarea>
-     <input id="aCity" placeholder="City *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
-      <div id="citySuggest" style="border:1px solid #ccc; display:none; max-height:120px; overflow:auto; background:#fff"></div>
+    <input id="aState" placeholder="State *">
 <div id="stateSuggest" style="border:1px solid #ccc; display:none; max-height:120px; overflow:auto; background:#fff"></div>
-        <input id="aPin" type="tel" placeholder="Pincode *" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
-        <input id="aState" placeholder="State *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+
+<input id="aCity" placeholder="City *" disabled>
+<div id="citySuggest" style="border:1px solid #ccc; display:none; max-height:120px; overflow:auto; background:#fff"></div>
+
+<input id="aPin" type="tel" placeholder="Pincode *" maxlength="6" disabled>
         <button onclick="saveAddress()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">SAVE ADDRESS</button>
     </div>
 </div>
@@ -1635,29 +1637,62 @@ function openAddress() {
     }
 }
 function closeAddress() { document.getElementById("addressModal").style.display = "none"; }
-    aCity.oninput = function () {
-  const v = this.value.toLowerCase();
-  const box = document.getElementById("citySuggest");
-  box.innerHTML = "";
-  if (!v) { box.style.display = "none"; return; }
-
-  CITIES.filter(c => c.toLowerCase().startsWith(v)).forEach(c => {
-    box.innerHTML += `<div style="padding:6px; cursor:pointer" 
-      onclick="aCity.value='${c}';box.style.display='none'">${c}</div>`;
-  });
-  box.style.display = "block";
-};
-
 aState.oninput = function () {
   const v = this.value.toLowerCase();
-  const box = document.getElementById("stateSuggest");
+  const box = stateSuggest;
   box.innerHTML = "";
-  if (!v) { box.style.display = "none"; return; }
+
+  if (!v) {
+    box.style.display = "none";
+    aCity.disabled = true;
+    aPin.disabled = true;
+    aCity.value = "";
+    aPin.value = "";
+    return;
+  }
 
   STATES.filter(s => s.toLowerCase().startsWith(v)).forEach(s => {
-    box.innerHTML += `<div style="padding:6px; cursor:pointer" 
-      onclick="aState.value='${s}';box.style.display='none'">${s}</div>`;
+    box.innerHTML += `
+      <div style="padding:6px; cursor:pointer"
+        onclick="
+          aState.value='${s}';
+          stateSuggest.style.display='none';
+          aCity.disabled=false;
+          aCity.focus();
+        ">
+        ${s}
+      </div>`;
   });
+
+  box.style.display = "block";
+};
+    aCity.oninput = function () {
+  if (aCity.disabled) return;
+
+  const v = this.value.toLowerCase();
+  const box = citySuggest;
+  box.innerHTML = "";
+
+  if (!v) {
+    box.style.display = "none";
+    aPin.disabled = true;
+    aPin.value = "";
+    return;
+  }
+
+  CITIES.filter(c => c.toLowerCase().startsWith(v)).forEach(c => {
+    box.innerHTML += `
+      <div style="padding:6px; cursor:pointer"
+        onclick="
+          aCity.value='${c}';
+          citySuggest.style.display='none';
+          aPin.disabled=false;
+          aPin.focus();
+        ">
+        ${c}
+      </div>`;
+  });
+
   box.style.display = "block";
 };
 function saveAddress() {
