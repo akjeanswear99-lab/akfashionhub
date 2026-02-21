@@ -720,6 +720,25 @@
   font-family: inherit;
   height: 44px;
 }
+    .suggest-box {
+  display: none;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  max-height: 140px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+.suggest-box div {
+  padding: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.suggest-box div:hover {
+  background: #f2f2f2;
+}
 </style>
 </head>
 <body>
@@ -883,14 +902,13 @@
         <input id="aPhone" type="tel" placeholder="Mobile Number" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
         <textarea id="aAddr" rows="2" placeholder="House No., Street, Landmark, Famous Place *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px"></textarea>
   <input id="aState" placeholder="State *">
-<div id="stateSuggest" style="border:1px solid #ccc; display:none; max-height:120px; overflow:auto; background:#fff"></div>
 
+<div id="stateSuggest" class="suggest-box"></div>
 <div class="city-pin-row">
   <input id="aCity" placeholder="City *">
   <input id="aPin" type="tel" placeholder="Pincode *" maxlength="6">
 </div>
-<div id="citySuggest" style="border:1px solid #ccc; display:none; max-height:120px; overflow:auto; background:#fff"></div>
-
+<div id="citySuggest" class="suggest-box"></div>
         <button onclick="saveAddress()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">SAVE ADDRESS</button>
     </div>
 </div>
@@ -1639,8 +1657,8 @@ function openAddress() {
         document.getElementById("aName").value = s.name || "";
         document.getElementById("aPhone").value = "";
         document.getElementById("aAddr").value = s.address || "";
-        document.getElementById("aCity").value = s.city || "";
-        document.getElementById("aPin").value = s.pin || "";
+       aCity.disabled = !document.getElementById("aState").value;
+aPin.disabled = !document.getElementById("aCity").value;
         document.getElementById("aState").value = s.state || "";
     } else {
         document.getElementById("aName").value = "";
@@ -1668,10 +1686,11 @@ aState.oninput = function () {
 
   STATES.filter(s => s.toLowerCase().startsWith(v)).forEach(s => {
     box.innerHTML += `
-      <div style="padding:6px; cursor:pointer"
+    <div style="cursor:pointer"
         onclick="
           aState.value='${s}';
-          stateSuggest.style.display='none';
+       stateSuggest.style.display='none';
+stateSuggest.innerHTML='';
           aCity.disabled=false;
           aCity.focus();
         ">
@@ -1697,12 +1716,13 @@ aState.oninput = function () {
 
   CITIES.filter(c => c.toLowerCase().startsWith(v)).forEach(c => {
     box.innerHTML += `
-      <div style="padding:6px; cursor:pointer"
-        onclick="
-          aCity.value='${c}';
-          citySuggest.style.display='none';
-          aPin.disabled=false;
-          aPin.focus();
+    <div style="cursor:pointer"  
+       onclick="
+  aCity.value='${c}';
+  citySuggest.style.display='none';
+  citySuggest.innerHTML='';
+  aPin.disabled=false;
+  aPin.focus();
         ">
         ${c}
       </div>`;
