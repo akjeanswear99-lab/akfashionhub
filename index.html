@@ -739,6 +739,25 @@
 .suggest-box div:hover {
   background: #f2f2f2;
 }
+    /* Address Modal Clean UI */
+#addressModal input,
+#addressModal textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+#addressModal textarea {
+  resize: none;
+}
+
+#addressModal h3 {
+  font-size: 22px;
+  font-weight: 700;
+}
 </style>
 </head>
 <body>
@@ -858,7 +877,12 @@
     <div class="cart-body" id="cartBodyContent">
         <div id="cartItemsView">
             <div id="cartItems"></div>
-
+<div id="addrSummary" style="display:none; background:#f9f9f9; border:1px solid #ddd; border-radius:10px; padding:12px; font-size:13px; line-height:1.6; margin-bottom:10px">
+  <b>Delivery Address</b><br>
+  <span id="sumName"></span><br>
+  <span id="sumPhone"></span><br>
+  <span id="sumAddr"></span>
+</div>
             <div id="cartTotal" style="font-size: 16px; font-weight:bold; margin:15px 0 12px 0; color:#000"></div>
             
             <input id="couponInput" placeholder="Enter Coupon Code" style="margin-bottom:5px; width:100%; padding:10px; border:1px solid #ccc; border-radius:6px" oninput="applyCoupon()">
@@ -894,23 +918,39 @@
 </div>
 
 <!-- Address Modal -->
+<!-- Address Modal -->
 <div id="addressModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; z-index:60000; align-items:center; justify-content:center">
-    <div style="background:#fff; padding:20px; width:90%; max-width:400px; border-radius:10px; position:relative">
-        <span onclick="closeAddress()" style="position:absolute; top:10px; left:10px; cursor:pointer; font-size:20px; font-weight:bold; color:#000;">❌</span>
-        <h3 style="text-align:center; margin-bottom:15px">Delivery Address</h3>
-        <input id="aName" placeholder="Full Name *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
-        <input id="aPhone" type="tel" placeholder="Mobile Number" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
-        <textarea id="aAddr" rows="2" placeholder="House No., Street, Landmark, Famous Place *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px"></textarea>
-  <input id="aState" placeholder="State *">
+  <div style="background:#fff; padding:20px; width:90%; max-width:400px; border-radius:12px; position:relative">
 
-<div id="stateSuggest" class="suggest-box"></div>
-<div class="city-pin-row">
-  <input id="aCity" placeholder="City *">
-  <input id="aPin" type="tel" placeholder="Pincode *" maxlength="6">
-</div>
-<div id="citySuggest" class="suggest-box"></div>
-        <button onclick="saveAddress()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">SAVE ADDRESS</button>
+    <span onclick="closeAddress()" style="position:absolute; top:10px; left:10px; cursor:pointer; font-size:22px; font-weight:bold; color:#ff4d6d;">✕</span>
+
+    <h3 style="text-align:center; margin-bottom:18px">Delivery Address</h3>
+
+    <input id="aName" placeholder="Full Name *">
+
+    <input id="aPhone" type="tel" placeholder="Mobile Number" maxlength="10"
+      oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+
+    <textarea id="aAddr" rows="2"
+      placeholder="House No., Street, Landmark, Famous Place *"></textarea>
+
+    <input id="aState" placeholder="State *">
+    <div id="stateSuggest" class="suggest-box"></div>
+
+    <div class="city-pin-row">
+      <input id="aCity" placeholder="City *">
+      <input id="aPin" type="tel" placeholder="Pincode *" maxlength="6"
+        oninput="this.value=this.value.replace(/[^0-9]/g,'')">
     </div>
+
+    <div id="citySuggest" class="suggest-box"></div>
+
+    <button onclick="saveAddress()"
+      style="width:100%; padding:14px; background:#000; color:#fff; border:none; font-weight:bold; cursor:pointer; border-radius:10px">
+      SAVE ADDRESS
+    </button>
+
+  </div>
 </div>
 
 <!-- Products Container -->
@@ -1735,29 +1775,34 @@ citySuggest.innerHTML='';
   box.style.display = "block";
 };
 function saveAddress() {
-    const d = {
-        name: aName.value.trim(), phone: aPhone.value.trim(),
-        address: aAddr.value.trim(), city: aCity.value.trim(),
-        pin: aPin.value.trim(), state: aState.value.trim()
-    };
-    if (!d.name) { alert("Enter Full Name"); return; }
-    if (!/^[6-9]\d{9}$/.test(d.phone)) { alert("Enter valid 10-digit Indian Mobile Number"); return; }
-    if (!d.address) { alert("Enter Complete Address"); return; }
-    if (!d.city) { alert("Enter City"); return; }
-    if (!/^[1-9][0-9]{5}$/.test(d.pin)) { alert("Enter valid 6-digit Pincode"); return; }
-    if (!d.state) { alert("Enter State"); return; }
-    
-    const oldAddr = JSON.parse(localStorage.getItem("addr"));
-    if (!oldAddr || oldAddr.phone !== d.phone) {
-         apiPost({ type: "CHECKOUT_LEAD", phone: d.phone, name: d.name, address: `${d.address}, ${d.city}`, cart: "Lead", total: "Lead" }).catch(e=>{});
-    }
+  const d = {
+    name: aName.value.trim(),
+    phone: aPhone.value.trim(),
+    address: aAddr.value.trim(),
+    city: aCity.value.trim(),
+    pin: aPin.value.trim(),
+    state: aState.value.trim()
+  };
 
-    localStorage.setItem("addr", JSON.stringify(d));
-    closeAddress();
-    updateCart();
-    alert("Address Saved!");
+  if (!d.name) { alert("Enter Full Name"); return; }
+  if (!/^[6-9]\d{9}$/.test(d.phone)) { alert("Enter valid mobile number"); return; }
+  if (!d.address) { alert("Enter complete address"); return; }
+  if (!d.city) { alert("Enter city"); return; }
+  if (!/^[1-9][0-9]{5}$/.test(d.pin)) { alert("Enter valid pincode"); return; }
+  if (!d.state) { alert("Enter state"); return; }
+
+  localStorage.setItem("addr", JSON.stringify(d));
+
+  document.getElementById("sumName").innerText = d.name;
+  document.getElementById("sumPhone").innerText = d.phone;
+  document.getElementById("sumAddr").innerText =
+    d.address + ", " + d.city + ", " + d.state + " - " + d.pin;
+
+  document.getElementById("addrSummary").style.display = "block";
+
+  closeAddress();
+  updateCart();
 }
-
 function openMyOrders() {
     document.getElementById("cartItemsView").style.display = "none";
     document.getElementById("myOrdersView").style.display = "block";
