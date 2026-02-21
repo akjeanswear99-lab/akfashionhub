@@ -80,12 +80,17 @@
     }
 
     /* Filters */
-    .filter-bar {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-bottom: 25px;
-    }
+   .filter-bar {
+    position: sticky;
+    top: 120px; /* header ke niche */
+    z-index: 5;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 25px;
+    background: #f4f4f4;
+    padding-top: 5px;
+}
 
     .filter-btn {
         padding: 8px 20px;
@@ -391,11 +396,11 @@
         margin-top: 5px;
     }
 
-    /* Floating Cart */
-    #floatingCart {
-        position: fixed;
-        top: 6px;
-        left: 4px;
+   
+ #floatingCart {
+    position: fixed;
+    top: 130px; 
+    left: 6px;
         background: transparent;
         color: #555;
         padding: 10px;
@@ -750,11 +755,13 @@
 <!-- Thank You Modal -->
 <div id="thankYouModal">
     <div>
-        <h2 style="font-size:22px; margin-bottom:15px">Thank You for Shopping!</h2>
-        <p style="font-size:16px; color:#555; line-height:1.6; margin-bottom:10px">
-            Thank you for shopping with AK Fashion Hub.<br>
-            Our team will call you shortly for order confirmation and payment details.
-        </p>
+      <div style="text-align:center; line-height:1.8; font-size:15px">
+    <b>AK FASHION HUB</b><br>
+    THANK YOU FOR CHOOSING US<br>
+    YOUR ORDER HAS BEEN RECEIVED – ORDER ID: <span id="tyOrderId"></span><br>
+    OUR TEAM WILL CONTACT YOU SHORTLY TO CONFIRM YOUR ORDER AND PAYMENT DETAILS<br>
+    <b>AK FASHION HUB</b>
+</div>
         <div style="margin-top:20px; font-size:14px; color:#999">This message will close automatically...</div>
     </div>
 </div>
@@ -863,7 +870,9 @@
         <input id="aName" placeholder="Full Name *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
         <input id="aPhone" type="tel" placeholder="Mobile Number" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
         <textarea id="aAddr" rows="2" placeholder="House No., Street, Landmark, Famous Place *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px"></textarea>
-        <input id="aCity" placeholder="City *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+     <input id="aCity" placeholder="City *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+      <div id="citySuggest" style="border:1px solid #ccc; display:none; max-height:120px; overflow:auto; background:#fff"></div>
+<div id="stateSuggest" style="border:1px solid #ccc; display:none; max-height:120px; overflow:auto; background:#fff"></div>
         <input id="aPin" type="tel" placeholder="Pincode *" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
         <input id="aState" placeholder="State *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
         <button onclick="saveAddress()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">SAVE ADDRESS</button>
@@ -895,7 +904,7 @@
 <div id="toast"></div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbzbxn4D3KkoIf3bnfU2Bgq4o-BnT18zfAFmKzXqU8N5wXsrAOkgYQ6ZmogK943PCrcCfw/exec";
+const API = "https://script.google.com/macros/s/AKfycbyM8vE2Gz1lV4qXYlnfIpHwebe_cbxb9-DeWw1FMEdhwwW-b76t8uHZWNF3iSIZ-AxQqg/exec";
 const SESSION_KEY = "akfh_session";
 const SESSION_DAYS = 30;
 const RETURN_WINDOW_DAYS = 3;
@@ -922,7 +931,8 @@ const RETURN_REASONS = [
     "Color different from image",
     "Other issue"
 ];
-
+const STATES = ["Uttar Pradesh","Delhi","Haryana","Punjab","Rajasthan","Bihar"];
+const CITIES = ["Hapur","Hathras","Hardoi","Delhi","Dehradun","Hisar","Panipat"];
 function showToast(msg) {
     const t = document.getElementById("toast");
     t.innerText = msg;
@@ -1022,7 +1032,11 @@ function filterProds(type) {
 function openModal(index) {
     currentProdIndex = index;
     const p = products[index];
-    
+    apiPost({
+    type: "PRODUCT_CLICK",
+    productId: p.id,
+    productName: p.name
+}).catch(e => {});
     document.getElementById("modalTitle").innerText = p.name;
     document.getElementById("modalDesc").innerText = p.description || "Premium Quality Product.";
     document.getElementById("modalMeasure").innerText = p.measure ? "Measurements: " + p.measure : "";
@@ -1075,21 +1089,34 @@ function changeImg(src, el) {
 function renderModalOpts(p) {
     const state = window.pState[p.id] || {};
     const sizes = [...new Set(p.variants.filter(v => Number(v.stock) > 0).map(v => v.size))];
-    const colors = state.size ? [...new Set(p.variants.filter(v => Number(v.stock) > 0 && v.size === state.size).map(v => v.color))] : [];
+  const colors = state.size
+ ? [...new Set(p.variants.filter(v => Number(v.stock) > 0 && v.size === state.size).map(v => v.color))]
+ : [];
 
-    let stockMsg = "";
-    let canAdd = false;
 
-    if (state.size && state.color) {
-        const v = p.variants.find(v => v.size === state.size && v.color === state.color);
-        if (v && Number(v.stock) > 0) {
-            stockMsg = `Hurry! Only ${v.stock} left.`;
-            canAdd = true;
-        } else if (v && Number(v.stock) <= 0) {
-            stockMsg = "Out of Stock";
-            canAdd = false;
-        }
+if (colors.length === 1 && !state.color) {
+    state.color = colors[0];
+}
+ let stockMsg = "";
+let canAdd = false;
+
+if (!state.size || !state.color) {
+    const stocks = p.variants
+        .map(v => Number(v.stock))
+        .filter(s => s > 0);
+    const minStock = stocks.length ? Math.min(...stocks) : 0;
+    stockMsg = `Available Stock: ${minStock}`;
+}
+if (state.size && state.color) {
+    const v = p.variants.find(v => v.size === state.size && v.color === state.color);
+    if (v && Number(v.stock) > 0) {
+        stockMsg = `Hurry! Only ${v.stock} left.`;
+        canAdd = true;
+    } else if (v && Number(v.stock) <= 0) {
+        stockMsg = "Out of Stock";
+        canAdd = false;
     }
+}  
 
     document.getElementById("modalSizes").innerHTML = sizes.map(s => 
         `<div class="opt-btn ${state.size === s ? 'selected' : ''}" onclick="selOpt('size', '${s}')">${s}</div>`
@@ -1125,6 +1152,10 @@ function selOpt(type, val) {
         if (cur.color === val) delete cur.color;
         else cur.color = val;
     }
+   if (type === "color") {
+    const v = p.variants.find(x => x.color === val && x.img);
+    document.getElementById("modalMainImg").src = v && v.img ? v.img : p.img[0];
+}
     renderModalOpts(p);
 }
 
@@ -1484,7 +1515,7 @@ async function confirmOrderYes() {
         localStorage.removeItem("cart");
         updateCart();
         toggleCart();
-        
+       document.getElementById("tyOrderId").innerText = oid; 
         document.getElementById("thankYouModal").style.display = "flex";
         setTimeout(() => {
             document.getElementById("thankYouModal").style.display = "none";
@@ -1519,6 +1550,31 @@ function openAddress() {
     }
 }
 function closeAddress() { document.getElementById("addressModal").style.display = "none"; }
+    aCity.oninput = function () {
+  const v = this.value.toLowerCase();
+  const box = document.getElementById("citySuggest");
+  box.innerHTML = "";
+  if (!v) { box.style.display = "none"; return; }
+
+  CITIES.filter(c => c.toLowerCase().startsWith(v)).forEach(c => {
+    box.innerHTML += `<div style="padding:6px; cursor:pointer" 
+      onclick="aCity.value='${c}';box.style.display='none'">${c}</div>`;
+  });
+  box.style.display = "block";
+};
+
+aState.oninput = function () {
+  const v = this.value.toLowerCase();
+  const box = document.getElementById("stateSuggest");
+  box.innerHTML = "";
+  if (!v) { box.style.display = "none"; return; }
+
+  STATES.filter(s => s.toLowerCase().startsWith(v)).forEach(s => {
+    box.innerHTML += `<div style="padding:6px; cursor:pointer" 
+      onclick="aState.value='${s}';box.style.display='none'">${s}</div>`;
+  });
+  box.style.display = "block";
+};
 function saveAddress() {
     const d = {
         name: aName.value.trim(), phone: aPhone.value.trim(),
@@ -1547,16 +1603,15 @@ function openMyOrders() {
     document.getElementById("cartItemsView").style.display = "none";
     document.getElementById("myOrdersView").style.display = "block";
     
-    const sess = JSON.parse(localStorage.getItem(SESSION_KEY));
-    
-    if (sess && sess.phone && sess.lastOid && (Date.now() - sess.time < SESSION_DAYS * 24 * 60 * 60 * 1000)) {
-        document.getElementById("orderInputArea").style.display = "none";
-        fetchOrders(sess.phone, sess.lastOid);
-    } else {
-        localStorage.removeItem(SESSION_KEY);
-        document.getElementById("orderInputArea").style.display = "block";
-        document.getElementById("orderList").innerHTML = "";
-    }
+   const sess = JSON.parse(localStorage.getItem(SESSION_KEY));
+
+document.getElementById("orderInputArea").style.display = "block";
+document.getElementById("orderList").innerHTML = "";
+
+if (sess && sess.phone && sess.lastOid && (Date.now() - sess.time < SESSION_DAYS * 24 * 60 * 60 * 1000)) {
+    fetchOrders(sess.phone, sess.lastOid);
+}
+  
 }
 
 async function fetchOrders(phone, oid) {
@@ -1568,12 +1623,19 @@ async function fetchOrders(phone, oid) {
         const res = await fetch(url);
         const d = JSON.parse(await res.text());
         document.getElementById("checkoutLoader").style.display = "none";
-        if (d.status === "SUCCESS" && d.orders && d.orders.length) {
-            allOrders = d.orders;
-            renderOrders(d.orders);
-        } else {
-            document.getElementById("orderList").innerHTML = `<p style='text-align:center; color:#666; padding:20px'>${d.message || 'No orders found'}</p>`;
-        }
+      if (d.status === "SUCCESS" && d.orders && d.orders.length) {
+    allOrders = d.orders;
+    renderOrders(d.orders);
+    document.getElementById("orderInputArea").style.display = "none";
+} else {
+    document.getElementById("orderList").innerHTML = `
+        <p style="text-align:center; color:#666; padding:15px">
+            Data not found.<br>
+            Please enter correct Order ID & Mobile Number.
+        </p>
+    `;
+    document.getElementById("orderInputArea").style.display = "block";
+}
     } catch(e) {
         document.getElementById("checkoutLoader").style.display = "none";
         document.getElementById("orderList").innerHTML = "<p style='text-align:center; color:red'>Error loading orders</p>";
@@ -1761,12 +1823,14 @@ async function submitReview() {
     isProcessing = true;
     document.getElementById("checkoutLoader").style.display = "flex";
     try {
-        const res = await apiPost({
-            type: "SUBMIT_REVIEW",
-            orderId: currentOrderDetail.orderId,
-            rating: currentRating,
-            comment: comment
-        });
+       const res = await apiPost({
+    type: "SUBMIT_REVIEW",
+    orderId: currentOrderDetail.orderId,
+    rating: currentRating,
+    comment: comment,
+    name: currentOrderDetail.name || "",
+    phone: currentOrderDetail.phone || ""
+});
         document.getElementById("checkoutLoader").style.display = "none";
         
         if (res.status === "SUCCESS") {
@@ -1827,7 +1891,10 @@ async function submitReturnRequest() {
 async function trackOrder() {
     const phone = orderPhone.value.trim();
     const oid = orderOid.value.trim();
-    if (!/^[6-9]\d{9}$/.test(phone) || !oid) { alert("Invalid details"); return; }
+  if (!/^[6-9]\d{9}$/.test(phone) || !oid) {
+    document.getElementById("orderList").innerHTML = "";
+    return;
+}
     
     document.getElementById("checkoutLoader").style.display = "flex";
     try {
