@@ -80,17 +80,12 @@
     }
 
     /* Filters */
-   .filter-bar {
-    position: sticky;
-    top: 120px; /* header ke niche */
-    z-index: 5;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-bottom: 25px;
-    background: #f4f4f4;
-    padding-top: 5px;
-}
+    .filter-bar {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 25px;
+    }
 
     .filter-btn {
         padding: 8px 20px;
@@ -396,20 +391,21 @@
         margin-top: 5px;
     }
 
-   
-#floatingCart {
-    position: fixed;
-    top: 4px;              /* hamesha header ke niche */
-    left: 6px;
-    background: transparent;
-    color: #555;
-    padding: 10px;
-    font-size: 22px;
-    cursor: pointer;
-    z-index: 99999;
-    opacity: 0.7;
-    display: none;
-}
+    /* Floating Cart */
+    #floatingCart {
+        position: fixed;
+        top: 6px;
+        left: 4px;
+        background: transparent;
+        color: #555;
+        padding: 10px;
+        font-size: 22px;
+        cursor: pointer;
+        z-index: 99999;
+        opacity: 0.7;
+        display: none;
+        touch-action: auto;
+    }
 
     /* Cart Panel */
     #cartPanel {
@@ -706,58 +702,7 @@
             right: -100%;
         }
     }
-.city-pin-row {
-  display: flex;
-  gap: 10px;
-}
 
-.city-pin-row input {
-  width: 50%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  font-family: inherit;
-  height: 44px;
-}
-    .suggest-box {
-  display: none;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: #fff;
-  max-height: 140px;
-  overflow-y: auto;
-  margin-bottom: 8px;
-}
-
-.suggest-box div {
-  padding: 10px;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.suggest-box div:hover {
-  background: #f2f2f2;
-}
-    /* Address Modal Clean UI */
-#addressModal input,
-#addressModal textarea {
-  width: 100%;
-  padding: 14px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  font-size: 15px;
-  margin-bottom: 12px;
-}
-
-#addressModal textarea {
-  resize: none;
-}
-
-#addressModal h3 {
-  font-size: 22px;
-  font-weight: 700;
-}
 </style>
 </head>
 <body>
@@ -805,13 +750,11 @@
 <!-- Thank You Modal -->
 <div id="thankYouModal">
     <div>
-      <div style="text-align:center; line-height:1.8; font-size:15px">
-    <b>AK FASHION HUB</b><br>
-    THANK YOU FOR CHOOSING US<br>
-    YOUR ORDER HAS BEEN RECEIVED – ORDER ID: <span id="tyOrderId"></span><br>
-    OUR TEAM WILL CONTACT YOU SHORTLY TO CONFIRM YOUR ORDER AND PAYMENT DETAILS<br>
-    <b>AK FASHION HUB</b>
-</div>
+        <h2 style="font-size:22px; margin-bottom:15px">Thank You for Shopping!</h2>
+        <p style="font-size:16px; color:#555; line-height:1.6; margin-bottom:10px">
+            Thank you for shopping with AK Fashion Hub.<br>
+            Our team will call you shortly for order confirmation and payment details.
+        </p>
         <div style="margin-top:20px; font-size:14px; color:#999">This message will close automatically...</div>
     </div>
 </div>
@@ -877,12 +820,7 @@
     <div class="cart-body" id="cartBodyContent">
         <div id="cartItemsView">
             <div id="cartItems"></div>
-<div id="addrSummary" style="display:none; background:#f9f9f9; border:1px solid #ddd; border-radius:10px; padding:12px; font-size:13px; line-height:1.6; margin-bottom:10px">
-  <b>Delivery Address</b><br>
-  <span id="sumName"></span><br>
-  <span id="sumPhone"></span><br>
-  <span id="sumAddr"></span>
-</div>
+
             <div id="cartTotal" style="font-size: 16px; font-weight:bold; margin:15px 0 12px 0; color:#000"></div>
             
             <input id="couponInput" placeholder="Enter Coupon Code" style="margin-bottom:5px; width:100%; padding:10px; border:1px solid #ccc; border-radius:6px" oninput="applyCoupon()">
@@ -918,39 +856,18 @@
 </div>
 
 <!-- Address Modal -->
-<!-- Address Modal -->
 <div id="addressModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; z-index:60000; align-items:center; justify-content:center">
-  <div style="background:#fff; padding:20px; width:90%; max-width:400px; border-radius:12px; position:relative">
-
-    <span onclick="closeAddress()" style="position:absolute; top:10px; left:10px; cursor:pointer; font-size:22px; font-weight:bold; color:#ff4d6d;">✕</span>
-
-    <h3 style="text-align:center; margin-bottom:18px">Delivery Address</h3>
-
-    <input id="aName" placeholder="Full Name *">
-
-    <input id="aPhone" type="tel" placeholder="Mobile Number" maxlength="10"
-      oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-
-    <textarea id="aAddr" rows="2"
-      placeholder="House No., Street, Landmark, Famous Place *"></textarea>
-
-    <input id="aState" placeholder="State *">
-    <div id="stateSuggest" class="suggest-box"></div>
-
-    <div class="city-pin-row">
-      <input id="aCity" placeholder="City *">
-      <input id="aPin" type="tel" placeholder="Pincode *" maxlength="6"
-        oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+    <div style="background:#fff; padding:20px; width:90%; max-width:400px; border-radius:10px; position:relative">
+        <span onclick="closeAddress()" style="position:absolute; top:10px; left:10px; cursor:pointer; font-size:20px; font-weight:bold; color:#000;">❌</span>
+        <h3 style="text-align:center; margin-bottom:15px">Delivery Address</h3>
+        <input id="aName" placeholder="Full Name *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+        <input id="aPhone" type="tel" placeholder="Mobile Number" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+        <textarea id="aAddr" rows="2" placeholder="House No., Street, Landmark, Famous Place *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px"></textarea>
+        <input id="aCity" placeholder="City *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+        <input id="aPin" type="tel" placeholder="Pincode *" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+        <input id="aState" placeholder="State *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+        <button onclick="saveAddress()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">SAVE ADDRESS</button>
     </div>
-
-    <div id="citySuggest" class="suggest-box"></div>
-
-    <button onclick="saveAddress()"
-      style="width:100%; padding:14px; background:#000; color:#fff; border:none; font-weight:bold; cursor:pointer; border-radius:10px">
-      SAVE ADDRESS
-    </button>
-
-  </div>
 </div>
 
 <!-- Products Container -->
@@ -978,7 +895,7 @@
 <div id="toast"></div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbyM8vE2Gz1lV4qXYlnfIpHwebe_cbxb9-DeWw1FMEdhwwW-b76t8uHZWNF3iSIZ-AxQqg/exec";
+const API = "https://script.google.com/macros/s/AKfycbx5TcsppzxxTES6at8PfmpPwWdbuab7GLjPR-Kmrp1NwZMHDYhchxFOaYmZkoetoL1eLg/exec";
 const SESSION_KEY = "akfh_session";
 const SESSION_DAYS = 30;
 const RETURN_WINDOW_DAYS = 3;
@@ -1005,94 +922,7 @@ const RETURN_REASONS = [
     "Color different from image",
     "Other issue"
 ];
-const STATES = [
-  "Andhra Pradesh",
-  "Arunachal Pradesh",
-  "Assam",
-  "Bihar",
-  "Chhattisgarh",
-  "Goa",
-  "Gujarat",
-  "Haryana",
-  "Himachal Pradesh",
-  "Jharkhand",
-  "Karnataka",
-  "Kerala",
-  "Madhya Pradesh",
-  "Maharashtra",
-  "Manipur",
-  "Meghalaya",
-  "Mizoram",
-  "Nagaland",
-  "Odisha",
-  "Punjab",
-  "Rajasthan",
-  "Sikkim",
-  "Tamil Nadu",
-  "Telangana",
-  "Tripura",
-  "Uttar Pradesh",
-  "Uttarakhand",
-  "West Bengal",
 
-  /* Union Territories */
-  "Andaman and Nicobar Islands",
-  "Chandigarh",
-  "Dadra and Nagar Haveli and Daman and Diu",
-  "Delhi",
-  "Jammu and Kashmir",
-  "Ladakh",
-  "Lakshadweep",
-  "Puducherry"
-];
-const CITIES = [
-  /* Uttar Pradesh */
-  "Agra","Aligarh","Ayodhya","Bareilly","Bulandshahr","Etah","Etawah",
-  "Ghaziabad","Gorakhpur","Hapur","Hardoi","Jhansi","Kanpur","Lucknow",
-  "Mathura","Meerut","Moradabad","Muzaffarnagar","Noida","Prayagraj",
-  "Saharanpur","Shahjahanpur","Varanasi",
-
-  /* Delhi */
-  "Delhi","New Delhi",
-
-  /* Haryana */
-  "Ambala","Faridabad","Gurugram","Hisar","Karnal","Panipat","Rohtak","Sonipat",
-
-  /* Rajasthan */
-  "Ajmer","Alwar","Bharatpur","Bikaner","Jaipur","Jodhpur","Kota","Udaipur",
-
-  /* Uttarakhand */
-  "Dehradun","Haridwar","Haldwani","Nainital","Roorkee",
-
-  /* Bihar */
-  "Arrah","Begusarai","Bhagalpur","Darbhanga","Gaya","Muzaffarpur","Patna",
-
-  /* Maharashtra */
-  "Ahmednagar","Akola","Amravati","Aurangabad","Kolhapur","Mumbai",
-  "Nagpur","Nanded","Nashik","Pune","Solapur","Thane",
-
-  /* Madhya Pradesh */
-  "Bhopal","Gwalior","Indore","Jabalpur","Ratlam","Ujjain",
-
-  /* Gujarat */
-  "Ahmedabad","Bhavnagar","Jamnagar","Rajkot","Surat","Vadodara",
-
-  /* Punjab */
-  "Amritsar","Bathinda","Jalandhar","Ludhiana","Mohali","Patiala",
-
-  /* West Bengal */
-  "Asansol","Durgapur","Howrah","Kolkata","Siliguri",
-
-  /* South India */
-  "Bengaluru","Chennai","Coimbatore","Hyderabad","Kochi",
-  "Madurai","Mangaluru","Mysuru","Thiruvananthapuram","Trichy","Vijayawada","Visakhapatnam",
-
-  /* East / North East */
-  "Bhubaneswar","Cuttack","Guwahati","Imphal","Itanagar","Shillong","Aizawl","Kohima",
-
-  /* Others */
-  "Chandigarh","Puducherry","Port Blair"
-];
 function showToast(msg) {
     const t = document.getElementById("toast");
     t.innerText = msg;
@@ -1192,11 +1022,7 @@ function filterProds(type) {
 function openModal(index) {
     currentProdIndex = index;
     const p = products[index];
-    apiPost({
-    type: "PRODUCT_CLICK",
-    productId: p.id,
-    productName: p.name
-}).catch(e => {});
+    
     document.getElementById("modalTitle").innerText = p.name;
     document.getElementById("modalDesc").innerText = p.description || "Premium Quality Product.";
     document.getElementById("modalMeasure").innerText = p.measure ? "Measurements: " + p.measure : "";
@@ -1249,34 +1075,21 @@ function changeImg(src, el) {
 function renderModalOpts(p) {
     const state = window.pState[p.id] || {};
     const sizes = [...new Set(p.variants.filter(v => Number(v.stock) > 0).map(v => v.size))];
-  const colors = state.size
- ? [...new Set(p.variants.filter(v => Number(v.stock) > 0 && v.size === state.size).map(v => v.color))]
- : [];
+    const colors = state.size ? [...new Set(p.variants.filter(v => Number(v.stock) > 0 && v.size === state.size).map(v => v.color))] : [];
 
+    let stockMsg = "";
+    let canAdd = false;
 
-if (colors.length === 1 && !state.color) {
-    state.color = colors[0];
-}
- let stockMsg = "";
-let canAdd = false;
-
-if (!state.size || !state.color) {
-    const stocks = p.variants
-        .map(v => Number(v.stock))
-        .filter(s => s > 0);
-    const minStock = stocks.length ? Math.min(...stocks) : 0;
-    stockMsg = `Available Stock: ${minStock}`;
-}
-if (state.size && state.color) {
-    const v = p.variants.find(v => v.size === state.size && v.color === state.color);
-    if (v && Number(v.stock) > 0) {
-        stockMsg = `Hurry! Only ${v.stock} left.`;
-        canAdd = true;
-    } else if (v && Number(v.stock) <= 0) {
-        stockMsg = "Out of Stock";
-        canAdd = false;
+    if (state.size && state.color) {
+        const v = p.variants.find(v => v.size === state.size && v.color === state.color);
+        if (v && Number(v.stock) > 0) {
+            stockMsg = `Hurry! Only ${v.stock} left.`;
+            canAdd = true;
+        } else if (v && Number(v.stock) <= 0) {
+            stockMsg = "Out of Stock";
+            canAdd = false;
+        }
     }
-}  
 
     document.getElementById("modalSizes").innerHTML = sizes.map(s => 
         `<div class="opt-btn ${state.size === s ? 'selected' : ''}" onclick="selOpt('size', '${s}')">${s}</div>`
@@ -1312,10 +1125,6 @@ function selOpt(type, val) {
         if (cur.color === val) delete cur.color;
         else cur.color = val;
     }
-   if (type === "color") {
-    const v = p.variants.find(x => x.color === val && x.img);
-    document.getElementById("modalMainImg").src = v && v.img ? v.img : p.img[0];
-}
     renderModalOpts(p);
 }
 
@@ -1675,7 +1484,7 @@ async function confirmOrderYes() {
         localStorage.removeItem("cart");
         updateCart();
         toggleCart();
-       document.getElementById("tyOrderId").innerText = oid; 
+        
         document.getElementById("thankYouModal").style.display = "flex";
         setTimeout(() => {
             document.getElementById("thankYouModal").style.display = "none";
@@ -1697,8 +1506,8 @@ function openAddress() {
         document.getElementById("aName").value = s.name || "";
         document.getElementById("aPhone").value = "";
         document.getElementById("aAddr").value = s.address || "";
-       aCity.disabled = !document.getElementById("aState").value;
-aPin.disabled = !document.getElementById("aCity").value;
+        document.getElementById("aCity").value = s.city || "";
+        document.getElementById("aPin").value = s.pin || "";
         document.getElementById("aState").value = s.state || "";
     } else {
         document.getElementById("aName").value = "";
@@ -1707,115 +1516,47 @@ aPin.disabled = !document.getElementById("aCity").value;
         document.getElementById("aCity").value = "";
         document.getElementById("aPin").value = "";
         document.getElementById("aState").value = "";
-        stateSuggest.style.display='none';
-citySuggest.style.display='none';
     }
 }
 function closeAddress() { document.getElementById("addressModal").style.display = "none"; }
-aState.oninput = function () {
-  const v = this.value.toLowerCase();
-  const box = stateSuggest;
-  box.innerHTML = "";
-
-  if (!v) {
-    box.style.display = "none";
-    aCity.disabled = true;
-    aPin.disabled = true;
-    aCity.value = "";
-    aPin.value = "";
-    return;
-  }
-
-  STATES.filter(s => s.toLowerCase().startsWith(v)).forEach(s => {
-    box.innerHTML += `
-    <div style="cursor:pointer"
-        onclick="
-          aState.value='${s}';
-       stateSuggest.style.display='none';
-stateSuggest.innerHTML='';
-aCity.value='';
-citySuggest.innerHTML='';
-          aCity.disabled=false;
-          aCity.focus();
-        ">
-        ${s}
-      </div>`;
-  });
-
-  box.style.display = "block";
-};
-    aCity.oninput = function () {
-  if (aCity.disabled) return;
-
-  const v = this.value.toLowerCase();
-  const box = citySuggest;
-  box.innerHTML = "";
-
-  if (!v) {
-    box.style.display = "none";
-    aPin.disabled = true;
-    aPin.value = "";
-    return;
-  }
-
-  CITIES.filter(c => c.toLowerCase().startsWith(v)).forEach(c => {
-    box.innerHTML += `
-    <div style="cursor:pointer"  
-       onclick="
-  aCity.value='${c}';
-  citySuggest.style.display='none';
-  citySuggest.innerHTML='';
-  aPin.disabled=false;
-  aPin.focus();
-        ">
-        ${c}
-      </div>`;
-  });
-
-  box.style.display = "block";
-};
 function saveAddress() {
-  const d = {
-    name: aName.value.trim(),
-    phone: aPhone.value.trim(),
-    address: aAddr.value.trim(),
-    city: aCity.value.trim(),
-    pin: aPin.value.trim(),
-    state: aState.value.trim()
-  };
+    const d = {
+        name: aName.value.trim(), phone: aPhone.value.trim(),
+        address: aAddr.value.trim(), city: aCity.value.trim(),
+        pin: aPin.value.trim(), state: aState.value.trim()
+    };
+    if (!d.name) { alert("Enter Full Name"); return; }
+    if (!/^[6-9]\d{9}$/.test(d.phone)) { alert("Enter valid 10-digit Indian Mobile Number"); return; }
+    if (!d.address) { alert("Enter Complete Address"); return; }
+    if (!d.city) { alert("Enter City"); return; }
+    if (!/^[1-9][0-9]{5}$/.test(d.pin)) { alert("Enter valid 6-digit Pincode"); return; }
+    if (!d.state) { alert("Enter State"); return; }
+    
+    const oldAddr = JSON.parse(localStorage.getItem("addr"));
+    if (!oldAddr || oldAddr.phone !== d.phone) {
+         apiPost({ type: "CHECKOUT_LEAD", phone: d.phone, name: d.name, address: `${d.address}, ${d.city}`, cart: "Lead", total: "Lead" }).catch(e=>{});
+    }
 
-  if (!d.name) { alert("Enter Full Name"); return; }
-  if (!/^[6-9]\d{9}$/.test(d.phone)) { alert("Enter valid mobile number"); return; }
-  if (!d.address) { alert("Enter complete address"); return; }
-  if (!d.city) { alert("Enter city"); return; }
-  if (!/^[1-9][0-9]{5}$/.test(d.pin)) { alert("Enter valid pincode"); return; }
-  if (!d.state) { alert("Enter state"); return; }
-
-  localStorage.setItem("addr", JSON.stringify(d));
-
-  document.getElementById("sumName").innerText = d.name;
-  document.getElementById("sumPhone").innerText = d.phone;
-  document.getElementById("sumAddr").innerText =
-    d.address + ", " + d.city + ", " + d.state + " - " + d.pin;
-
-  document.getElementById("addrSummary").style.display = "block";
-
-  closeAddress();
-  updateCart();
+    localStorage.setItem("addr", JSON.stringify(d));
+    closeAddress();
+    updateCart();
+    alert("Address Saved!");
 }
+
 function openMyOrders() {
     document.getElementById("cartItemsView").style.display = "none";
     document.getElementById("myOrdersView").style.display = "block";
     
-   const sess = JSON.parse(localStorage.getItem(SESSION_KEY));
-
-document.getElementById("orderInputArea").style.display = "block";
-document.getElementById("orderList").innerHTML = "";
-
-if (sess && sess.phone && sess.lastOid && (Date.now() - sess.time < SESSION_DAYS * 24 * 60 * 60 * 1000)) {
-    fetchOrders(sess.phone, sess.lastOid);
-}
-  
+    const sess = JSON.parse(localStorage.getItem(SESSION_KEY));
+    
+    if (sess && sess.phone && sess.lastOid && (Date.now() - sess.time < SESSION_DAYS * 24 * 60 * 60 * 1000)) {
+        document.getElementById("orderInputArea").style.display = "none";
+        fetchOrders(sess.phone, sess.lastOid);
+    } else {
+        localStorage.removeItem(SESSION_KEY);
+        document.getElementById("orderInputArea").style.display = "block";
+        document.getElementById("orderList").innerHTML = "";
+    }
 }
 
 async function fetchOrders(phone, oid) {
@@ -1827,19 +1568,12 @@ async function fetchOrders(phone, oid) {
         const res = await fetch(url);
         const d = JSON.parse(await res.text());
         document.getElementById("checkoutLoader").style.display = "none";
-      if (d.status === "SUCCESS" && d.orders && d.orders.length) {
-    allOrders = d.orders;
-    renderOrders(d.orders);
-    document.getElementById("orderInputArea").style.display = "none";
-} else {
-    document.getElementById("orderList").innerHTML = `
-        <p style="text-align:center; color:#666; padding:15px">
-            Data not found.<br>
-            Please enter correct Order ID & Mobile Number.
-        </p>
-    `;
-    document.getElementById("orderInputArea").style.display = "block";
-}
+        if (d.status === "SUCCESS" && d.orders && d.orders.length) {
+            allOrders = d.orders;
+            renderOrders(d.orders);
+        } else {
+            document.getElementById("orderList").innerHTML = `<p style='text-align:center; color:#666; padding:20px'>${d.message || 'No orders found'}</p>`;
+        }
     } catch(e) {
         document.getElementById("checkoutLoader").style.display = "none";
         document.getElementById("orderList").innerHTML = "<p style='text-align:center; color:red'>Error loading orders</p>";
@@ -2027,14 +1761,12 @@ async function submitReview() {
     isProcessing = true;
     document.getElementById("checkoutLoader").style.display = "flex";
     try {
-       const res = await apiPost({
-    type: "SUBMIT_REVIEW",
-    orderId: currentOrderDetail.orderId,
-    rating: currentRating,
-    comment: comment,
-    name: currentOrderDetail.name || "",
-    phone: currentOrderDetail.phone || ""
-});
+        const res = await apiPost({
+            type: "SUBMIT_REVIEW",
+            orderId: currentOrderDetail.orderId,
+            rating: currentRating,
+            comment: comment
+        });
         document.getElementById("checkoutLoader").style.display = "none";
         
         if (res.status === "SUCCESS") {
@@ -2095,10 +1827,7 @@ async function submitReturnRequest() {
 async function trackOrder() {
     const phone = orderPhone.value.trim();
     const oid = orderOid.value.trim();
-  if (!/^[6-9]\d{9}$/.test(phone) || !oid) {
-    document.getElementById("orderList").innerHTML = "";
-    return;
-}
+    if (!/^[6-9]\d{9}$/.test(phone) || !oid) { alert("Invalid details"); return; }
     
     document.getElementById("checkoutLoader").style.display = "flex";
     try {
@@ -2154,37 +1883,22 @@ function openTerms() {
     d.style.cssText = "position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999999; display:flex; align-items:center; justify-content:center; padding:20px";
     d.innerHTML = `
         <div style="background:#fff; padding:25px; max-width:500px; border-radius:10px; max-height:80vh; overflow-y:auto; width:100%">
-    <h3 style="margin-bottom:15px; text-align:center">Terms & Conditions – AK FASHION HUB</h3>
-    <div style="font-size:13px; line-height:1.8; color:#333">
-        <b>• Delivery Time:</b> Orders will be delivered within 4–6 working days after the order is confirmed. Delivery timelines may vary depending on location, courier partner, and operational conditions.<br><br>
-
-        <b>• Cancellation & Refund (Before Dispatch):</b> Orders cancelled within 12 hours of placing the order are eligible for a full refund. The refund amount will be processed and credited within 2–3 working days after cancellation confirmation.<br><br>
-
-        <b>• Cancellation Policy (After Dispatch):</b> Once the order has been dispatched, cancellation will not be allowed. In such cases, the customer is required to make full payment for the order.<br><br>
-
-        <b>• Product Images Disclaimer:</b> All product images displayed on this website are captured using professional camera equipment or generated/enhanced using AI technology. Due to variations in screen resolution, lighting conditions, camera settings, and pixel density, there may be slight differences in color, texture, or appearance between the images shown and the actual product received.<br><br>
-
-        <b>• Return & Replacement Request:</b> Any return or replacement request must be raised within 3 days from the date of product delivery.<br><br>
-
-        <b>• Mandatory Proof:</b> A clear unboxing video along with clear photos of the received product is mandatory for all return or replacement requests. Requests without proper video and photo proof will not be accepted under any circumstances.<br><br>
-
-        <b>• Product Condition:</b> The product must be unused, unwashed, undamaged, and in original condition. Products that are worn, washed, dirty, altered, or damaged will not be eligible for return or replacement.<br><br>
-
-        <b>• Invoice Requirement:</b> The original invoice/bill provided with the product must be submitted at the time of return or replacement. Requests without the original invoice will not be processed.<br><br>
-
-        <b>• Refund Eligibility:</b> Refunds will be issued only in cases where an incorrect or damaged product has been delivered by AK FASHION HUB.<br><br>
-
-        <b>• Size & Fit Issues:</b> In case of size or fitting issues, only replacement will be provided. Refunds are not applicable for size or fitting concerns.<br><br>
-
-        <b>• Shipping Charges:</b> For size or fitting replacements, the customer is required to pay one-side delivery/shipping charges.<br><br>
-
-        <b>• RTO Policy:</b> If an order is returned to origin (RTO) due to customer unavailability, refusal to accept the parcel, or incorrect delivery details, the customer will be required to pay one-side delivery/shipping charges.<br><br>
-
-        <b>• Color Variation Disclaimer:</b> Minor color differences may occur due to screen brightness, display settings, and lighting conditions. Such variations shall not be considered a defect.<br><br>
-
-        <b>• Agreement:</b> By placing an order, the customer confirms that they have read, understood, and agreed to all the above Terms & Conditions.
-    </div>
-
+            <h3 style="margin-bottom:15px; text-align:center">Terms & Conditions – AK FASHION HUB</h3>
+            <div style="font-size:13px; line-height:1.8; color:#333">
+                <b>• Delivery Time:</b> Orders will be delivered within 4–6 working days after the order is confirmed. Delivery timelines may vary depending on location, courier partner, and operational conditions.<br><br>
+                <b>• Cancellation & Refund (Before Dispatch):</b> Orders cancelled within 12 hours of placing the order are eligible for a full refund. The refund amount will be processed and credited within 2–3 working days after cancellation confirmation.<br><br>
+                <b>• Cancellation Policy (After Dispatch):</b> Once the order has been dispatched, cancellation will not be allowed. In such cases, the customer is required to make full payment for the order.<br><br>
+                <b>• Product Images Disclaimer:</b> All product images displayed on this website are captured using professional camera equipment or generated/enhanced using AI technology. Due to variations in screen resolution, lighting conditions, camera settings, and pixel density, there may be slight differences in color, texture, or appearance between the images shown and the actual product received.<br><br>
+                <b>• Return & Replacement Request:</b> Any return or replacement request must be raised within 3 days from the date of product delivery.<br><br>
+                <b>• Mandatory Proof:</b> A clear unboxing video along with clear photos of the received product is mandatory for all return or replacement requests. Requests without proper video and photo proof will not be accepted under any circumstances.<br><br>
+                <b>• Product Condition:</b> The product must be unused, unwashed, undamaged, and in original condition. Products that are worn, washed, dirty, altered, or damaged will not be eligible for return or replacement.<br><br>
+                <b>• Invoice Requirement:</b> The original invoice/bill provided with the product must be submitted at the time of return or replacement. Requests without the original invoice will not be processed.<br><br>
+                <b>• Refund Eligibility:</b> Refunds will be issued only in cases where an incorrect or damaged product has been delivered by AK FASHION HUB.<br><br>
+                <b>• Size & Fit Issues:</b> In case of size or fitting issues, only replacement will be provided. Refunds are not applicable for size or fitting concerns.<br><br>
+                <b>• Shipping Charges:</b> For size or fitting replacements, the customer is required to pay one-side delivery/shipping charges.<br><br>
+                <b>• Color Variation Disclaimer:</b> Minor color differences may occur due to screen brightness, display settings, and lighting conditions. Such variations shall not be considered a defect.<br><br>
+                <b>• Agreement:</b> By placing an order, the customer confirms that they have read, understood, and agreed to all the above Terms & Conditions.
+            </div>
             <button onclick="this.parentElement.parentElement.remove()" style="margin-top:20px; width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">OK, I AGREE</button>
         </div>
     `;
