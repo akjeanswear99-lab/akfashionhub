@@ -399,7 +399,7 @@
    
 #floatingCart {
     position: fixed;
-    top: 6px;              /* hamesha header ke niche */
+    top: 4px;              /* hamesha header ke niche */
     left: 6px;
     background: transparent;
     color: #555;
@@ -930,8 +930,94 @@ const RETURN_REASONS = [
     "Color different from image",
     "Other issue"
 ];
-const STATES = ["Uttar Pradesh","Delhi","Haryana","Punjab","Rajasthan","Bihar"];
-const CITIES = ["Hapur","Hathras","Hardoi","Delhi","Dehradun","Hisar","Panipat"];
+const STATES = [
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chhattisgarh",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+
+  /* Union Territories */
+  "Andaman and Nicobar Islands",
+  "Chandigarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi",
+  "Jammu and Kashmir",
+  "Ladakh",
+  "Lakshadweep",
+  "Puducherry"
+];
+const CITIES = [
+  /* Uttar Pradesh */
+  "Agra","Aligarh","Ayodhya","Bareilly","Bulandshahr","Etah","Etawah",
+  "Ghaziabad","Gorakhpur","Hapur","Hardoi","Jhansi","Kanpur","Lucknow",
+  "Mathura","Meerut","Moradabad","Muzaffarnagar","Noida","Prayagraj",
+  "Saharanpur","Shahjahanpur","Varanasi",
+
+  /* Delhi */
+  "Delhi","New Delhi",
+
+  /* Haryana */
+  "Ambala","Faridabad","Gurugram","Hisar","Karnal","Panipat","Rohtak","Sonipat",
+
+  /* Rajasthan */
+  "Ajmer","Alwar","Bharatpur","Bikaner","Jaipur","Jodhpur","Kota","Udaipur",
+
+  /* Uttarakhand */
+  "Dehradun","Haridwar","Haldwani","Nainital","Roorkee",
+
+  /* Bihar */
+  "Arrah","Begusarai","Bhagalpur","Darbhanga","Gaya","Muzaffarpur","Patna",
+
+  /* Maharashtra */
+  "Ahmednagar","Akola","Amravati","Aurangabad","Kolhapur","Mumbai",
+  "Nagpur","Nanded","Nashik","Pune","Solapur","Thane",
+
+  /* Madhya Pradesh */
+  "Bhopal","Gwalior","Indore","Jabalpur","Ratlam","Ujjain",
+
+  /* Gujarat */
+  "Ahmedabad","Bhavnagar","Jamnagar","Rajkot","Surat","Vadodara",
+
+  /* Punjab */
+  "Amritsar","Bathinda","Jalandhar","Ludhiana","Mohali","Patiala",
+
+  /* West Bengal */
+  "Asansol","Durgapur","Howrah","Kolkata","Siliguri",
+
+  /* South India */
+  "Bengaluru","Chennai","Coimbatore","Hyderabad","Kochi",
+  "Madurai","Mangaluru","Mysuru","Thiruvananthapuram","Trichy","Vijayawada","Visakhapatnam",
+
+  /* East / North East */
+  "Bhubaneswar","Cuttack","Guwahati","Imphal","Itanagar","Shillong","Aizawl","Kohima",
+
+  /* Others */
+  "Chandigarh","Puducherry","Port Blair"
+];
 function showToast(msg) {
     const t = document.getElementById("toast");
     t.innerText = msg;
