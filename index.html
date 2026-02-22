@@ -396,7 +396,7 @@
     /* Floating Cart */
     #floatingCart {
         position: fixed;
-        top: 6px;
+        top: 70px;
         left: 4px;
         background: transparent;
         color: #555;
@@ -764,12 +764,12 @@
 
 <!-- Lead Capture Modal -->
 <div id="leadModal">
-    <div style="background:#fff; padding:25px; width:90%; max-width:350px; border-radius:10px; text-align:center">
-        <h3 style="margin-bottom:10px; font-size:18px">Unlock Exclusive Offers</h3>
-        <p style="font-size:13px; color:#666; margin-bottom:15px">Verify your mobile number to access exclusive member offers and receive important order updates.</p>
-        <input id="leadPhone" placeholder="Enter Mobile Number" maxlength="10" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:6px; margin-bottom:10px; font-size:16px; text-align:center" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-        <button onclick="saveLeadNumber()" style="width:100%; padding:12px; background:#25D366; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:16px">VERIFY NOW</button>
-        <div onclick="document.getElementById('leadModal').style.display='none'" style="margin-top:10px; font-size:12px; color:#999; cursor:pointer">No thanks</div>
+    <div style="background:#faf9f7; padding:35px 30px; width:90%; max-width:380px; border-radius:12px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.15)">
+        <h3 style="margin-bottom:12px; font-size:22px; font-weight:600; letter-spacing:0.5px; color:#1a1a1a">Join AK Fashion Hub Privilege Club</h3>
+        <p style="font-size:14px; color:#666; margin-bottom:20px; line-height:1.6">Enter your mobile number to access member-only offers and priority order updates.</p>
+        <input id="leadPhone" placeholder="Enter Mobile Number" maxlength="10" style="width:100%; padding:14px; border:1px solid #d4d4d4; border-radius:8px; margin-bottom:15px; font-size:15px; text-align:center; font-family:inherit" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        <button onclick="saveLeadNumber()" style="width:100%; padding:14px; background:#1a1a1a; color:#fff; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-size:15px; letter-spacing:0.5px; text-transform:uppercase; transition:all 0.3s">JOIN NOW</button>
+        <div onclick="document.getElementById('leadModal').style.display='none'" style="margin-top:15px; font-size:13px; color:#999; cursor:pointer; font-weight:400">Maybe later</div>
     </div>
 </div>
 
@@ -1087,7 +1087,13 @@ function renderProducts() {
     const grid = document.getElementById("productsGrid");
     grid.innerHTML = "";
 
-    products.forEach((p, i) => {
+    const sortedProducts = [...products].sort((a, b) => {
+        const priorityA = a.priority ? Number(a.priority) : 9999;
+        const priorityB = b.priority ? Number(b.priority) : 9999;
+        return priorityA - priorityB;
+    });
+
+    sortedProducts.forEach((p, i) => {
         if (!p.variants || p.variants.length === 0) return;
         
         const gender = document.querySelector(".filter-btn.active").innerText;
@@ -1100,9 +1106,10 @@ function renderProducts() {
         if(!img) return;
         
         const priceInfo = getPriceInfo(p.variants[0]);
+        const originalIndex = products.findIndex(prod => prod.id === p.id);
 
         grid.innerHTML += `
-            <div class="card" onclick="openModal(${i})">
+            <div class="card" onclick="openModal(${originalIndex})">
                 <img src="${img}" alt="${p.name}">
                 <div class="price-overlay">
                     <span class="mrp-tag">MRP ₹${priceInfo.mrp}</span>
@@ -1134,6 +1141,8 @@ function getImageForColor(p, color) {
 function openModal(index) {
     currentProdIndex = index;
     const p = products[index];
+    
+    apiPost({ type: "TRACK_CLICK", productId: p.id, productName: p.name, timestamp: new Date().toISOString() }).catch(e=>{});
     
     document.getElementById("modalTitle").innerText = p.name;
     document.getElementById("modalDesc").innerText = p.description || "Premium Quality Product.";
@@ -1175,24 +1184,16 @@ function openModal(index) {
 
     document.getElementById("productModal").style.display = "flex";
     document.body.style.overflow = "hidden";
-    document.getElementById('floatingCart').style.display = 'none';
+    document.getElementById('floatingCart').style.display = 'block';
 }
 
 function openZoom(src) {
     document.getElementById("zoomOverlay").style.display = "flex";
     document.getElementById("zoomImg").src = src;
-    document.getElementById('floatingCart').style.display = 'none';
 }
 
 function closeZoom() {
     document.getElementById("zoomOverlay").style.display = "none";
-    const modal = document.getElementById("productModal");
-    const icon = document.getElementById('floatingCart');
-    const panel = document.getElementById("cartPanel");
-    
-    if (modal.style.display !== 'flex' && !panel.classList.contains("open")) {
-        icon.style.display = 'block';
-    }
 }
 
 function changeImg(src, el) {
@@ -1205,6 +1206,11 @@ function renderModalOpts(p) {
     const state = window.pState[p.id] || {};
     const sizes = [...new Set(p.variants.filter(v => Number(v.stock) > 0).map(v => v.size))];
     const colors = state.size ? [...new Set(p.variants.filter(v => Number(v.stock) > 0 && v.size === state.size).map(v => v.color))] : [];
+
+    if (state.size && colors.length === 1 && !state.color) {
+        state.color = colors[0];
+        window.pState[p.id].color = colors[0];
+    }
 
     let stockMsg = "";
     let canAdd = false;
@@ -1477,7 +1483,7 @@ function updBadge(t) {
     if (!b) {
         b = document.createElement("span");
         b.id = "cartCount";
-        b.style.cssText = "position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; color:#000; font-size:9px; font-weight:bold; padding:1px 4px; border-radius:3px; line-height:1; box-shadow:0 1px 3px rgba(0,0,0,0.3);";
+        b.style.cssText = "position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:transparent; color:#000; font-size:10px; font-weight:bold; line-height:1; text-shadow:0 0 2px #fff, 0 0 4px #fff;";
         document.getElementById("floatingCart").appendChild(b);
     }
     b.innerText = cart.reduce((s, i) => s + i.qty, 0);
@@ -1649,11 +1655,11 @@ function setupSuggestions() {
 
     cityInput.addEventListener("input", function() {
         const val = this.value.trim();
-        if (val.length < 2) {
+        if (val.length < 1) {
             citySuggestions.style.display = "none";
             return;
         }
-        const matches = MAJOR_CITIES.filter(c => c.toLowerCase().includes(val.toLowerCase()));
+        const matches = MAJOR_CITIES.filter(c => c.toLowerCase().startsWith(val.toLowerCase()));
         if (matches.length > 0) {
             citySuggestions.innerHTML = matches.slice(0, 10).map(c => 
                 `<div class="suggestion-item" onclick="selectCity('${c}')">${c}</div>`
@@ -1666,11 +1672,11 @@ function setupSuggestions() {
 
     stateInput.addEventListener("input", function() {
         const val = this.value.trim();
-        if (val.length < 2) {
+        if (val.length < 1) {
             stateSuggestions.style.display = "none";
             return;
         }
-        const matches = INDIAN_STATES.filter(s => s.toLowerCase().includes(val.toLowerCase()));
+        const matches = INDIAN_STATES.filter(s => s.toLowerCase().startsWith(val.toLowerCase()));
         if (matches.length > 0) {
             stateSuggestions.innerHTML = matches.map(s => 
                 `<div class="suggestion-item" onclick="selectState('${s}')">${s}</div>`
@@ -1683,13 +1689,13 @@ function setupSuggestions() {
 
     pinInput.addEventListener("input", function() {
         const val = this.value.trim();
-        if (val.length < 2) {
+        if (val.length < 1) {
             pinSuggestions.style.display = "none";
             return;
         }
         const combinedSuggestions = [...MAJOR_CITIES, ...INDIAN_STATES];
         const matches = combinedSuggestions.filter(item => 
-            item.toLowerCase().includes(val.toLowerCase())
+            item.toLowerCase().startsWith(val.toLowerCase())
         );
         if (matches.length > 0) {
             pinSuggestions.innerHTML = matches.slice(0, 10).map(item => 
