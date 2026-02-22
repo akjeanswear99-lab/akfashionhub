@@ -50,17 +50,20 @@
         text-align: center;
     }
 
-    header h1 {
-        font-size: 32px;
-        letter-spacing: 3px;
-        margin-bottom: 5px;
-        font-weight: 900;
-        text-transform: uppercase;
-        background: linear-gradient(45deg, #ffffff, #aaaaaa);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 0px 2px 4px rgba(0,0,0,0.3);
-    }
+   header h1 {
+    font-size: 24px;             
+    letter-spacing: 2px;         
+    margin-bottom: 4px;
+    font-weight: 900;
+    text-transform: uppercase;
+    white-space: nowrap;          
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: linear-gradient(45deg, #ffffff, #aaaaaa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0px 2px 4px rgba(0,0,0,0.3);
+}
 
     header .tagline {
         font-size: 12px;
@@ -725,22 +728,28 @@
     .star-rating input:checked ~ label { color: #f5a623; }
     .star-rating label:hover, .star-rating label:hover ~ label { color: #f5a623; }
 
-    @media (max-width: 768px) {
-        .products {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        .card img {
-            height: 280px;
-        }
-        #productModal .main-image-box img {
-            max-height: 350px;
-        }
-        #cartPanel {
-            width: 100%;
-            right: -100%;
-        }
+ @media (max-width: 768px) {
+    .products {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
+    .card img {
+        height: 280px;
+    }
+    #productModal .main-image-box img {
+        max-height: 350px;
+    }
+    #cartPanel {
+        width: 100%;
+        right: -100%;
+    }
+
+    /* ✅ ADD THIS */
+    header h1 {
+        font-size: 20px;
+        letter-spacing: 1.5px;
+    }
+}
 
 </style>
 </head>
@@ -823,7 +832,7 @@
         <div class="details">
             <div class="price-big" id="modalPrice"></div>
             <div class="desc" id="modalDesc"></div>
-            <div class="desc" id="modalMeasure"></div>
+           
 
             <div class="opt-group">
                 <div class="opt-title">Select Size</div>
@@ -995,8 +1004,115 @@ const MAJOR_CITIES = [
     "Asansol", "Rourkela", "Nanded", "Kolhapur", "Ajmer", "Akola", "Gulbarga", "Jamnagar", 
     "Ujjain", "Loni", "Siliguri", "Jhansi", "Ulhasnagar", "Jammu", "Sangli-Miraj & Kupwad", 
     "Mangalore", "Erode", "Belgaum", "Ambattur", "Tirunelveli", "Malegaon", "Gaya", "Jalgaon", 
-    "Udaipur", "Maheshtala", "Hapur"
+    "Udaipur", "Maheshtala", "Hapur","Vapi","Mahoba"
 ];
+  const CITY_PIN_STATE = {
+  "Mumbai": { pin: "400001", state: "Maharashtra" },
+  "Delhi": { pin: "110001", state: "Delhi" },
+  "Bangalore": { pin: "560001", state: "Karnataka" },
+  "Hyderabad": { pin: "500001", state: "Telangana" },
+  "Ahmedabad": { pin: "380001", state: "Gujarat" },
+  "Chennai": { pin: "600001", state: "Tamil Nadu" },
+  "Kolkata": { pin: "700001", state: "West Bengal" },
+  "Pune": { pin: "411001", state: "Maharashtra" },
+  "Jaipur": { pin: "302001", state: "Rajasthan" },
+  "Surat": { pin: "395003", state: "Gujarat" },
+  "Lucknow": { pin: "226001", state: "Uttar Pradesh" },
+  "Kanpur": { pin: "208001", state: "Uttar Pradesh" },
+  "Nagpur": { pin: "440001", state: "Maharashtra" },
+  "Indore": { pin: "452001", state: "Madhya Pradesh" },
+  "Thane": { pin: "400601", state: "Maharashtra" },
+  "Bhopal": { pin: "462001", state: "Madhya Pradesh" },
+  "Visakhapatnam": { pin: "530001", state: "Andhra Pradesh" },
+  "Pimpri-Chinchwad": { pin: "411018", state: "Maharashtra" },
+  "Patna": { pin: "800001", state: "Bihar" },
+  "Vadodara": { pin: "390001", state: "Gujarat" },
+  "Ghaziabad": { pin: "201001", state: "Uttar Pradesh" },
+  "Ludhiana": { pin: "141001", state: "Punjab" },
+  "Agra": { pin: "282001", state: "Uttar Pradesh" },
+  "Nashik": { pin: "422001", state: "Maharashtra" },
+  "Faridabad": { pin: "121001", state: "Haryana" },
+  "Meerut": { pin: "250001", state: "Uttar Pradesh" },
+  "Rajkot": { pin: "360001", state: "Gujarat" },
+  "Kalyan-Dombivali": { pin: "421301", state: "Maharashtra" },
+  "Vasai-Virar": { pin: "401201", state: "Maharashtra" },
+  "Varanasi": { pin: "221001", state: "Uttar Pradesh" },
+  "Srinagar": { pin: "190001", state: "Jammu and Kashmir" },
+  "Aurangabad": { pin: "431001", state: "Maharashtra" },
+  "Dhanbad": { pin: "826001", state: "Jharkhand" },
+  "Amritsar": { pin: "143001", state: "Punjab" },
+  "Navi Mumbai": { pin: "400706", state: "Maharashtra" },
+  "Allahabad": { pin: "211001", state: "Uttar Pradesh" },
+  "Ranchi": { pin: "834001", state: "Jharkhand" },
+  "Howrah": { pin: "711101", state: "West Bengal" },
+  "Coimbatore": { pin: "641001", state: "Tamil Nadu" },
+  "Jabalpur": { pin: "482001", state: "Madhya Pradesh" },
+  "Gwalior": { pin: "474001", state: "Madhya Pradesh" },
+  "Vijayawada": { pin: "520001", state: "Andhra Pradesh" },
+  "Jodhpur": { pin: "342001", state: "Rajasthan" },
+  "Madurai": { pin: "625001", state: "Tamil Nadu" },
+  "Raipur": { pin: "492001", state: "Chhattisgarh" },
+  "Kota": { pin: "324001", state: "Rajasthan" },
+  "Chandigarh": { pin: "160017", state: "Chandigarh" },
+  "Guwahati": { pin: "781001", state: "Assam" },
+  "Solapur": { pin: "413001", state: "Maharashtra" },
+  "Hubli-Dharwad": { pin: "580020", state: "Karnataka" },
+  "Mysore": { pin: "570001", state: "Karnataka" },
+  "Tiruchirappalli": { pin: "620001", state: "Tamil Nadu" },
+  "Bareilly": { pin: "243001", state: "Uttar Pradesh" },
+  "Aligarh": { pin: "202001", state: "Uttar Pradesh" },
+  "Tiruppur": { pin: "641601", state: "Tamil Nadu" },
+  "Moradabad": { pin: "244001", state: "Uttar Pradesh" },
+  "Jalandhar": { pin: "144001", state: "Punjab" },
+  "Bhubaneswar": { pin: "751001", state: "Odisha" },
+  "Salem": { pin: "636001", state: "Tamil Nadu" },
+  "Warangal": { pin: "506002", state: "Telangana" },
+  "Mira-Bhayandar": { pin: "401101", state: "Maharashtra" },
+  "Thiruvananthapuram": { pin: "695001", state: "Kerala" },
+  "Bhiwandi": { pin: "421302", state: "Maharashtra" },
+  "Saharanpur": { pin: "247001", state: "Uttar Pradesh" },
+  "Guntur": { pin: "522002", state: "Andhra Pradesh" },
+  "Amravati": { pin: "444601", state: "Maharashtra" },
+  "Bikaner": { pin: "334001", state: "Rajasthan" },
+  "Noida": { pin: "201301", state: "Uttar Pradesh" },
+  "Jamshedpur": { pin: "831001", state: "Jharkhand" },
+  "Bhilai": { pin: "490001", state: "Chhattisgarh" },
+  "Cuttack": { pin: "753001", state: "Odisha" },
+  "Firozabad": { pin: "283203", state: "Uttar Pradesh" },
+  "Kochi": { pin: "682001", state: "Kerala" },
+  "Nellore": { pin: "524001", state: "Andhra Pradesh" },
+  "Bhavnagar": { pin: "364001", state: "Gujarat" },
+  "Dehradun": { pin: "248001", state: "Uttarakhand" },
+  "Durgapur": { pin: "713201", state: "West Bengal" },
+  "Asansol": { pin: "713301", state: "West Bengal" },
+  "Rourkela": { pin: "769001", state: "Odisha" },
+  "Nanded": { pin: "431601", state: "Maharashtra" },
+  "Kolhapur": { pin: "416001", state: "Maharashtra" },
+  "Ajmer": { pin: "305001", state: "Rajasthan" },
+  "Akola": { pin: "444001", state: "Maharashtra" },
+  "Gulbarga": { pin: "585101", state: "Karnataka" },
+  "Jamnagar": { pin: "361001", state: "Gujarat" },
+  "Ujjain": { pin: "456001", state: "Madhya Pradesh" },
+  "Loni": { pin: "201102", state: "Uttar Pradesh" },
+  "Siliguri": { pin: "734001", state: "West Bengal" },
+  "Jhansi": { pin: "284001", state: "Uttar Pradesh" },
+  "Ulhasnagar": { pin: "421003", state: "Maharashtra" },
+  "Jammu": { pin: "180001", state: "Jammu and Kashmir" },
+  "Sangli-Miraj & Kupwad": { pin: "416416", state: "Maharashtra" },
+  "Mangalore": { pin: "575001", state: "Karnataka" },
+  "Erode": { pin: "638001", state: "Tamil Nadu" },
+  "Belgaum": { pin: "590001", state: "Karnataka" },
+  "Ambattur": { pin: "600053", state: "Tamil Nadu" },
+  "Tirunelveli": { pin: "627001", state: "Tamil Nadu" },
+  "Malegaon": { pin: "423203", state: "Maharashtra" },
+  "Gaya": { pin: "823001", state: "Bihar" },
+  "Jalgaon": { pin: "425001", state: "Maharashtra" },
+  "Udaipur": { pin: "313001", state: "Rajasthan" },
+      "Vapi": { pin: "396191", state: "Gujarat" },
+  "Maheshtala": { pin: "700141", state: "West Bengal" },
+      "Mahoba": { pin: "210427", state: "Uttar Pradesh" },
+  "Hapur": { pin: "245101", state: "Uttar Pradesh" }
+};
 
 const INDIAN_STATES = [
     "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", 
@@ -1146,7 +1262,7 @@ function openModal(index) {
     
     document.getElementById("modalTitle").innerText = p.name;
     document.getElementById("modalDesc").innerText = p.description || "Premium Quality Product.";
-    document.getElementById("modalMeasure").innerText = p.measure ? "Description: " + p.measure : "";
+   
     
     const priceInfo = getPriceInfo(p.variants[0]);
     document.getElementById("modalPrice").innerHTML = `<span style="text-decoration:line-through; font-size:14px; color:#999">MRP ₹${priceInfo.mrp}</span> ₹${priceInfo.final}`;
@@ -1653,22 +1769,32 @@ function setupSuggestions() {
     const pinInput = document.getElementById("aPin");
     const pinSuggestions = document.getElementById("pinSuggestions");
 
-    cityInput.addEventListener("input", function() {
-        const val = this.value.trim();
-        if (val.length < 1) {
-            citySuggestions.style.display = "none";
-            return;
-        }
-        const matches = MAJOR_CITIES.filter(c => c.toLowerCase().startsWith(val.toLowerCase()));
-        if (matches.length > 0) {
-            citySuggestions.innerHTML = matches.slice(0, 10).map(c => 
-                `<div class="suggestion-item" onclick="selectCity('${c}')">${c}</div>`
-            ).join("");
-            citySuggestions.style.display = "block";
-        } else {
-            citySuggestions.style.display = "none";
-        }
-    });
+   cityInput.addEventListener("input", function () {
+    const val = this.value.trim();
+    if (val.length < 1) {
+        citySuggestions.style.display = "none";
+        return;
+    }
+
+    const matches = Object.keys(CITY_PIN_STATE)
+        .filter(c => c.toLowerCase().startsWith(val.toLowerCase()));
+
+    if (matches.length > 0) {
+        citySuggestions.innerHTML = matches.map(c =>
+            `<div class="suggestion-item" onclick="selectCityFull('${c}')">${c}</div>`
+        ).join("");
+        citySuggestions.style.display = "block";
+    } else {
+        citySuggestions.style.display = "none";
+    }
+
+    // ✅ auto-fill if exact city typed
+    if (CITY_PIN_STATE[val]) {
+        aPin.value = CITY_PIN_STATE[val].pin;
+        aState.value = CITY_PIN_STATE[val].state;
+        citySuggestions.style.display = "none";
+    }
+});
 
     stateInput.addEventListener("input", function() {
         const val = this.value.trim();
@@ -1693,20 +1819,33 @@ function setupSuggestions() {
             pinSuggestions.style.display = "none";
             return;
         }
-        const combinedSuggestions = [...MAJOR_CITIES, ...INDIAN_STATES];
-        const matches = combinedSuggestions.filter(item => 
-            item.toLowerCase().startsWith(val.toLowerCase())
-        );
-        if (matches.length > 0) {
-            pinSuggestions.innerHTML = matches.slice(0, 10).map(item => 
-                `<div class="suggestion-item" onclick="selectPinSuggestion('${item}')">${item}</div>`
-            ).join("");
-            pinSuggestions.style.display = "block";
-        } else {
-            pinSuggestions.style.display = "none";
-        }
-    });
+       pinInput.addEventListener("input", function () {
+    const val = this.value.trim();
 
+    if (val.length < 2) {
+        pinSuggestions.style.display = "none";
+        return;
+    }
+
+    const matches = Object.entries(CITY_PIN_STATE)
+        .filter(([_, v]) => v.pin.startsWith(val));
+
+    if (matches.length > 0) {
+        pinSuggestions.innerHTML = matches.map(([city, v]) =>
+            `<div class="suggestion-item" onclick="selectPin('${v.pin}','${city}','${v.state}')">
+              ${v.pin} – ${city}
+            </div>`
+        ).join("");
+        pinSuggestions.style.display = "block";
+    } else {
+        pinSuggestions.style.display = "none";
+    }
+
+    // full pin typed → hide suggestion
+    if (val.length === 6) {
+        pinSuggestions.style.display = "none";
+    }
+});
     document.addEventListener("click", function(e) {
         if (!citySuggestions.contains(e.target) && e.target !== cityInput) {
             citySuggestions.style.display = "none";
@@ -1724,12 +1863,26 @@ function selectCity(city) {
     document.getElementById("aCity").value = city;
     document.getElementById("citySuggestions").style.display = "none";
 }
+   
 
 function selectState(state) {
     document.getElementById("aState").value = state;
     document.getElementById("stateSuggestions").style.display = "none";
 }
-
+     function selectCityFull(city) {
+    aCity.value = city;
+    if (CITY_PIN_STATE[city]) {
+        aPin.value = CITY_PIN_STATE[city].pin;
+        aState.value = CITY_PIN_STATE[city].state;
+    }
+    citySuggestions.style.display = "none";
+}
+function selectPin(pin, city, state) {
+    document.getElementById("aPin").value = pin;
+    document.getElementById("aCity").value = city;
+    document.getElementById("aState").value = state;
+    document.getElementById("pinSuggestions").style.display = "none";
+}
 function selectPinSuggestion(item) {
     document.getElementById("pinSuggestions").style.display = "none";
 }
