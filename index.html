@@ -50,21 +50,26 @@
         text-align: center;
     }
 
-   header h1 {
-    font-size: 24px;             
-    letter-spacing: 2px;         
+header h1 {
+    font-size: 32px;              /* bada */
+    letter-spacing: 1.5px;        /* thoda tight */
     margin-bottom: 4px;
     font-weight: 900;
     text-transform: uppercase;
-    white-space: nowrap;          
-    overflow: hidden;
-    text-overflow: ellipsis;
+
+    white-space: nowrap;          /* ek hi line */
+    overflow: hidden;             /* bahar na nikle */
+    text-overflow: ellipsis;      /* safety */
+
+    max-width: calc(100% - 70px); /* 🛒 icon se bachaav */
+    margin-left: auto;
+    margin-right: auto;
+
     background: linear-gradient(45deg, #ffffff, #aaaaaa);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: 0px 2px 4px rgba(0,0,0,0.3);
 }
-
     header .tagline {
         font-size: 12px;
         opacity: 0.8;
@@ -744,11 +749,16 @@
         right: -100%;
     }
 
-    /* ✅ ADD THIS */
-    header h1 {
-        font-size: 20px;
-        letter-spacing: 1.5px;
-    }
+  header h1 {
+    font-size: 22px;             
+    letter-spacing: 1px;         
+    white-space: nowrap;         
+    overflow: hidden;            
+    text-overflow: ellipsis;     
+    max-width: calc(100% - 60px);
+    margin-left: auto;
+    margin-right: auto;
+}
 }
 
 </style>
@@ -962,7 +972,12 @@
 
 <script>
 const API = "https://script.google.com/macros/s/AKfycbyM8vE2Gz1lV4qXYlnfIpHwebe_cbxb9-DeWw1FMEdhwwW-b76t8uHZWNF3iSIZ-AxQqg/exec";
-const SESSION_KEY = "akfh_session";
+  
+    const aCity  = document.getElementById("aCity");
+const aPin   = document.getElementById("aPin");
+const aState = document.getElementById("aState");
+
+    const SESSION_KEY = "akfh_session";
 const SESSION_DAYS = 30;
 const RETURN_WINDOW_DAYS = 3;
 
@@ -1151,7 +1166,8 @@ function getPriceInfo(variant) {
 
 function isReturnWindowOpen(deliveryDate) {
     if (!deliveryDate) return false;
-    const delivery = new Date(deliveryDate);
+   const delivery = new Date(deliveryDate);
+if (isNaN(delivery)) return false;
     const now = new Date();
     const diffDays = Math.floor((now - delivery) / (1000 * 60 * 60 * 24));
     return diffDays <= RETURN_WINDOW_DAYS;
@@ -1395,18 +1411,45 @@ function renderSimilar(p) {
     
     box.innerHTML = sims.map(s => {
         const idx = products.findIndex(x => x.id === s.id);
-        return `<div class="sim-item" onclick="openModal(${idx})"><img src="${s.img && s.img[0] ? s.img[0] : ''}"><p>${s.name}</p></div>`;
+        return `<div class="sim-item" onclick="openModal(${idx})">${s.img && s.img[0] ? `<img src="${s.img[0]}">` : ``}<p>${s.name}</p></div>`;
     }).join("");
 }
 
 function closeModal() {
+    document.getElementById("productModal").style.display = "none";
     document.getElementById('floatingCart').style.display = 'block';
     document.body.style.overflow = "";
     const icon = document.getElementById('floatingCart');
     const panel = document.getElementById("cartPanel");
-    if (!panel.classList.contains("open")) {
-        icon.style.display = 'block';
-    }
+  icon.style.display = panel.classList.contains("open") ? "none" : "block";
+}
+function openTerms() {
+    let d = document.createElement("div");
+    d.style.cssText = "position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999999; display:flex; align-items:center; justify-content:center; padding:20px";
+    d.innerHTML = `
+        <div style="background:#fff; padding:25px; max-width:500px; border-radius:10px; max-height:80vh; overflow-y:auto; width:100%">
+            <h3 style="margin-bottom:15px; text-align:center">Terms & Conditions – AK FASHION HUB</h3>
+            <div style="font-size:13px; line-height:1.8; color:#333">
+                <b>• Delivery Time:</b> Orders will be delivered within 4–6 working days after the order is confirmed. Delivery timelines may vary depending on location, courier partner, and operational conditions.<br><br>
+                <b>• Cancellation & Refund (Before Dispatch):</b> Orders cancelled within 12 hours of placing the order are eligible for a full refund. The refund amount will be processed and credited within 2–3 working days after cancellation confirmation.<br><br>
+                <b>• Cancellation Policy (After Dispatch):</b> Once the order has been dispatched, cancellation will not be allowed. In such cases, the customer is required to make full payment for the order.<br><br>
+                <b>• Product Images Disclaimer:</b> All product images displayed on this website are captured using professional camera equipment or generated/enhanced using AI technology. Due to variations in screen resolution, lighting conditions, camera settings, and pixel density, there may be slight differences in color, texture, or appearance between the images shown and the actual product received.<br><br>
+                <b>• Return & Replacement Request:</b> Any return or replacement request must be raised within 3 days from the date of product delivery.<br><br>
+                <b>• Mandatory Proof:</b> A clear unboxing video along with clear photos of the received product is mandatory for all return or replacement requests. Requests without proper video and photo proof will not be accepted under any circumstances.<br><br>
+                <b>• Product Condition:</b> The product must be unused, unwashed, undamaged, and in original condition. Products that are worn, washed, dirty, altered, or damaged will not be eligible for return or replacement.<br><br>
+                <b>• Invoice Requirement:</b> The original invoice/bill provided with the product must be submitted at the time of return or replacement. Requests without the original invoice will not be processed.<br><br>
+                <b>• Refund Eligibility:</b> Refunds will be issued only in cases where an incorrect or damaged product has been delivered by AK FASHION HUB.<br><br>
+                <b>• Size & Fit Issues:</b> In case of size or fitting issues, only replacement will be provided. Refunds are not applicable for size or fitting concerns.<br><br>
+                <b>• Shipping Charges:</b> For size or fitting replacements, the customer is required to pay one-side delivery/shipping charges.<br><br>
+                <b>• RTO (Return to Origin) Charges:</b> In the event of an RTO situation, the customer will be required to pay one-side delivery charges.<br><br>
+                <b>• Color Variation Disclaimer:</b> Minor color differences may occur due to screen brightness, display settings, and lighting conditions. Such variations shall not be considered a defect.<br><br>
+                <b>• Agreement:</b> By placing an order, the customer confirms that they have read, understood, and agreed to all the above Terms & Conditions.
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" style="margin-top:20px; width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">OK, I AGREE</button>
+        </div>
+    `;
+    d.onclick = (e) => { if(e.target === d) d.remove(); };
+    document.body.appendChild(d);
 }
 
 function addToCartFromModal() {
@@ -1478,8 +1521,7 @@ function updateCart() {
 
     let del = calcDel(totalWeight);
     let disc = 0;
-    let msg = "";
-
+  let msg = "&nbsp;";
     if (appliedCoup && siteCoupons[appliedCoup]) {
         const r = siteCoupons[appliedCoup];
         if (r.type === "FREE_DELIVERY") disc += del;
@@ -1609,12 +1651,12 @@ function updBadge(t) {
         bar = document.createElement("div");
         bar.id = "bb";
         bar.style.cssText = "position:fixed; bottom:0; left:0; width:100%; background:#000; color:#fff; padding:12px; display:none; justify-content:space-between; z-index:9999";
-        bar.onclick = toggleCart;
+        bar.onclick = () => toggleCart();
         document.body.appendChild(bar);
     }
     if (window.innerWidth < 768 && cart.length > 0) {
         bar.style.display = "flex";
-        bar.innerHTML = `🛒 View Cart (${cart.length}) <b>₹${t}</b>`;
+      bar.innerHTML = `🛒 View Cart (${cart.reduce((s,i)=>s+i.qty,0)}) <b>₹${t}</b>`;
     } else {
         bar.style.display = "none";
     }
@@ -1851,17 +1893,14 @@ function setupSuggestions() {
     });
 }
 
-function selectCity(city) {
-    document.getElementById("aCity").value = city;
-    document.getElementById("citySuggestions").style.display = "none";
-}
-   
+
 
 function selectState(state) {
     document.getElementById("aState").value = state;
     document.getElementById("stateSuggestions").style.display = "none";
 }
-     function selectCityFull(city) {
+  function selectCityFull(city) {
+    const citySuggestions = document.getElementById("citySuggestions");
     aCity.value = city;
     if (CITY_PIN_STATE[city]) {
         aPin.value = CITY_PIN_STATE[city].pin;
@@ -1873,9 +1912,6 @@ function selectPin(pin, city, state) {
     document.getElementById("aPin").value = pin;
     document.getElementById("aCity").value = city;
     document.getElementById("aState").value = state;
-    document.getElementById("pinSuggestions").style.display = "none";
-}
-function selectPinSuggestion(item) {
     document.getElementById("pinSuggestions").style.display = "none";
 }
 
@@ -1900,13 +1936,23 @@ function openAddress() {
    if (!window.suggInit) {
   setupSuggestions();
   window.suggInit = true;
+    }
 }
-function closeAddress() { document.getElementById("addressModal").style.display = "none"; }
+function closeAddress() {
+    document.getElementById("addressModal").style.display = "none";
+}
 function saveAddress() {
+    const aName  = document.getElementById("aName");
+    const aPhone = document.getElementById("aPhone");
+    const aAddr  = document.getElementById("aAddr");
+
     const d = {
-        name: aName.value.trim(), phone: aPhone.value.trim(),
-        address: aAddr.value.trim(), city: aCity.value.trim(),
-        pin: aPin.value.trim(), state: aState.value.trim()
+        name: aName.value.trim(),
+        phone: aPhone.value.trim(),
+        address: aAddr.value.trim(),
+        city: aCity.value.trim(),
+        pin: aPin.value.trim(),
+        state: aState.value.trim()
     };
     if (!d.name) { alert("Enter Full Name"); return; }
     if (!/^[6-9]\d{9}$/.test(d.phone)) { alert("Enter valid 10-digit Indian Mobile Number"); return; }
@@ -1969,8 +2015,9 @@ function renderOrders(list) {
                            o.status === 'Dispatched' ? 'status-dispatched' : 'status-placed';
         
         const placedDate = o.date ? new Date(o.date).toLocaleDateString() : 'N/A';
-        const deliveryDate = o.deliveryDate ? new Date(o.deliveryDate).toLocaleDateString() : '';
-
+   const deliveryDate = (o.deliveryDate && !isNaN(new Date(o.deliveryDate)))
+    ? new Date(o.deliveryDate).toLocaleDateString()
+    : '';
         return `
             <div class="order-card" onclick="showOrderDetail(${idx})">
                 <div style="display:flex; justify-content:space-between; margin-bottom:5px">
@@ -1988,6 +2035,7 @@ function renderOrders(list) {
 }
 
 function showOrderDetail(idx) {
+    currentRating = 0;
     const o = allOrders[idx];
     currentOrderDetail = o;
     
@@ -2208,8 +2256,8 @@ async function submitReturnRequest() {
 }
 
 async function trackOrder() {
-    const phone = orderPhone.value.trim();
-    const oid = orderOid.value.trim();
+   const phone = document.getElementById("orderPhone").value.trim();
+const oid = document.getElementById("orderOid").value.trim();
     if (!/^[6-9]\d{9}$/.test(phone) || !oid) { alert("Invalid details"); return; }
     
     document.getElementById("checkoutLoader").style.display = "flex";
@@ -2240,7 +2288,7 @@ async function loadProds() {
     try {
         const res = await fetch(API + "?t=" + Date.now(), { cache: "no-store" });
         const data = JSON.parse(await res.text());
-        
+
         if (Array.isArray(data)) {
             products = data;
         } else {
@@ -2252,59 +2300,9 @@ async function loadProds() {
                 siteOffer = data.offer;
             }
         }
-        async function loadProds() {
-    document.getElementById("loaderWrap").style.display = "flex";
-    try {
-        const res = await fetch(API + "?t=" + Date.now(), { cache: "no-store" });
-        const data = JSON.parse(await res.text());
-
-        products = data.products || [];
-        siteCoupons = data.coupons || {};
-        siteOffer = data.offer || null;
-
-        renderProducts();
     } catch (e) {
-        document.getElementById("loaderWrap").innerHTML =
-          "<div class='loader-text' onclick='location.reload()'>Error. Tap to Refresh</div>";
-    }
-    document.getElementById("loaderWrap").style.display = "none";
-    document.getElementById("floatingCart").style.display = "block";
-}
-        renderProducts();
-    } catch(e) {
-        document.getElementById("loaderWrap").innerHTML = "<div class='loader-text' style='cursor:pointer' onclick='location.reload()'>Error. Tap to Refresh</div>";
-    }
-    document.getElementById("loaderWrap").style.display = "none";
-    document.getElementById("floatingCart").style.display = "block";
-}
-
-function openTerms() {
-    let d = document.createElement("div");
-    d.style.cssText = "position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999999; display:flex; align-items:center; justify-content:center; padding:20px";
-    d.innerHTML = `
-        <div style="background:#fff; padding:25px; max-width:500px; border-radius:10px; max-height:80vh; overflow-y:auto; width:100%">
-            <h3 style="margin-bottom:15px; text-align:center">Terms & Conditions – AK FASHION HUB</h3>
-            <div style="font-size:13px; line-height:1.8; color:#333">
-                <b>• Delivery Time:</b> Orders will be delivered within 4–6 working days after the order is confirmed. Delivery timelines may vary depending on location, courier partner, and operational conditions.<br><br>
-                <b>• Cancellation & Refund (Before Dispatch):</b> Orders cancelled within 12 hours of placing the order are eligible for a full refund. The refund amount will be processed and credited within 2–3 working days after cancellation confirmation.<br><br>
-                <b>• Cancellation Policy (After Dispatch):</b> Once the order has been dispatched, cancellation will not be allowed. In such cases, the customer is required to make full payment for the order.<br><br>
-                <b>• Product Images Disclaimer:</b> All product images displayed on this website are captured using professional camera equipment or generated/enhanced using AI technology. Due to variations in screen resolution, lighting conditions, camera settings, and pixel density, there may be slight differences in color, texture, or appearance between the images shown and the actual product received.<br><br>
-                <b>• Return & Replacement Request:</b> Any return or replacement request must be raised within 3 days from the date of product delivery.<br><br>
-                <b>• Mandatory Proof:</b> A clear unboxing video along with clear photos of the received product is mandatory for all return or replacement requests. Requests without proper video and photo proof will not be accepted under any circumstances.<br><br>
-                <b>• Product Condition:</b> The product must be unused, unwashed, undamaged, and in original condition. Products that are worn, washed, dirty, altered, or damaged will not be eligible for return or replacement.<br><br>
-                <b>• Invoice Requirement:</b> The original invoice/bill provided with the product must be submitted at the time of return or replacement. Requests without the original invoice will not be processed.<br><br>
-                <b>• Refund Eligibility:</b> Refunds will be issued only in cases where an incorrect or damaged product has been delivered by AK FASHION HUB.<br><br>
-                <b>• Size & Fit Issues:</b> In case of size or fitting issues, only replacement will be provided. Refunds are not applicable for size or fitting concerns.<br><br>
-                <b>• Shipping Charges:</b> For size or fitting replacements, the customer is required to pay one-side delivery/shipping charges.<br><br>
-                <b>• RTO (Return to Origin) Charges:</b> In the event of an RTO situation, the customer will be required to pay one-side delivery charges.<br><br>
-                <b>• Color Variation Disclaimer:</b> Minor color differences may occur due to screen brightness, display settings, and lighting conditions. Such variations shall not be considered a defect.<br><br>
-                <b>• Agreement:</b> By placing an order, the customer confirms that they have read, understood, and agreed to all the above Terms & Conditions.
-            </div>
-            <button onclick="this.parentElement.parentElement.remove()" style="margin-top:20px; width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">OK, I AGREE</button>
-        </div>
-    `;
-    d.onclick = (e) => { if(e.target === d) d.remove(); };
-    document.body.appendChild(d);
+    console.error(e);
+    alert("Unable to load products. Please reload the page.");
 }
 
 updateCart();
