@@ -939,9 +939,9 @@
 <!-- Products Container -->
 <div class="container">
     <div class="filter-bar">
-      <button class="filter-btn active" onclick="filterProds('All', this)">All</button>
-        <button class="filter-btn" onclick="filterProds('Men')">Men</button>
-        <button class="filter-btn" onclick="filterProds('Women')">Women</button>
+     <button class="filter-btn active" onclick="filterProds('All', this)">All</button>
+<button class="filter-btn" onclick="filterProds('Men', this)">Men</button>
+<button class="filter-btn" onclick="filterProds('Women', this)">Women</button>
     </div>
     <div class="products" id="productsGrid"></div>
 </div>
@@ -1257,7 +1257,7 @@ function openModal(index) {
     currentProdIndex = index;
     const p = products[index];
     
-    apiPost({ type: "TRACK_CLICK", productId: p.id, productName: p.name, timestamp: new Date().toISOString() }).catch(e=>{});
+    apiPost({ type:  "PRODUCT_CLICK", productId: p.id, productName: p.name, timestamp: new Date().toISOString() }).catch(e=>{});
     
     document.getElementById("modalTitle").innerText = p.name;
     document.getElementById("modalDesc").innerText = p.description || "Premium Quality Product.";
@@ -1300,7 +1300,7 @@ function openModal(index) {
 
     document.getElementById("productModal").style.display = "flex";
     document.body.style.overflow = "hidden";
-    document.getElementById('floatingCart').style.display = 'block';
+   document.getElementById('floatingCart').style.display = 'none';
 }
 
 function openZoom(src) {
@@ -1400,7 +1400,7 @@ function renderSimilar(p) {
 }
 
 function closeModal() {
-    document.getElementById("productModal").style.display = "none";
+    document.getElementById('floatingCart').style.display = 'block';
     document.body.style.overflow = "";
     const icon = document.getElementById('floatingCart');
     const panel = document.getElementById("cartPanel");
@@ -1813,12 +1813,7 @@ function setupSuggestions() {
         }
     });
 
-    pinInput.addEventListener("input", function() {
-        const val = this.value.trim();
-        if (val.length < 1) {
-            pinSuggestions.style.display = "none";
-            return;
-        }
+ 
     pinInput.addEventListener("input", function () {
     const val = this.value.trim();
 
@@ -1902,7 +1897,9 @@ function openAddress() {
         document.getElementById("aPin").value = "";
         document.getElementById("aState").value = "";
     }
-    setupSuggestions();
+   if (!window.suggInit) {
+  setupSuggestions();
+  window.suggInit = true;
 }
 function closeAddress() { document.getElementById("addressModal").style.display = "none"; }
 function saveAddress() {
