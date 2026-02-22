@@ -26,6 +26,8 @@
         /* Native edge swipe gestures allowed */
         touch-action: auto;
         -webkit-overflow-scrolling: touch;
+        /* FIX: Prevent horizontal scroll chain that blocks gestures */
+        overscroll-behavior-x: contain;
     }
 
     body {
@@ -405,6 +407,8 @@
         opacity: 0.7;
         display: none;
         touch-action: auto;
+        /* FIX: Ensure it doesn't block left-edge swipe start */
+        margin-left: 2px; 
     }
 
     /* Cart Panel */
@@ -421,10 +425,16 @@
         display: flex;
         flex-direction: column;
         touch-action: auto;
+        /* FIX: Critical for right-edge swipe. 
+           Panel is closed by default, so it should NOT catch touches. 
+           When .open is added, it becomes interactive. */
+        pointer-events: none; 
     }
 
     #cartPanel.open {
         right: 0;
+        /* FIX: Allow interaction when open */
+        pointer-events: auto; 
     }
 
     .cart-header {
@@ -545,6 +555,35 @@
     .return-section input:read-only {
         background: #f5f5f5;
         color: #777;
+    }
+
+    /* Suggestion Dropdown */
+    .suggestion-dropdown {
+        position: absolute;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        width: 100%;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        display: none;
+    }
+
+    .suggestion-item {
+        padding: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .suggestion-item:hover {
+        background: #f0f0f0;
+    }
+
+    .suggestion-item:last-child {
+        border-bottom: none;
     }
 
     /* Footer */
@@ -749,11 +788,20 @@
 
 <!-- Thank You Modal -->
 <div id="thankYouModal">
-    <div>
-        <h2 style="font-size:22px; margin-bottom:15px">Thank You for Shopping!</h2>
-        <p style="font-size:16px; color:#555; line-height:1.6; margin-bottom:10px">
-            Thank you for shopping with AK Fashion Hub.<br>
-            Our team will call you shortly for order confirmation and payment details.
+    <div style="max-width: 500px;">
+        <h2 style="font-size:22px; margin-bottom:20px; font-weight:bold">AK FASHION HUB</h2>
+        <p style="font-size:16px; color:#555; line-height:1.8; margin-bottom:15px">
+            Thank you for choosing AK Fashion Hub.
+        </p>
+        <p style="font-size:16px; color:#555; line-height:1.8; margin-bottom:15px">
+            Your order has been received.<br>
+            <b>Your Order ID: <span id="thankYouOrderId"></span></b>
+        </p>
+        <p style="font-size:16px; color:#555; line-height:1.8; margin-bottom:15px">
+            Our team will contact you shortly to confirm your order and payment details.
+        </p>
+        <p style="font-size:14px; color:#999; margin-top:25px; font-style:italic">
+            — AK Fashion Hub
         </p>
         <div style="margin-top:20px; font-size:14px; color:#999">This message will close automatically...</div>
     </div>
@@ -863,9 +911,18 @@
         <input id="aName" placeholder="Full Name *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
         <input id="aPhone" type="tel" placeholder="Mobile Number" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
         <textarea id="aAddr" rows="2" placeholder="House No., Street, Landmark, Famous Place *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px"></textarea>
-        <input id="aCity" placeholder="City *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
-        <input id="aPin" type="tel" placeholder="Pincode *" maxlength="6" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
-        <input id="aState" placeholder="State *" style="width:100%; padding:10px; margin-bottom:8px; border:1px solid #ccc; border-radius:6px">
+        <div style="position:relative; margin-bottom:8px">
+            <input id="aCity" placeholder="City *" autocomplete="off" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px">
+            <div id="citySuggestions" class="suggestion-dropdown"></div>
+        </div>
+        <div style="position:relative; margin-bottom:8px">
+            <input id="aPin" type="tel" placeholder="Pincode *" maxlength="6" autocomplete="off" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px">
+            <div id="pinSuggestions" class="suggestion-dropdown"></div>
+        </div>
+        <div style="position:relative; margin-bottom:8px">
+            <input id="aState" placeholder="State *" autocomplete="off" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px">
+            <div id="stateSuggestions" class="suggestion-dropdown"></div>
+        </div>
         <button onclick="saveAddress()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">SAVE ADDRESS</button>
     </div>
 </div>
@@ -921,6 +978,34 @@ const RETURN_REASONS = [
     "Damaged product",
     "Color different from image",
     "Other issue"
+];
+
+const MAJOR_CITIES = [
+    "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Ahmedabad", "Chennai", "Kolkata", "Pune", 
+    "Jaipur", "Surat", "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane", "Bhopal", 
+    "Visakhapatnam", "Pimpri-Chinchwad", "Patna", "Vadodara", "Ghaziabad", "Ludhiana", 
+    "Agra", "Nashik", "Faridabad", "Meerut", "Rajkot", "Kalyan-Dombivali", "Vasai-Virar", 
+    "Varanasi", "Srinagar", "Aurangabad", "Dhanbad", "Amritsar", "Navi Mumbai", "Allahabad", 
+    "Ranchi", "Howrah", "Coimbatore", "Jabalpur", "Gwalior", "Vijayawada", "Jodhpur", 
+    "Madurai", "Raipur", "Kota", "Chandigarh", "Guwahati", "Solapur", "Hubli-Dharwad", 
+    "Mysore", "Tiruchirappalli", "Bareilly", "Aligarh", "Tiruppur", "Moradabad", "Jalandhar", 
+    "Bhubaneswar", "Salem", "Warangal", "Mira-Bhayandar", "Thiruvananthapuram", "Bhiwandi", 
+    "Saharanpur", "Guntur", "Amravati", "Bikaner", "Noida", "Jamshedpur", "Bhilai", 
+    "Cuttack", "Firozabad", "Kochi", "Nellore", "Bhavnagar", "Dehradun", "Durgapur", 
+    "Asansol", "Rourkela", "Nanded", "Kolhapur", "Ajmer", "Akola", "Gulbarga", "Jamnagar", 
+    "Ujjain", "Loni", "Siliguri", "Jhansi", "Ulhasnagar", "Jammu", "Sangli-Miraj & Kupwad", 
+    "Mangalore", "Erode", "Belgaum", "Ambattur", "Tirunelveli", "Malegaon", "Gaya", "Jalgaon", 
+    "Udaipur", "Maheshtala", "Hapur"
+];
+
+const INDIAN_STATES = [
+    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", 
+    "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", 
+    "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", 
+    "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", 
+    "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", 
+    "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", 
+    "Ladakh", "Lakshadweep", "Puducherry"
 ];
 
 function showToast(msg) {
@@ -985,6 +1070,19 @@ function saveLeadNumber() {
     showToast("Number verified!");
 }
 
+function getMinStockForProduct(p) {
+    let minStock = Infinity;
+    if (p.variants && p.variants.length > 0) {
+        p.variants.forEach(v => {
+            const stock = Number(v.stock);
+            if (stock > 0 && stock < minStock) {
+                minStock = stock;
+            }
+        });
+    }
+    return minStock === Infinity ? 0 : minStock;
+}
+
 function renderProducts() {
     const grid = document.getElementById("productsGrid");
     grid.innerHTML = "";
@@ -995,7 +1093,10 @@ function renderProducts() {
         const gender = document.querySelector(".filter-btn.active").innerText;
         if (gender !== "All" && p.gender !== gender) return;
 
-        const img = (p.img && p.img[0]) ? p.img[0] : "";
+        let img = "";
+        if (p.img && p.img.length > 0) {
+            img = p.img[0];
+        }
         if(!img) return;
         
         const priceInfo = getPriceInfo(p.variants[0]);
@@ -1019,13 +1120,24 @@ function filterProds(type) {
     renderProducts();
 }
 
+function getImageForColor(p, color) {
+    if (!p.img || p.img.length === 0) return "";
+    if (p.img.length === 1) return p.img[0];
+    
+    if (p.colorImages && p.colorImages[color]) {
+        return p.colorImages[color];
+    }
+    
+    return p.img[0];
+}
+
 function openModal(index) {
     currentProdIndex = index;
     const p = products[index];
     
     document.getElementById("modalTitle").innerText = p.name;
     document.getElementById("modalDesc").innerText = p.description || "Premium Quality Product.";
-    document.getElementById("modalMeasure").innerText = p.measure ? "Measurements: " + p.measure : "";
+    document.getElementById("modalMeasure").innerText = p.measure ? "Description: " + p.measure : "";
     
     const priceInfo = getPriceInfo(p.variants[0]);
     document.getElementById("modalPrice").innerHTML = `<span style="text-decoration:line-through; font-size:14px; color:#999">MRP ₹${priceInfo.mrp}</span> ₹${priceInfo.final}`;
@@ -1039,6 +1151,23 @@ function openModal(index) {
         p.img.forEach((src, i) => {
             thumbs.innerHTML += `<img src="${src}" class="thumb ${i===0?'active':''}" onclick="changeImg('${src}', this)">`;
         });
+    }
+
+    const sizes = [...new Set(p.variants.filter(v => Number(v.stock) > 0).map(v => v.size))];
+    const colors = [...new Set(p.variants.filter(v => Number(v.stock) > 0).map(v => v.color))];
+    
+    if (!window.pState[p.id]) window.pState[p.id] = {};
+    
+    if (sizes.length === 1 && colors.length === 1) {
+        window.pState[p.id].size = sizes[0];
+        window.pState[p.id].color = colors[0];
+    } else {
+        if (!window.pState[p.id].size && sizes.length > 0) {
+            delete window.pState[p.id].size;
+        }
+        if (!window.pState[p.id].color && colors.length > 0) {
+            delete window.pState[p.id].color;
+        }
     }
 
     renderModalOpts(p);
@@ -1085,9 +1214,19 @@ function renderModalOpts(p) {
         if (v && Number(v.stock) > 0) {
             stockMsg = `Hurry! Only ${v.stock} left.`;
             canAdd = true;
+            
+            const colorImg = getImageForColor(p, state.color);
+            if (colorImg) {
+                document.getElementById("modalMainImg").src = colorImg;
+            }
         } else if (v && Number(v.stock) <= 0) {
             stockMsg = "Out of Stock";
             canAdd = false;
+        }
+    } else {
+        const minStock = getMinStockForProduct(p);
+        if (minStock > 0) {
+            stockMsg = `Hurry! Only ${minStock} left.`;
         }
     }
 
@@ -1485,6 +1624,7 @@ async function confirmOrderYes() {
         updateCart();
         toggleCart();
         
+        document.getElementById("thankYouOrderId").innerText = oid;
         document.getElementById("thankYouModal").style.display = "flex";
         setTimeout(() => {
             document.getElementById("thankYouModal").style.display = "none";
@@ -1497,6 +1637,95 @@ async function confirmOrderYes() {
         alert(e.message || "Connection error. Please try again.");
     }
     isProcessing = false;
+}
+
+function setupSuggestions() {
+    const cityInput = document.getElementById("aCity");
+    const citySuggestions = document.getElementById("citySuggestions");
+    const stateInput = document.getElementById("aState");
+    const stateSuggestions = document.getElementById("stateSuggestions");
+    const pinInput = document.getElementById("aPin");
+    const pinSuggestions = document.getElementById("pinSuggestions");
+
+    cityInput.addEventListener("input", function() {
+        const val = this.value.trim();
+        if (val.length < 2) {
+            citySuggestions.style.display = "none";
+            return;
+        }
+        const matches = MAJOR_CITIES.filter(c => c.toLowerCase().includes(val.toLowerCase()));
+        if (matches.length > 0) {
+            citySuggestions.innerHTML = matches.slice(0, 10).map(c => 
+                `<div class="suggestion-item" onclick="selectCity('${c}')">${c}</div>`
+            ).join("");
+            citySuggestions.style.display = "block";
+        } else {
+            citySuggestions.style.display = "none";
+        }
+    });
+
+    stateInput.addEventListener("input", function() {
+        const val = this.value.trim();
+        if (val.length < 2) {
+            stateSuggestions.style.display = "none";
+            return;
+        }
+        const matches = INDIAN_STATES.filter(s => s.toLowerCase().includes(val.toLowerCase()));
+        if (matches.length > 0) {
+            stateSuggestions.innerHTML = matches.map(s => 
+                `<div class="suggestion-item" onclick="selectState('${s}')">${s}</div>`
+            ).join("");
+            stateSuggestions.style.display = "block";
+        } else {
+            stateSuggestions.style.display = "none";
+        }
+    });
+
+    pinInput.addEventListener("input", function() {
+        const val = this.value.trim();
+        if (val.length < 2) {
+            pinSuggestions.style.display = "none";
+            return;
+        }
+        const combinedSuggestions = [...MAJOR_CITIES, ...INDIAN_STATES];
+        const matches = combinedSuggestions.filter(item => 
+            item.toLowerCase().includes(val.toLowerCase())
+        );
+        if (matches.length > 0) {
+            pinSuggestions.innerHTML = matches.slice(0, 10).map(item => 
+                `<div class="suggestion-item" onclick="selectPinSuggestion('${item}')">${item}</div>`
+            ).join("");
+            pinSuggestions.style.display = "block";
+        } else {
+            pinSuggestions.style.display = "none";
+        }
+    });
+
+    document.addEventListener("click", function(e) {
+        if (!citySuggestions.contains(e.target) && e.target !== cityInput) {
+            citySuggestions.style.display = "none";
+        }
+        if (!stateSuggestions.contains(e.target) && e.target !== stateInput) {
+            stateSuggestions.style.display = "none";
+        }
+        if (!pinSuggestions.contains(e.target) && e.target !== pinInput) {
+            pinSuggestions.style.display = "none";
+        }
+    });
+}
+
+function selectCity(city) {
+    document.getElementById("aCity").value = city;
+    document.getElementById("citySuggestions").style.display = "none";
+}
+
+function selectState(state) {
+    document.getElementById("aState").value = state;
+    document.getElementById("stateSuggestions").style.display = "none";
+}
+
+function selectPinSuggestion(item) {
+    document.getElementById("pinSuggestions").style.display = "none";
 }
 
 function openAddress() {
@@ -1517,6 +1746,7 @@ function openAddress() {
         document.getElementById("aPin").value = "";
         document.getElementById("aState").value = "";
     }
+    setupSuggestions();
 }
 function closeAddress() { document.getElementById("addressModal").style.display = "none"; }
 function saveAddress() {
@@ -1896,6 +2126,7 @@ function openTerms() {
                 <b>• Refund Eligibility:</b> Refunds will be issued only in cases where an incorrect or damaged product has been delivered by AK FASHION HUB.<br><br>
                 <b>• Size & Fit Issues:</b> In case of size or fitting issues, only replacement will be provided. Refunds are not applicable for size or fitting concerns.<br><br>
                 <b>• Shipping Charges:</b> For size or fitting replacements, the customer is required to pay one-side delivery/shipping charges.<br><br>
+                <b>• RTO (Return to Origin) Charges:</b> In the event of an RTO situation, the customer will be required to pay one-side delivery charges.<br><br>
                 <b>• Color Variation Disclaimer:</b> Minor color differences may occur due to screen brightness, display settings, and lighting conditions. Such variations shall not be considered a defect.<br><br>
                 <b>• Agreement:</b> By placing an order, the customer confirms that they have read, understood, and agreed to all the above Terms & Conditions.
             </div>
