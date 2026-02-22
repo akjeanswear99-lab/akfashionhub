@@ -2252,7 +2252,24 @@ async function loadProds() {
                 siteOffer = data.offer;
             }
         }
-        
+        async function loadProds() {
+    document.getElementById("loaderWrap").style.display = "flex";
+    try {
+        const res = await fetch(API + "?t=" + Date.now(), { cache: "no-store" });
+        const data = JSON.parse(await res.text());
+
+        products = data.products || [];
+        siteCoupons = data.coupons || {};
+        siteOffer = data.offer || null;
+
+        renderProducts();
+    } catch (e) {
+        document.getElementById("loaderWrap").innerHTML =
+          "<div class='loader-text' onclick='location.reload()'>Error. Tap to Refresh</div>";
+    }
+    document.getElementById("loaderWrap").style.display = "none";
+    document.getElementById("floatingCart").style.display = "block";
+}
         renderProducts();
     } catch(e) {
         document.getElementById("loaderWrap").innerHTML = "<div class='loader-text' style='cursor:pointer' onclick='location.reload()'>Error. Tap to Refresh</div>";
