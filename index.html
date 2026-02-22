@@ -2346,6 +2346,7 @@ async function loadProds() {
     grid.offsetHeight;
 
     document.getElementById("loaderWrap").style.display = "flex";
+    document.getElementById("floatingCart").style.display = "none";
     try {
         const res = await fetch(API + "?t=" + Date.now(), { cache: "no-store" });
         const data = JSON.parse(await res.text());
@@ -2371,6 +2372,7 @@ async function loadProds() {
         // 📍 YAHAN LOADER HIDE (reload-feel finish)
         setTimeout(() => {
             document.getElementById("loaderWrap").style.display = "none";
+            document.getElementById("floatingCart").style.display = "block";
         }, 60);
 
     } catch (e) {
