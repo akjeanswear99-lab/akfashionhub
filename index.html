@@ -732,34 +732,82 @@ header h1 {
     .star-rating label:before { content: '★'; }
     .star-rating input:checked ~ label { color: #f5a623; }
     .star-rating label:hover, .star-rating label:hover ~ label { color: #f5a623; }
+@media (max-width: 768px) {
 
- @media (max-width: 768px) {
     .products {
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
     }
+
     .card img {
         height: 280px;
     }
+
     #productModal .main-image-box img {
         max-height: 350px;
     }
+
     #cartPanel {
         width: 100%;
         right: -100%;
     }
 
-  header h1 {
-    font-size: 22px;             
-    letter-spacing: 1px;         
-    white-space: nowrap;         
-    overflow: hidden;            
-    text-overflow: ellipsis;     
-    max-width: calc(100% - 60px);
-    margin-left: auto;
-    margin-right: auto;
+    /* Header */
+    header h1 {
+        font-size: 24px;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: calc(100% - 60px);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    header .tagline {
+        font-size: 11px;
+    }
+
+    header .address {
+        font-size: 9px;
+    }
+
+    /* Footer buttons */
+    .footer-links a {
+        padding: 8px 18px;
+        font-size: 12px;
+        width: 170px;
+    }
+
+    footer p {
+        font-size: 10px;
+    }
+
+    /* Product image overlay text */
+    .price-overlay {
+        padding: 30px 12px 12px;
+    }
+
+    .price-overlay .mrp-tag {
+        font-size: 11px;
+    }
+
+    .price-overlay .final-tag {
+        font-size: 16px;
+    }
+
+    .price-overlay .name-tag {
+        font-size: 12px;
+    }
+
+    /* Floating cart */
+    #floatingCart {
+        top: 4px;
+        left: 2px;
+        font-size: 20px;
+    }
 }
-}
+
 
 </style>
 </head>
