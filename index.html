@@ -333,7 +333,39 @@ header h1 {
         color: #fff;
         border-color: #000;
     }
+/* Description clamp + toggle */
+.desc {
+  font-size: 14px;
+  line-height: 1.6;
+}
 
+/* Desktop: 2 lines only */
+@media (min-width: 769px) {
+  .desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Mobile: 2 lines by default, expandable */
+@media (max-width: 768px) {
+  .desc.clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+.desc-toggle {
+  font-size: 12px;
+  color: #007bff;
+  cursor: pointer;
+  margin-top: 6px;
+  display: inline-block;
+}
     .size-info-text {
         font-size: 12px;
         color: #555;
@@ -732,7 +764,8 @@ header h1 {
     .star-rating label:before { content: '★'; }
     .star-rating input:checked ~ label { color: #f5a623; }
     .star-rating label:hover, .star-rating label:hover ~ label { color: #f5a623; }
-@media (max-width: 768px) {
+
+    @media (max-width: 768px) {
 
     .products {
         grid-template-columns: repeat(2, 1fr);
@@ -754,7 +787,7 @@ header h1 {
 
     /* Header */
     header h1 {
-        font-size: 27px;
+        font-size: 27px;          /* AK FASHION HUB bada */
         letter-spacing: 1px;
         white-space: nowrap;
         overflow: hidden;
@@ -765,11 +798,11 @@ header h1 {
     }
 
     header .tagline {
-        font-size: 9px;
+        font-size: 9px;           /* tagline chhoti */
     }
 
     header .address {
-        font-size: 6px;
+        font-size: 6px;           /* address aur chhoti */
     }
 
     /* Footer buttons */
@@ -779,6 +812,7 @@ header h1 {
         width: 170px;
     }
 
+    /* Footer terms (blue text) */
     footer p {
         font-size: 8px;
     }
@@ -799,18 +833,15 @@ header h1 {
     .price-overlay .name-tag {
         font-size: 12px;
     }
-#floatingCart {
-    display: block;
-}
-    /* Floating cart */
+
+    /* Floating cart (phone) */
     #floatingCart {
+        display: block;
         top: 4px;
         left: 2px;
         font-size: 20px;
-        
     }
 }
-
 
 </style>
 </head>
@@ -893,7 +924,9 @@ header h1 {
         <div class="details">
             <div class="price-big" id="modalPrice"></div>
             <div class="desc" id="modalDesc"></div>
-           
+           <div class="desc-toggle" id="descToggle" onclick="toggleDesc()" style="display:none">
+See more
+</div>
 
             <div class="opt-group">
                 <div class="opt-title">Select Size</div>
@@ -941,7 +974,12 @@ header h1 {
 
             <div id="cartTotal" style="font-size: 16px; font-weight:bold; margin:15px 0 12px 0; color:#000"></div>
             
-            <input id="couponInput" placeholder="Enter Coupon Code" style="margin-bottom:5px; width:100%; padding:10px; border:1px solid #ccc; border-radius:6px" oninput="applyCoupon()">
+            <input id="couponInput" placeholder="Enter Coupon Code"
+style="margin-bottom:5px; width:100%; padding:10px; border:1px solid #ccc; border-radius:6px">
+            <button onclick="applyCouponBtn()"
+style="width:100%; padding:10px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:6px">
+OK
+</button>
             <small id="couponMsg" style="color:green"></small>
             
             <div id="priceBreak" style="font-size:15px; color:#333; margin:15px 0; line-height:1.8; background:#f9f9f9; padding:12px; border-radius:8px"></div>
@@ -1328,7 +1366,11 @@ function openModal(index) {
     
     document.getElementById("modalTitle").innerText = p.name;
     document.getElementById("modalDesc").innerText = p.description || "Premium Quality Product.";
-   
+   const d = document.getElementById("modalDesc");
+const t = document.getElementById("descToggle");
+d.classList.add("clamp");        // default 2 lines on mobile
+t.style.display = window.innerWidth <= 768 ? "inline-block" : "none";
+t.innerText = "See more";
     
     const priceInfo = getPriceInfo(p.variants[0]);
     document.getElementById("modalPrice").innerHTML = `<span style="text-decoration:line-through; font-size:14px; color:#999">MRP ₹${priceInfo.mrp}</span> ₹${priceInfo.final}`;
@@ -1369,7 +1411,18 @@ function openModal(index) {
     document.body.style.overflow = "hidden";
  
 }
+function toggleDesc() {
+  const d = document.getElementById("modalDesc");
+  const t = document.getElementById("descToggle");
 
+  if (d.classList.contains("clamp")) {
+    d.classList.remove("clamp");
+    t.innerText = "Hide";
+  } else {
+    d.classList.add("clamp");
+    t.innerText = "See more";
+  }
+}
 function openZoom(src) {
     document.getElementById("zoomOverlay").style.display = "flex";
     document.getElementById("zoomImg").src = src;
@@ -1647,18 +1700,38 @@ function removeItem(index) {
 function applyCoupon() {
     const code = document.getElementById("couponInput").value.trim().toUpperCase();
     const msg = document.getElementById("couponMsg");
-    if (siteCoupons[code]) {
+    const addr = JSON.parse(localStorage.getItem("addr"));
+if (!addr || !addr.phone) {
+    msg.innerText = "Enter address first";
+    msg.style.color = "red";
+    return;
+}
+
+apiPost({
+    type: "CHECK_COUPON",
+    phone: addr.phone,
+    coupon: code,
+    cartTotal: cart.reduce((s, i) => s + i.price * i.qty, 0)
+}).then(res => {
+
+    if (res.status === "OK") {
         appliedCoup = code;
         msg.innerText = "✅ Applied";
         msg.style.color = "green";
     } else {
         appliedCoup = null;
-        msg.innerText = "Invalid";
+        msg.innerText = res.message || "Coupon not valid";
         msg.style.color = "red";
     }
-    updateCart();
-}
 
+    updateCart();
+});
+}
+function applyCouponBtn() {
+    const input = document.getElementById("couponInput");
+    input.blur();      // keyboard band
+    applyCoupon();     // tumhara existing coupon check
+}
 function toggleCart() {
     const panel = document.getElementById("cartPanel");
     const over = document.getElementById("cartOverlay");
