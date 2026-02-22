@@ -250,7 +250,7 @@ header h1 {
         justify-content: center;
         overflow-x: auto;
         padding-bottom: 10px;
-        touch-action: pan-x auto;
+      touch-action: pan-x;
     }
 
     .thumb {
@@ -463,7 +463,7 @@ header h1 {
         flex: 1;
         overflow-y: auto;
         padding: 20px;
-        touch-action: pan-y auto;
+       touch-action: pan-y;
     }
 
     .cart-item {
@@ -1207,7 +1207,7 @@ function getMinStockForProduct(p) {
     let minStock = Infinity;
     if (p.variants && p.variants.length > 0) {
         p.variants.forEach(v => {
-            const stock = Number(v.stock);
+          const stock = Number(v.stock) || 0;
             if (stock > 0 && stock < minStock) {
                 minStock = stock;
             }
@@ -1316,7 +1316,7 @@ function openModal(index) {
 
     document.getElementById("productModal").style.display = "flex";
     document.body.style.overflow = "hidden";
-   document.getElementById('floatingCart').style.display = 'none';
+ 
 }
 
 function openZoom(src) {
@@ -1377,7 +1377,9 @@ function renderModalOpts(p) {
     ).join("");
 
     document.getElementById("modalStock").innerText = stockMsg;
-    document.getElementById("modalStock").style.color = canAdd ? "green" : "red";
+  const stockEl = document.getElementById("modalStock");
+if (!state.size || !state.color) stockEl.style.color = "#555";
+else stockEl.style.color = canAdd ? "green" : "red";
     
     const sizeInfoDiv = document.getElementById("sizeInfoDisplay");
     if (state.size && p.sizeChart && p.sizeChart[state.size]) {
@@ -1407,7 +1409,9 @@ function selOpt(type, val) {
 
 function renderSimilar(p) {
     const box = document.getElementById("similarGrid");
-    const sims = products.filter(x => x.id !== p.id && x.gender === p.gender).slice(0, 4);
+const sims = products.filter(
+    x => x.id !== p.id && (x.gender || "").toLowerCase() === (p.gender || "").toLowerCase()
+).slice(0, 4);
     
     box.innerHTML = sims.map(s => {
         const idx = products.findIndex(x => x.id === s.id);
@@ -1617,7 +1621,7 @@ function toggleCart() {
         if (modal.style.display !== 'flex') {
             icon.style.display = "block";
         }
-        document.body.style.overflow = "";
+       if (document.getElementById("productModal").style.display !== "flex") document.body.style.overflow = "";
     } else {
         panel.classList.add("open");
         over.style.display = "block";
@@ -1642,7 +1646,8 @@ function updBadge(t) {
         b = document.createElement("span");
         b.id = "cartCount";
         b.style.cssText = "position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:transparent; color:#000; font-size:10px; font-weight:bold; line-height:1; text-shadow:0 0 2px #fff, 0 0 4px #fff;";
-        document.getElementById("floatingCart").appendChild(b);
+        const fc = document.getElementById("floatingCart");
+if (fc) fc.appendChild(b);
     }
     b.innerText = cart.reduce((s, i) => s + i.qty, 0);
     
@@ -2033,7 +2038,7 @@ function renderOrders(list) {
         `;
     }).join("");
 }
-
+let currentRating = 0;
 function showOrderDetail(idx) {
     currentRating = 0;
     const o = allOrders[idx];
@@ -2046,7 +2051,8 @@ function showOrderDetail(idx) {
     const returnOpen = isDelivered && isReturnWindowOpen(o.deliveryDate);
 
     const placedDate = o.date ? new Date(o.date).toLocaleDateString() : 'N/A';
-    const deliveryDate = o.deliveryDate ? new Date(o.deliveryDate).toLocaleDateString() : '';
+   const ddt = new Date(o.deliveryDate);
+const deliveryDate = (o.deliveryDate && !isNaN(ddt)) ? ddt.toLocaleDateString() : '';
     
     let itemsHTML = '';
     if (o.items && Array.isArray(o.items)) {
@@ -2176,7 +2182,7 @@ function showOrderDetail(idx) {
     `;
 }
 
-let currentRating = 0;
+
 function setRating(r) {
     currentRating = r;
 }
@@ -2218,15 +2224,16 @@ async function submitReview() {
 
 async function submitReturnRequest() {
     if (isProcessing) return;
+    isProcessing = true;
+
     const phone = document.getElementById("retPhone").value.trim();
     const orderId = document.getElementById("retOrderId").value.trim();
     const reason = document.getElementById("retReason").value;
     const note = document.getElementById("retNote").value.trim();
     
-    if (!/^[6-9]\d{9}$/.test(phone)) { showToast("Invalid phone"); return; }
-    if (!reason) { showToast("Select reason"); return; }
-    
-    isProcessing = true;
+   if (!/^[6-9]\d{9}$/.test(phone)) { showToast("Invalid phone"); isProcessing = false; return; }
+if (!reason) { showToast("Select reason"); isProcessing = false; return; }
+   
     document.getElementById("checkoutLoader").style.display = "flex";
     
     try {
@@ -2282,8 +2289,11 @@ function backToCart() {
     document.getElementById("myOrdersView").style.display = "none";
     document.getElementById("cartItemsView").style.display = "block";
 }
-
 async function loadProds() {
+    const grid = document.getElementById("productsGrid");
+    grid.innerHTML = "";
+    grid.offsetHeight;
+
     document.getElementById("loaderWrap").style.display = "flex";
     try {
         const res = await fetch(API + "?t=" + Date.now(), { cache: "no-store" });
@@ -2292,7 +2302,7 @@ async function loadProds() {
         if (Array.isArray(data)) {
             products = data;
         } else {
-            products = data.products || [];
+           products = Array.isArray(data.products) ? data.products : [];
             if (data.coupons) {
                 siteCoupons = data.coupons;
             }
@@ -2300,9 +2310,22 @@ async function loadProds() {
                 siteOffer = data.offer;
             }
         }
+
+        // 📍 YAHAN FRAME BREAK
+        await new Promise(r => requestAnimationFrame(r));
+
+        // 📍 YAHAN PRODUCTS DIKHANA
+        renderProducts();
+
+        // 📍 YAHAN LOADER HIDE (reload-feel finish)
+        setTimeout(() => {
+            document.getElementById("loaderWrap").style.display = "none";
+        }, 60);
+
     } catch (e) {
-    console.error(e);
-    alert("Unable to load products. Please reload the page.");
+        console.error(e);
+       showToast("Network error. Please refresh.");
+    }
 }
 
 updateCart();
