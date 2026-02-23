@@ -13,22 +13,22 @@
         padding: 0;
     }
 
-    html, body {
-        width: 100%;
-        background: #f4f4f4;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-        overflow-x: hidden;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        /* Native edge swipe gestures allowed */
-        touch-action: auto;
-        -webkit-overflow-scrolling: touch;
-        /* FIX: Prevent horizontal scroll chain that blocks gestures */
-        overscroll-behavior-x: contain;
-    }
+   html, body {
+    width: 100%;
+    background: #f4f4f4;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    overflow-x: hidden;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    /* Native edge swipe gestures allowed */
+    touch-action: auto;
+    -webkit-overflow-scrolling: touch;
+}
 
     body {
         
@@ -765,7 +765,7 @@ header h1 {
     .star-rating input:checked ~ label { color: #f5a623; }
     .star-rating label:hover, .star-rating label:hover ~ label { color: #f5a623; }
 
-    @media (max-width: 768px) {
+ @media (max-width: 768px) {
 
     .products {
         grid-template-columns: repeat(2, 1fr);
@@ -787,7 +787,7 @@ header h1 {
 
     /* Header */
     header h1 {
-        font-size: 27px;          /* AK FASHION HUB bada */
+        font-size: 27px;
         letter-spacing: 1px;
         white-space: nowrap;
         overflow: hidden;
@@ -798,11 +798,11 @@ header h1 {
     }
 
     header .tagline {
-        font-size: 9px;           /* tagline chhoti */
+        font-size: 9px;
     }
 
     header .address {
-        font-size: 6px;           /* address aur chhoti */
+        font-size: 6px;
     }
 
     /* Footer buttons */
@@ -812,11 +812,11 @@ header h1 {
         width: 170px;
     }
 
-    /* Footer terms (blue text) */
+    /* ✅ Footer terms (blue text) — FORCE SMALL ON MOBILE */
     footer p {
-        font-size: 7px;
-        opacity: 0.75;
-        letter-spacing: 0.5px;
+        font-size: 7px !important;
+        opacity: 0.7;
+        letter-spacing: 0.4px;
     }
 
     /* Product image overlay text */
@@ -844,7 +844,6 @@ header h1 {
         font-size: 20px;
     }
 }
-
 </style>
 </head>
 <body>
@@ -1052,7 +1051,7 @@ style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px">
 
 <!-- Footer -->
 <footer>
-    <p style="cursor:pointer; text-decoration:underline; color:#4da3ff; font-size:12px;" onclick="openTerms()">TERMS AND CONDITION APPLY</p>
+    <p style="cursor:pointer; text-decoration:underline; color:#4da3ff;" onclick="openTerms()">TERMS AND CONDITION APPLY</p>
     
     <div class="footer-links">
         <div class="social-row">
@@ -2316,7 +2315,11 @@ if (isDelivered) {
             <div style="font-size:11px; color:#666; margin-bottom:5px">Items</div>
             ${itemsHTML}
         </div>
-        
+        ${o.returnStatus ? `
+<div style="margin-bottom:10px; padding:8px; background:#eef6ff; color:#004085; border-radius:6px; font-size:12px; text-align:center">
+    Return Status: <b>${o.returnStatus}</b>
+</div>
+` : ''}
         <div style="background:#f0f0f0; padding:12px; border-radius:8px">
             <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px">
                 <span>Subtotal:</span><span>₹${o.productsPrice || 0}</span>
