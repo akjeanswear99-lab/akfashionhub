@@ -814,7 +814,9 @@ header h1 {
 
     /* Footer terms (blue text) */
     footer p {
-        font-size: 8px;
+        font-size: 7px;
+        opacity: 0.75;
+        letter-spacing: 0.5px;
     }
 
     /* Product image overlay text */
@@ -974,12 +976,11 @@ See more
 
             <div id="cartTotal" style="font-size: 16px; font-weight:bold; margin:15px 0 12px 0; color:#000"></div>
             
-            <input id="couponInput" placeholder="Enter Coupon Code"
+            <input id="couponInput"
+placeholder="Enter Coupon Code"
+onkeydown="if(event.key==='Enter'){applyCouponBtn()}"
 style="margin-bottom:5px; width:100%; padding:10px; border:1px solid #ccc; border-radius:6px">
-            <button onclick="applyCouponBtn()"
-style="width:100%; padding:10px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:6px">
-OK
-</button>
+           
             <small id="couponMsg" style="color:green"></small>
             
             <div id="priceBreak" style="font-size:15px; color:#333; margin:15px 0; line-height:1.8; background:#f9f9f9; padding:12px; border-radius:8px"></div>
@@ -1028,7 +1029,11 @@ OK
             <div id="pinSuggestions" class="suggestion-dropdown"></div>
         </div>
         <div style="position:relative; margin-bottom:8px">
-            <input id="aState" placeholder="State *" autocomplete="off" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px">
+            <input id="aState"
+placeholder="State *"
+autocomplete="off"
+onkeydown="if(event.key==='Enter'){saveAddress()}"
+style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px">
             <div id="stateSuggestions" class="suggestion-dropdown"></div>
         </div>
         <button onclick="saveAddress()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">SAVE ADDRESS</button>
@@ -2190,32 +2195,58 @@ const deliveryDate = (o.deliveryDate && !isNaN(ddt)) ? ddt.toLocaleDateString() 
         itemsHTML = `<div style="padding:8px 0; font-size:13px">${o.products}</div>`;
     }
     
-    let returnSectionHTML = '';
-    if (isDelivered) {
-        if (returnOpen) {
-            const sess = JSON.parse(localStorage.getItem(SESSION_KEY)) || {};
-            returnSectionHTML = `
-                <div class="return-section">
-                    <h4 style="margin-bottom:10px">Return / Replacement Request</h4>
-                    <input type="text" id="retPhone" value="${sess.phone || ''}" placeholder="Mobile Number *" maxlength="10" ${sess.phone ? 'readonly' : ''}>
-                    <input type="text" id="retOrderId" value="${o.orderId}" readonly>
-                    <select id="retReason">
-                        <option value="">Select Reason for Return *</option>
-                        ${RETURN_REASONS.map(r => `<option value="${r}">${r}</option>`).join("")}
-                    </select>
-                    <textarea id="retNote" placeholder="Additional note (optional)"></textarea>
-                    <button onclick="submitReturnRequest()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">SUBMIT RETURN REQUEST</button>
-                </div>
-            `;
-        } else {
-            returnSectionHTML = `
-                <div style="margin-top:15px; padding:10px; background:#f8d7da; color:#721c24; border-radius:6px; text-align:center; font-size:13px">
-                    Return window closed (3 days after delivery)
-                </div>
-            `;
-        }
-    }
+ let returnSectionHTML = '';
+if (isDelivered) {
+    if (returnOpen) {
+        const sess = JSON.parse(localStorage.getItem(SESSION_KEY)) || {};
+        returnSectionHTML = `
+        <div class="return-section">
 
+            <!-- 🔘 TOGGLE HEADER (ADDED) -->
+            <div onclick="
+              const b=this.nextElementSibling;
+              b.style.display = b.style.display==='none'?'block':'none';
+            " style="cursor:pointer; font-weight:bold; padding:10px; background:#000; color:#fff; border-radius:6px; text-align:center">
+              RETURN / REPLACEMENT
+            </div>
+
+            <!-- 📦 COLLAPSIBLE BOX (ADDED START) -->
+            <div style="display:none; margin-top:10px">
+
+                <h4 style="margin-bottom:10px">Return / Replacement Request</h4>
+
+                <input type="text" id="retPhone" value="${sess.phone || ''}" placeholder="Mobile Number *" maxlength="10" ${sess.phone ? 'readonly' : ''}>
+                <input type="text" id="retOrderId" value="${o.orderId}" readonly>
+
+                <select id="retProduct">
+                    <option value="">Select Product *</option>
+                    ${
+                        (o.items || []).map(it =>
+                            `<option value="${it.name}|${it.size}|${it.color}|${it.qty}">
+                                ${it.name} (${it.size}, ${it.color}) x${it.qty}
+                            </option>`
+                        ).join("")
+                    }
+                </select>
+
+                <select id="retReason">
+                    <option value="">Select Reason for Return *</option>
+                    ${RETURN_REASONS.map(r => `<option value="${r}">${r}</option>`).join("")}
+                </select>
+
+                <textarea id="retNote" placeholder="Additional note (optional)"></textarea>
+
+                <button onclick="submitReturnRequest()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">
+                    SUBMIT RETURN REQUEST
+                </button>
+
+            </div>
+            <!-- 📦 COLLAPSIBLE BOX (ADDED END) -->
+
+        </div>
+        `;
+    }
+}
     let reviewHTML = '';
     if (isDelivered) {
         if (o.reviewSubmitted) {
@@ -2354,38 +2385,42 @@ async function submitReturnRequest() {
     const orderId = document.getElementById("retOrderId").value.trim();
     const reason = document.getElementById("retReason").value;
     const note = document.getElementById("retNote").value.trim();
-    
-   if (!/^[6-9]\d{9}$/.test(phone)) { showToast("Invalid phone"); isProcessing = false; return; }
-if (!reason) { showToast("Select reason"); isProcessing = false; return; }
-   
+
+    const prod = document.getElementById("retProduct").value;
+    if (!prod) { showToast("Select product"); isProcessing = false; return; }
+
+    if (!/^[6-9]\d{9}$/.test(phone)) { showToast("Invalid phone"); isProcessing = false; return; }
+    if (!reason) { showToast("Select reason"); isProcessing = false; return; }
+
     document.getElementById("checkoutLoader").style.display = "flex";
-    
+
     try {
         const res = await apiPost({
             type: "RETURN_REQUEST",
-            orderId: orderId,
-            phone: phone,
-            reason: reason,
-            note: note,
+            orderId,
+            phone,
+            product: prod,
+            reason,
+            note,
             requestDate: new Date().toISOString(),
             status: "Requested"
         });
-        
+
         document.getElementById("checkoutLoader").style.display = "none";
-        
+
         if (res.status === "SUCCESS") {
             showToast("AK Fashion Hub team will call you shortly.");
             renderOrders(allOrders);
         } else {
             showToast(res.message || "Failed");
         }
-    } catch(e) {
+    } catch (e) {
         document.getElementById("checkoutLoader").style.display = "none";
         showToast("Error");
     }
+
     isProcessing = false;
 }
-
 async function trackOrder() {
    const phone = document.getElementById("orderPhone").value.trim();
 const oid = document.getElementById("orderOid").value.trim();
