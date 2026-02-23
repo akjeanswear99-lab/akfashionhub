@@ -1705,31 +1705,54 @@ function applyCoupon() {
     const code = document.getElementById("couponInput").value.trim().toUpperCase();
     const msg = document.getElementById("couponMsg");
     const addr = JSON.parse(localStorage.getItem("addr"));
-if (!addr || !addr.phone) {
-    msg.innerText = "Enter address first";
-    msg.style.color = "red";
-    return;
-}
 
-apiPost({
-    type: "CHECK_COUPON",
-    phone: addr.phone,
-    coupon: code,
-    cartTotal: cart.reduce((s, i) => s + i.price * i.qty, 0)
-}).then(res => {
-
-    if (res.status === "OK") {
-        appliedCoup = code;
-        msg.innerText = "✅ Applied";
-        msg.style.color = "green";
-    } else {
-        appliedCoup = null;
-        msg.innerText = res.message || "Coupon not valid";
+    if (!addr || !addr.phone) {
+        msg.innerText = "Enter address first";
         msg.style.color = "red";
+        return;
     }
 
-    updateCart();
-});
+    // ✅ INSTANT FEEDBACK
+    msg.innerText = "Applying coupon...";
+    msg.style.color = "#555";
+
+    apiPost({
+        type: "CHECK_COUPON",
+        phone: addr.phone,
+        coupon: code,
+        cartTotal: cart.reduce((s, i) => s + i.price * i.qty, 0)
+    }).then(res => {
+
+        if (res.status === "OK") {
+            appliedCoup = code;
+
+            if (res.coupon && res.coupon.type === "FREE_DELIVERY") {
+                msg.innerText = "Coupon applied! Delivery is FREE 🎉";
+            } else if (res.coupon && res.coupon.type === "FLAT") {
+                msg.innerText = `Coupon applied! You saved ₹${res.coupon.val}`;
+            } else {
+                msg.innerText = "✅ Coupon Applied";
+            }
+
+            msg.style.color = "green";
+
+        } else if (res.status === "BLOCKED" && res.coupon && res.coupon.min) {
+            appliedCoup = null;
+            const diff = res.coupon.min - cart.reduce((s, i) => s + i.price * i.qty, 0);
+            msg.innerText = `Add ₹${diff} more to apply this coupon`;
+            msg.style.color = "orange";
+
+        } else {
+            appliedCoup = null;
+            msg.innerText = res.message || "Coupon not valid";
+            msg.style.color = "red";
+        }
+
+        updateCart();
+    }).catch(() => {
+        msg.innerText = "Network error. Try again.";
+        msg.style.color = "red";
+    });
 }
 function applyCouponBtn() {
     const input = document.getElementById("couponInput");
