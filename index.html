@@ -1528,71 +1528,89 @@ function changeImg(src, el) {
 
 function renderModalOpts(p) {
     const state = window.pState[p.id] || {};
-    // Sizes ko bhi trim karo display pe
+
+    // 1. Sizes: Saare available sizes nikalo
     const sizes = [...new Set(p.variants.filter(v => Number(v.stock) > 0).map(v => v.size))];
+
+    // 2. Colors Logic: SIRF tab dikhao jab Size select ho
+    let colors = [];
     
-    // Auto-select size if only 1 size exists
+    if (state.size) {
+        // ✅ REQUIREMENT: Size select hone par sirf uske colors dikhao
+        colors = [...new Set(p.variants.filter(v => 
+            Number(v.stock) > 0 && 
+            String(v.size).trim() === String(state.size).trim()
+        ).map(v => v.color))];
+    } 
+    // Agar size select nahi hai, to colors empty rahenge (colors = [])
+
+    // Empty strings hatao
+    colors = colors.filter(c => c);
+
+    // 3. Auto-Selection Logic
+    // Agar sirf 1 size hai toh auto-select
     if (sizes.length === 1 && !state.size) {
         state.size = sizes[0];
         window.pState[p.id] = state;
-    }
-
-    // COLORS LOGIC
-    let colors = [];
-    if (state.size) {
-        colors = [...new Set(p.variants.filter(v => Number(v.stock) > 0 && v.size === state.size).map(v => v.color))];
+        return renderModalOpts(p); // Re-render to load colors
     }
     
-    // Agar size ke hisaab se colors nahi mile, to saare dikhao
-    if (colors.length === 0) {
-         colors = [...new Set(p.variants.filter(v => Number(v.stock) > 0).map(v => v.color))];
-    }
-    
-    // Empty hatao
-    colors = colors.filter(c => c);
-
-    // Auto-select color
+    // Agar size select hai aur sirf 1 color mila, toh auto-select
     if (state.size && colors.length === 1 && !state.color) {
         state.color = colors[0];
-        window.pState[p.id].color = colors[0];
+        window.pState[p.id] = state;
     }
 
+    // 4. Stock Message & Button Logic
     let stockMsg = "";
     let canAdd = false;
 
-    // ✅ CRITICAL FIX: Add to Cart Logic
     if (state.size && state.color) {
-        // Trim karke compare karo taaki space ki wajah se fail na ho
-        const v = p.variants.find(v => v.size === state.size && v.color === state.color);
+        const v = p.variants.find(v => 
+            String(v.size).trim() === String(state.size).trim() && 
+            String(v.color).trim() === String(state.color).trim()
+        );
         
         if (v && Number(v.stock) > 0) {
             stockMsg = `Hurry! Only ${v.stock} left.`;
-            canAdd = true; // ✅ Button Enable hoga
+            canAdd = true;
             
             const colorImg = getImageForColor(p, state.color);
             if (colorImg) document.getElementById("modalMainImg").src = colorImg;
-        } else if (v && Number(v.stock) <= 0) {
-            stockMsg = "Out of Stock";
-            canAdd = false;
         }
     } else {
-        const minStock = getMinStockForProduct(p);
-        if (minStock > 0) stockMsg = `Hurry! Only ${minStock} left.`;
+        // User ko guide karo
+        if (!state.size) stockMsg = "Please select a Size";
+        else if (!state.color) stockMsg = "Please select a Color";
     }
 
+    // 5. Render Buttons
     document.getElementById("modalSizes").innerHTML = sizes.map(s => 
         `<div class="opt-btn ${state.size === s ? 'selected' : ''}" onclick="selOpt('size', '${s}')">${s}</div>`
     ).join("");
 
-    document.getElementById("modalColors").innerHTML = colors.map(c => 
-        `<div class="opt-btn ${state.color === c ? 'selected' : ''}" onclick="selOpt('color', '${c}')">${c}</div>`
-    ).join("");
+    // COLOR SECTION RENDER (Strict Logic)
+    const colorBox = document.getElementById("modalColors");
+    
+    if (!state.size) {
+        // Agar size select nahi hai toh message dikhao
+        colorBox.innerHTML = "<span style='font-size:12px; color:#999; padding:5px; display:block;'>Select Size first</span>";
+    } else if (colors.length === 0) {
+        // Agar size select hai par usme color nahi hai
+        colorBox.innerHTML = "<span style='font-size:12px; color:red; padding:5px; display:block;'>No colors available</span>";
+    } else {
+        // Colors dikhao
+        colorBox.innerHTML = colors.map(c => 
+            `<div class="opt-btn ${state.color === c ? 'selected' : ''}" onclick="selOpt('color', '${c}')">${c}</div>`
+        ).join("");
+    }
 
+    // 6. UI Updates
     document.getElementById("modalStock").innerText = stockMsg;
     const stockEl = document.getElementById("modalStock");
-    if (!state.size || !state.color) stockEl.style.color = "#555";
-    else stockEl.style.color = canAdd ? "green" : "red";
+    stockEl.style.color = canAdd ? "green" : "#555";
     
+    // Size Chart Logic
     const sizeInfoDiv = document.getElementById("sizeInfoDisplay");
     if (state.size && p.sizeChart && p.sizeChart[state.size]) {
         sizeInfoDiv.innerText = `${state.size}: ${p.sizeChart[state.size]}`;
