@@ -844,6 +844,35 @@ header h1 {
         font-size: 20px;
     }
 }
+/* Description Table Styles */
+.desc-table-box {
+    width: 100%;
+    border-top: 1px solid #eee;
+    margin-top: 10px;
+}
+.desc-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 10px 5px;
+    font-size: 13px;
+}
+.desc-row:last-child { border-bottom: none; }
+
+.desc-key {
+    color: #555;
+    width: 45%;
+    font-weight: 500;
+}
+.desc-val {
+    color: #000;
+    width: 55%;
+    text-align: right;
+}
+.details .desc p {
+    margin: 8px 0;
+    line-height: 1.5;
+}    
 </style>
 </head>
 <body>
@@ -1368,20 +1397,34 @@ function getImageForColor(p, color) {
     return p.img[0];
 }
 
-function openModal(index) {
+
+    function openModal(index) {
     currentProdIndex = index;
     const p = products[index];
     
     apiPost({ type:  "PRODUCT_CLICK", productId: p.id, productName: p.name, timestamp: new Date().toISOString() }).catch(e=>{});
     
     document.getElementById("modalTitle").innerText = p.name;
-    document.getElementById("modalDesc").innerText = p.description || "Premium Quality Product.";
-   const d = document.getElementById("modalDesc");
-const t = document.getElementById("descToggle");
-d.classList.add("clamp");        // default 2 lines on mobile
-t.style.display = window.innerWidth <= 768 ? "inline-block" : "none";
-t.innerText = "See more";
     
+    // --- DESCRIPTION LOGIC UPDATE ---
+    const descDiv = document.getElementById("modalDesc");
+    const rawText = p.description || "Premium Quality Product.";
+    
+    // 1. Raw Text store karo
+    descDiv.dataset.raw = rawText;
+    // 2. Formatted Table store karo
+    descDiv.dataset.formatted = formatDescription(rawText);
+    
+    // 3. Default state: Raw text dikhao aur clamp laga do
+    descDiv.innerText = rawText;
+    descDiv.classList.add("clamp"); 
+    descDiv.classList.remove("expanded-table");
+    
+    const toggleBtn = document.getElementById("descToggle");
+    toggleBtn.style.display = window.innerWidth <= 768 ? "inline-block" : "none";
+    toggleBtn.innerText = "See more";
+    // ----------------------------------
+
     const priceInfo = getPriceInfo(p.variants[0]);
     document.getElementById("modalPrice").innerHTML = `<span style="text-decoration:line-through; font-size:14px; color:#999">MRP ₹${priceInfo.mrp}</span> ₹${priceInfo.final}`;
 
@@ -1406,12 +1449,8 @@ t.innerText = "See more";
         window.pState[p.id].size = sizes[0];
         window.pState[p.id].color = colors[0];
     } else {
-        if (!window.pState[p.id].size && sizes.length > 0) {
-            delete window.pState[p.id].size;
-        }
-        if (!window.pState[p.id].color && colors.length > 0) {
-            delete window.pState[p.id].color;
-        }
+        if (!window.pState[p.id].size && sizes.length > 0) delete window.pState[p.id].size;
+        if (!window.pState[p.id].color && colors.length > 0) delete window.pState[p.id].color;
     }
 
     renderModalOpts(p);
@@ -1419,19 +1458,58 @@ t.innerText = "See more";
 
     document.getElementById("productModal").style.display = "flex";
     document.body.style.overflow = "hidden";
- 
 }
 function toggleDesc() {
-  const d = document.getElementById("modalDesc");
-  const t = document.getElementById("descToggle");
+    const d = document.getElementById("modalDesc");
+    const t = document.getElementById("descToggle");
 
-  if (d.classList.contains("clamp")) {
-    d.classList.remove("clamp");
-    t.innerText = "Hide";
-  } else {
-    d.classList.add("clamp");
-    t.innerText = "See more";
-  }
+    // Agar abhi clamped hai (2 lines)
+    if (d.classList.contains("clamp")) {
+        // Clamp hatao
+        d.classList.remove("clamp");
+        // Formatted HTML insert karo (Table wala)
+        d.innerHTML = d.dataset.formatted;
+        t.innerText = "Show less";
+    } 
+    // Agar expanded hai
+    else {
+        // Wapas clamp laga do
+        d.classList.add("clamp");
+        // Raw text wapas lao
+        d.innerText = d.dataset.raw;
+        t.innerText = "See more";
+    }
+}
+
+// Ye naya function text ko table format mein convert karega
+function formatDescription(text) {
+    if (!text) return "";
+    
+    let html = "";
+    const lines = text.split('\n');
+    
+    lines.forEach(line => {
+        line = line.trim();
+        if (!line) return;
+
+        // Agar line mein colon (:) hai, toh table row banao
+        if (line.includes(':')) {
+            const parts = line.split(/:(.+)/); 
+            if (parts.length >= 2) {
+                const key = parts[0].trim();
+                const val = parts[1].trim();
+                if (key && val) {
+                    html += `<div class="desc-row"><div class="desc-key">${key}</div><div class="desc-val">${val}</div></div>`;
+                    return;
+                }
+            }
+        }
+        
+        // Agar colon nahi hai, toh normal paragraph rakho
+        html += `<p>${line}</p>`;
+    });
+    
+    return html;
 }
 function openZoom(src) {
     document.getElementById("zoomOverlay").style.display = "flex";
@@ -1451,6 +1529,13 @@ function changeImg(src, el) {
 function renderModalOpts(p) {
     const state = window.pState[p.id] || {};
     const sizes = [...new Set(p.variants.filter(v => Number(v.stock) > 0).map(v => v.size))];
+    
+    // ✅ FIX: Auto-select size if only 1 size exists
+    if (sizes.length === 1 && !state.size) {
+        state.size = sizes[0];
+        window.pState[p.id] = state;
+    }
+
     const colors = state.size ? [...new Set(p.variants.filter(v => Number(v.stock) > 0 && v.size === state.size).map(v => v.color))] : [];
 
     if (state.size && colors.length === 1 && !state.color) {
@@ -1468,18 +1553,14 @@ function renderModalOpts(p) {
             canAdd = true;
             
             const colorImg = getImageForColor(p, state.color);
-            if (colorImg) {
-                document.getElementById("modalMainImg").src = colorImg;
-            }
+            if (colorImg) document.getElementById("modalMainImg").src = colorImg;
         } else if (v && Number(v.stock) <= 0) {
             stockMsg = "Out of Stock";
             canAdd = false;
         }
     } else {
         const minStock = getMinStockForProduct(p);
-        if (minStock > 0) {
-            stockMsg = `Hurry! Only ${minStock} left.`;
-        }
+        if (minStock > 0) stockMsg = `Hurry! Only ${minStock} left.`;
     }
 
     document.getElementById("modalSizes").innerHTML = sizes.map(s => 
@@ -1491,9 +1572,9 @@ function renderModalOpts(p) {
     ).join("");
 
     document.getElementById("modalStock").innerText = stockMsg;
-  const stockEl = document.getElementById("modalStock");
-if (!state.size || !state.color) stockEl.style.color = "#555";
-else stockEl.style.color = canAdd ? "green" : "red";
+    const stockEl = document.getElementById("modalStock");
+    if (!state.size || !state.color) stockEl.style.color = "#555";
+    else stockEl.style.color = canAdd ? "green" : "red";
     
     const sizeInfoDiv = document.getElementById("sizeInfoDisplay");
     if (state.size && p.sizeChart && p.sizeChart[state.size]) {
@@ -1504,7 +1585,6 @@ else stockEl.style.color = canAdd ? "green" : "red";
 
     document.getElementById("modalAddBtn").disabled = !canAdd;
 }
-
 function selOpt(type, val) {
     const p = products[currentProdIndex];
     if (!window.pState[p.id]) window.pState[p.id] = {};
@@ -2491,25 +2571,63 @@ async function loadProds() {
         const res = await fetch(API + "?t=" + Date.now(), { cache: "no-store" });
         const data = JSON.parse(await res.text());
 
+        let rawProducts = [];
         if (Array.isArray(data)) {
-            products = data;
+            rawProducts = data;
         } else {
-           products = Array.isArray(data.products) ? data.products : [];
-            if (data.coupons) {
-                siteCoupons = data.coupons;
-            }
-            if (data.offer) {
-                siteOffer = data.offer;
-            }
+           rawProducts = Array.isArray(data.products) ? data.products : [];
+            if (data.coupons) siteCoupons = data.coupons;
+            if (data.offer) siteOffer = data.offer;
         }
 
-        // 📍 YAHAN FRAME BREAK
-        await new Promise(r => requestAnimationFrame(r));
+        // ✅ FIX 1: DATA GROUPING LOGIC (Flat Rows ko Nested Structure mein convert karna)
+        if (rawProducts.length > 0 && !rawProducts[0].variants) {
+            const grouped = {};
+            rawProducts.forEach(row => {
+                const id = row.ID || row.id;
+                if (!id) return;
 
-        // 📍 YAHAN PRODUCTS DIKHANA
+                if (!grouped[id]) {
+                    grouped[id] = {
+                        id: id,
+                        name: row.Name || row.name,
+                        gender: row.Gender || row.gender,
+                        description: row.Description || row.description,
+                        img: row['Image URLs'] || row.img || row.Image || "",
+                        sizeChart: {},
+                        variants: []
+                    };
+                }
+                
+                const sz = row.Size || row.size;
+                const szChart = row['Size Chart'] || row.sizeChart;
+                if(sz && szChart) grouped[id].sizeChart[sz] = szChart;
+
+                grouped[id].variants.push({
+                    size: sz,
+                    color: row.Colour || row.Color || row.color,
+                    stock: row.Stock || row.stock,
+                    price: row.Price || row.price,
+                    mrp: row.MRP || row.mrp,
+                    weight: row.Weight || row.weight || 500
+                });
+            });
+            products = Object.values(grouped);
+        } else {
+            products = rawProducts;
+        }
+
+        // ✅ FIX 2: IMAGE HANDLING (String ko Array mein convert karna)
+        products.forEach(p => {
+            if (typeof p.img === 'string') {
+                p.img = p.img.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            }
+            if (!Array.isArray(p.img)) p.img = [];
+        });
+
+        await new Promise(r => requestAnimationFrame(r));
         renderProducts();
 
-        // 📍 YAHAN LOADER HIDE (reload-feel finish)
         setTimeout(() => {
             document.getElementById("loaderWrap").style.display = "none";
             document.getElementById("floatingCart").style.display = "block";
@@ -2517,10 +2635,9 @@ async function loadProds() {
 
     } catch (e) {
         console.error(e);
-       showToast("Network error. Please refresh.");
+        showToast("Network error. Please refresh.");
     }
 }
-
 updateCart();
 loadProds();
 initLeadPopup();
