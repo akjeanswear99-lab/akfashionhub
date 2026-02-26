@@ -1530,13 +1530,26 @@ function renderModalOpts(p) {
     const state = window.pState[p.id] || {};
     const sizes = [...new Set(p.variants.filter(v => Number(v.stock) > 0).map(v => v.size))];
     
-    // ✅ FIX: Auto-select size if only 1 size exists
+    // Auto-select size if only 1 size exists
     if (sizes.length === 1 && !state.size) {
         state.size = sizes[0];
         window.pState[p.id] = state;
     }
 
-    const colors = state.size ? [...new Set(p.variants.filter(v => Number(v.stock) > 0 && v.size === state.size).map(v => v.color))] : [];
+    // ✅ FIX: COLORS LOGIC UPDATE
+    // Step 1: Selected size ke hisaab se colors dhundho
+    let colors = [];
+    if (state.size) {
+        colors = [...new Set(p.variants.filter(v => Number(v.stock) > 0 && v.size === state.size).map(v => v.color))];
+    }
+    
+    // Step 2: Agar selected size ke liye colors nahi mile (ya size select hi nahi hua), to SAARE colors dikhao
+    if (colors.length === 0) {
+         colors = [...new Set(p.variants.filter(v => Number(v.stock) > 0).map(v => v.color))];
+    }
+
+    // Step 3: Empty strings remove karo
+    colors = colors.filter(c => c && c.trim() !== "");
 
     if (state.size && colors.length === 1 && !state.color) {
         state.color = colors[0];
@@ -2580,7 +2593,7 @@ async function loadProds() {
             if (data.offer) siteOffer = data.offer;
         }
 
-        // ✅ FIX 1: DATA GROUPING LOGIC (Flat Rows ko Nested Structure mein convert karna)
+        // ✅ FIX 1: DATA GROUPING LOGIC
         if (rawProducts.length > 0 && !rawProducts[0].variants) {
             const grouped = {};
             rawProducts.forEach(row => {
@@ -2603,9 +2616,20 @@ async function loadProds() {
                 const szChart = row['Size Chart'] || row.sizeChart;
                 if(sz && szChart) grouped[id].sizeChart[sz] = szChart;
 
+                // ✅ ROBUST COLOR MAPPING (Automatic header detection + Trim)
+                let colorVal = row.Colour || row.Color || row.color || row.colour;
+                if (!colorVal) {
+                    for (let key in row) {
+                        if (key.toLowerCase().includes('col')) {
+                            colorVal = row[key];
+                            break;
+                        }
+                    }
+                }
+
                 grouped[id].variants.push({
-                    size: sz,
-                    color: row.Colour || row.Color || row.color,
+                    size: sz ? String(sz).trim() : "", // ✅ Trim Size
+                    color: colorVal ? String(colorVal).trim() : "", // ✅ Trim Color
                     stock: row.Stock || row.stock,
                     price: row.Price || row.price,
                     mrp: row.MRP || row.mrp,
@@ -2617,7 +2641,7 @@ async function loadProds() {
             products = rawProducts;
         }
 
-        // ✅ FIX 2: IMAGE HANDLING (String ko Array mein convert karna)
+        // ✅ FIX 2: IMAGE HANDLING
         products.forEach(p => {
             if (typeof p.img === 'string') {
                 p.img = p.img.split(',').map(s => s.trim()).filter(s => s.length > 0);
