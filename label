@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Auto Label Generator</title>
+
+<!-- Barcode & QR Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+<style>
+body { font-family: Arial; }
+
+.container { display: flex; gap: 20px; }
+
+.form { width: 260px; }
+
+.form input, textarea {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 5px;
+}
+
+.label {
+  width: 500px;
+  border: 2px solid black;
+  padding: 10px;
+}
+
+.box {
+  border: 2px solid black;
+  padding: 5px;
+  margin: 3px;
+  display: inline-block;
+  font-weight: bold;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.qr {
+  width: 80px;
+  height: 80px;
+}
+
+.small { font-size: 12px; }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- INPUT -->
+<div class="form">
+  <h3>Enter Details</h3>
+
+  AWB: <input id="awb" value="368572884627">
+  Name: <input id="name" value="Customer Name">
+  Address: <textarea id="address">Full Address</textarea>
+
+  Weight: <input id="weight" value="0.50 kgs">
+  Date: <input id="date" value="18/04">
+  Payment: <input id="payment" value="PREPAID">
+
+  Order ID: <input id="order" value="408-XXXX">
+  Ship Date: <input id="ship" value="13/04/2026">
+
+  Station: <input id="station" value="KJMG">
+  Sector: <input id="sector" value="S-03">
+
+  <button onclick="generate()">Generate Label</button>
+</div>
+
+<!-- LABEL -->
+<div class="label">
+
+  <!-- BARCODE -->
+  <svg id="barcode"></svg>
+  <div style="text-align:center;">AWB <span id="o_awb"></span></div>
+
+  <div class="row">
+    <div>
+      <div class="box">SUR</div>
+      <div class="box" id="o_weight"></div>
+      <div class="box" id="o_date"></div>
+      <div class="box" id="o_payment"></div>
+    </div>
+
+    <div>
+      <div class="box">BOX 1 of 1</div>
+    </div>
+  </div>
+
+  <div>
+    <b>Ship To:</b><br>
+    <span id="o_name"></span><br>
+    <span id="o_address"></span>
+  </div>
+
+  <div class="small">
+    Order Id: <span id="o_order"></span><br>
+    Ship Date: <span id="o_ship"></span>
+  </div>
+
+  <!-- QR -->
+  <canvas id="qr"></canvas>
+
+  <div class="row">
+    <div class="box" id="o_station"></div>
+    <div class="box" id="o_sector"></div>
+  </div>
+
+</div>
+
+</div>
+
+<script>
+function generate() {
+
+  // TEXT UPDATE
+  o_awb.innerText = awb.value;
+  o_name.innerText = name.value;
+  o_address.innerText = address.value;
+  o_weight.innerText = weight.value;
+  o_date.innerText = date.value;
+  o_payment.innerText = payment.value;
+  o_order.innerText = order.value;
+  o_ship.innerText = ship.value;
+  o_station.innerText = station.value;
+  o_sector.innerText = sector.value;
+
+  // BARCODE AUTO
+  JsBarcode("#barcode", awb.value, {
+    format: "CODE128",
+    width: 2,
+    height: 60,
+    displayValue: false
+  });
+
+  // QR AUTO (Full Data)
+  let qrData = `
+  AWB: ${awb.value}
+  Name: ${name.value}
+  Address: ${address.value}
+  Order: ${order.value}
+  `;
+
+  QRCode.toCanvas(document.getElementById("qr"), qrData);
+}
+</script>
+
+</body>
+</html>
