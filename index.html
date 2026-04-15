@@ -876,25 +876,7 @@ header h1 {
 </style>
 </head>
 <body>
-<div style="
-position:fixed;
-inset:0;
-background:#ffffff;
-z-index:999999;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-font-family:Arial, sans-serif;
-text-align:center;
-padding:20px;
-">
 
-    <h1 style="font-size:28px; margin-bottom:12px;">
-        🚧 Website Under Maintenance
-   
-
-</div>
 <!-- Loader -->
 <div id="loaderWrap">
     <div class="loader-text">AK FASHION HUB...</div>
@@ -1128,7 +1110,12 @@ const SESSION_DAYS = 30;
 const RETURN_WINDOW_DAYS = 3;
 
 let products = [];
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let cart = [];
+try {
+cart = JSON.parse(localStorage.getItem('cart')) || [];
+} catch(e) {
+cart = [];
+}
 let currentProdIndex = null;
 let allOrders = [];
 let currentOrderDetail = null;
@@ -1300,9 +1287,13 @@ async function apiPost(data) {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
         body: JSON.stringify({...data, _sid: sessionId, _ts: Date.now()})
-    });
-    return JSON.parse(await res.text());
+ });
+try {
+return JSON.parse(await res.text());
+} catch(e) {
+return { status: "error" };
 }
+} // ✅ ये closing bracket missing था
 
 function getPriceInfo(variant) {
     let final = variant.price;
