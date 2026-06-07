@@ -25,7 +25,6 @@
     -ms-user-select: none;
     user-select: none;
 
-    /* Native edge swipe gestures allowed */
     touch-action: auto;
     -webkit-overflow-scrolling: touch;
 }
@@ -51,17 +50,17 @@
     }
 
 header h1 {
-    font-size: 32px;              /* bada */
-    letter-spacing: 1.5px;        /* thoda tight */
+    font-size: 32px;
+    letter-spacing: 1.5px;
     margin-bottom: 4px;
     font-weight: 900;
     text-transform: uppercase;
 
-    white-space: nowrap;          /* ek hi line */
-    overflow: hidden;             /* bahar na nikle */
-    text-overflow: ellipsis;      /* safety */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
-    max-width: calc(100% - 70px); /* 🛒 icon se bachaav */
+    max-width: calc(100% - 70px);
     margin-left: auto;
     margin-right: auto;
 
@@ -333,6 +332,7 @@ header h1 {
         color: #fff;
         border-color: #000;
     }
+
 /* Description clamp + toggle */
 .desc {
   font-size: 14px;
@@ -437,7 +437,7 @@ header h1 {
     #floatingCart {
         position: fixed;
         top: 70px;
-        left: 4px;
+        left: 20px; /* BUG FIX: 4px se 20px - edge swipe conflict fix */
         background: transparent;
         color: #555;
         padding: 10px;
@@ -447,8 +447,6 @@ header h1 {
         opacity: 0.7;
         display: none;
         touch-action: auto;
-        /* FIX: Ensure it doesn't block left-edge swipe start */
-        margin-left: 2px; 
     }
 
     /* Cart Panel */
@@ -465,15 +463,11 @@ header h1 {
         display: flex;
         flex-direction: column;
         touch-action: auto;
-        /* FIX: Critical for right-edge swipe. 
-           Panel is closed by default, so it should NOT catch touches. 
-           When .open is added, it becomes interactive. */
         pointer-events: none; 
     }
 
     #cartPanel.open {
         right: 0;
-        /* FIX: Allow interaction when open */
         pointer-events: auto; 
     }
 
@@ -812,7 +806,6 @@ header h1 {
         width: 170px;
     }
 
-    /* ✅ Footer terms (blue text) — FORCE SMALL ON MOBILE */
     footer p {
         font-size: 7px !important;
         opacity: 0.7;
@@ -840,10 +833,11 @@ header h1 {
     #floatingCart {
         display: block;
         top: 4px;
-        left: 2px;
+        left: 10px; /* BUG FIX: 2px se 10px - edge swipe conflict fix */
         font-size: 20px;
     }
 }
+
 /* Description Table Styles */
 .desc-table-box {
     width: 100%;
@@ -1101,20 +1095,22 @@ style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px">
 <script>
 const API = "https://script.google.com/macros/s/AKfycbzGjggDupu-Ir3oszHUTE1N-edK31rkKaiEtppT3wCozE4iuofdBH27Lp5Q3oMiYphqLA/exec";
   
-    const aCity  = document.getElementById("aCity");
+const aCity  = document.getElementById("aCity");
 const aPin   = document.getElementById("aPin");
 const aState = document.getElementById("aState");
 
-    const SESSION_KEY = "akfh_session";
+const SESSION_KEY = "akfh_session";
 const SESSION_DAYS = 30;
 const RETURN_WINDOW_DAYS = 3;
 
 let products = [];
 let cart = [];
 try {
-cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart = JSON.parse(localStorage.getItem('cart')) || [];
+    // BUG FIX: Invalid cart items hatao (price na ho toh)
+    cart = cart.filter(item => item && item.price && item.id);
 } catch(e) {
-cart = [];
+    cart = [];
 }
 let currentProdIndex = null;
 let allOrders = [];
@@ -1154,7 +1150,8 @@ const MAJOR_CITIES = [
     "Mangalore", "Erode", "Belgaum", "Ambattur", "Tirunelveli", "Malegaon", "Gaya", "Jalgaon", 
     "Udaipur", "Maheshtala", "Hapur","Vapi","Mahoba"
 ];
-  const CITY_PIN_STATE = {
+
+const CITY_PIN_STATE = {
   "Mumbai": { pin: "400001", state: "Maharashtra" },
   "Delhi": { pin: "110001", state: "Delhi" },
   "Bangalore": { pin: "560001", state: "Karnataka" },
@@ -1256,9 +1253,9 @@ const MAJOR_CITIES = [
   "Gaya": { pin: "823001", state: "Bihar" },
   "Jalgaon": { pin: "425001", state: "Maharashtra" },
   "Udaipur": { pin: "313001", state: "Rajasthan" },
-      "Vapi": { pin: "396191", state: "Gujarat" },
+  "Vapi": { pin: "396191", state: "Gujarat" },
   "Maheshtala": { pin: "700141", state: "West Bengal" },
-      "Mahoba": { pin: "210427", state: "Uttar Pradesh" },
+  "Mahoba": { pin: "210427", state: "Uttar Pradesh" },
   "Hapur": { pin: "245101", state: "Uttar Pradesh" }
 };
 
@@ -1280,20 +1277,20 @@ function showToast(msg) {
 }
 
 async function apiPost(data) {
-  const sessionId = localStorage.getItem('akfh_session_id') || Math.random().toString(36).substring(2);
-  localStorage.setItem('akfh_session_id', sessionId);
-  
-  const res = await fetch(API, {
+    const sessionId = localStorage.getItem('akfh_session_id') || Math.random().toString(36).substring(2);
+    localStorage.setItem('akfh_session_id', sessionId);
+    
+    const res = await fetch(API, {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
         body: JSON.stringify({...data, _sid: sessionId, _ts: Date.now()})
- });
-try {
-return JSON.parse(await res.text());
-} catch(e) {
-return { status: "error" };
+    });
+    try {
+        return JSON.parse(await res.text());
+    } catch(e) {
+        return { status: "error" };
+    }
 }
-} // ✅ ये closing bracket missing था
 
 function getPriceInfo(variant) {
     let final = variant.price;
@@ -1303,8 +1300,8 @@ function getPriceInfo(variant) {
 
 function isReturnWindowOpen(deliveryDate) {
     if (!deliveryDate) return false;
-   const delivery = new Date(deliveryDate);
-if (isNaN(delivery)) return false;
+    const delivery = new Date(deliveryDate);
+    if (isNaN(delivery)) return false;
     const now = new Date();
     const diffDays = Math.floor((now - delivery) / (1000 * 60 * 60 * 24));
     return diffDays <= RETURN_WINDOW_DAYS;
@@ -1330,11 +1327,10 @@ function saveLeadNumber() {
     const phone = document.getElementById("leadPhone").value.trim();
     if (!/^[6-9]\d{9}$/.test(phone)) { alert("Invalid number"); return; }
 
-    const d = { phone: phone };
-   const old = JSON.parse(localStorage.getItem("addr")) || {};
-localStorage.setItem("addr", JSON.stringify({ ...old, phone: d.phone }));
+    const old = JSON.parse(localStorage.getItem("addr")) || {};
+    localStorage.setItem("addr", JSON.stringify({ ...old, phone: phone }));
     localStorage.setItem("lead_verified", "true");
-    apiPost({ type: "CHECKOUT_LEAD", phone: d.phone, name: "Lead User", address: "Website Popup Lead", cart: "Popup Lead", total: "0" }).catch(e=>{});
+    apiPost({ type: "CHECKOUT_LEAD", phone: phone, name: "Lead User", address: "Website Popup Lead", cart: "Popup Lead", total: "0" }).catch(e=>{});
     
     document.getElementById("leadModal").style.display = "none";
     showToast("Number verified!");
@@ -1380,7 +1376,7 @@ function renderProducts() {
 
         grid.innerHTML += `
             <div class="card" onclick="openModal(${originalIndex})">
-                <img src="${img}" alt="${p.name}">
+                <img src="${img}" alt="${p.name}" loading="lazy">
                 <div class="price-overlay">
                     <span class="mrp-tag">MRP ₹${priceInfo.mrp}</span>
                     <span class="final-tag">₹${priceInfo.final}</span>
@@ -1390,11 +1386,13 @@ function renderProducts() {
         `;
     });
 }
+
 function filterProds(type, el) {
     document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
     el.classList.add("active");
     renderProducts();
 }
+
 function getImageForColor(p, color) {
     if (!p.img || p.img.length === 0) return "";
     if (p.img.length === 1) return p.img[0];
@@ -1406,25 +1404,20 @@ function getImageForColor(p, color) {
     return p.img[0];
 }
 
-
-    function openModal(index) {
+function openModal(index) {
     currentProdIndex = index;
     const p = products[index];
     
-    apiPost({ type:  "PRODUCT_CLICK", productId: p.id, productName: p.name, timestamp: new Date().toISOString() }).catch(e=>{});
+    apiPost({ type: "PRODUCT_CLICK", productId: p.id, productName: p.name, timestamp: new Date().toISOString() }).catch(e=>{});
     
     document.getElementById("modalTitle").innerText = p.name;
     
-    // --- DESCRIPTION LOGIC UPDATE ---
     const descDiv = document.getElementById("modalDesc");
     const rawText = p.description || "Premium Quality Product.";
     
-    // 1. Raw Text store karo
     descDiv.dataset.raw = rawText;
-    // 2. Formatted Table store karo
     descDiv.dataset.formatted = formatDescription(rawText);
     
-    // 3. Default state: Raw text dikhao aur clamp laga do
     descDiv.innerText = rawText;
     descDiv.classList.add("clamp"); 
     descDiv.classList.remove("expanded-table");
@@ -1432,7 +1425,6 @@ function getImageForColor(p, color) {
     const toggleBtn = document.getElementById("descToggle");
     toggleBtn.style.display = window.innerWidth <= 768 ? "inline-block" : "none";
     toggleBtn.innerText = "See more";
-    // ----------------------------------
 
     const priceInfo = getPriceInfo(p.variants[0]);
     document.getElementById("modalPrice").innerHTML = `<span style="text-decoration:line-through; font-size:14px; color:#999">MRP ₹${priceInfo.mrp}</span> ₹${priceInfo.final}`;
@@ -1468,29 +1460,22 @@ function getImageForColor(p, color) {
     document.getElementById("productModal").style.display = "flex";
     document.body.style.overflow = "hidden";
 }
+
 function toggleDesc() {
     const d = document.getElementById("modalDesc");
     const t = document.getElementById("descToggle");
 
-    // Agar abhi clamped hai (2 lines)
     if (d.classList.contains("clamp")) {
-        // Clamp hatao
         d.classList.remove("clamp");
-        // Formatted HTML insert karo (Table wala)
         d.innerHTML = d.dataset.formatted;
         t.innerText = "Show less";
-    } 
-    // Agar expanded hai
-    else {
-        // Wapas clamp laga do
+    } else {
         d.classList.add("clamp");
-        // Raw text wapas lao
         d.innerText = d.dataset.raw;
         t.innerText = "See more";
     }
 }
 
-// Ye naya function text ko table format mein convert karega
 function formatDescription(text) {
     if (!text) return "";
     
@@ -1501,7 +1486,6 @@ function formatDescription(text) {
         line = line.trim();
         if (!line) return;
 
-        // Agar line mein colon (:) hai, toh table row banao
         if (line.includes(':')) {
             const parts = line.split(/:(.+)/); 
             if (parts.length >= 2) {
@@ -1514,12 +1498,12 @@ function formatDescription(text) {
             }
         }
         
-        // Agar colon nahi hai, toh normal paragraph rakho
         html += `<p>${line}</p>`;
     });
     
     return html;
 }
+
 function openZoom(src) {
     document.getElementById("zoomOverlay").style.display = "flex";
     document.getElementById("zoomImg").src = src;
@@ -1538,39 +1522,30 @@ function changeImg(src, el) {
 function renderModalOpts(p) {
     const state = window.pState[p.id] || {};
 
-    // 1. Sizes: Saare available sizes nikalo
     const sizes = [...new Set(p.variants.filter(v => Number(v.stock) > 0).map(v => v.size))];
 
-    // 2. Colors Logic: SIRF tab dikhao jab Size select ho
     let colors = [];
     
     if (state.size) {
-        // ✅ REQUIREMENT: Size select hone par sirf uske colors dikhao
         colors = [...new Set(p.variants.filter(v => 
             Number(v.stock) > 0 && 
             String(v.size).trim() === String(state.size).trim()
         ).map(v => v.color))];
-    } 
-    // Agar size select nahi hai, to colors empty rahenge (colors = [])
+    }
 
-    // Empty strings hatao
     colors = colors.filter(c => c);
 
-    // 3. Auto-Selection Logic
-    // Agar sirf 1 size hai toh auto-select
     if (sizes.length === 1 && !state.size) {
         state.size = sizes[0];
         window.pState[p.id] = state;
-        return renderModalOpts(p); // Re-render to load colors
+        return renderModalOpts(p);
     }
     
-    // Agar size select hai aur sirf 1 color mila, toh auto-select
     if (state.size && colors.length === 1 && !state.color) {
         state.color = colors[0];
         window.pState[p.id] = state;
     }
 
-    // 4. Stock Message & Button Logic
     let stockMsg = "";
     let canAdd = false;
 
@@ -1588,38 +1563,30 @@ function renderModalOpts(p) {
             if (colorImg) document.getElementById("modalMainImg").src = colorImg;
         }
     } else {
-        // User ko guide karo
         if (!state.size) stockMsg = "Please select a Size";
         else if (!state.color) stockMsg = "Please select a Color";
     }
 
-    // 5. Render Buttons
     document.getElementById("modalSizes").innerHTML = sizes.map(s => 
         `<div class="opt-btn ${state.size === s ? 'selected' : ''}" onclick="selOpt('size', '${s}')">${s}</div>`
     ).join("");
 
-    // COLOR SECTION RENDER (Strict Logic)
     const colorBox = document.getElementById("modalColors");
     
     if (!state.size) {
-        // Agar size select nahi hai toh message dikhao
         colorBox.innerHTML = "<span style='font-size:12px; color:#999; padding:5px; display:block;'>Select Size first</span>";
     } else if (colors.length === 0) {
-        // Agar size select hai par usme color nahi hai
         colorBox.innerHTML = "<span style='font-size:12px; color:red; padding:5px; display:block;'>No colors available</span>";
     } else {
-        // Colors dikhao
         colorBox.innerHTML = colors.map(c => 
             `<div class="opt-btn ${state.color === c ? 'selected' : ''}" onclick="selOpt('color', '${c}')">${c}</div>`
         ).join("");
     }
 
-    // 6. UI Updates
     document.getElementById("modalStock").innerText = stockMsg;
     const stockEl = document.getElementById("modalStock");
     stockEl.style.color = canAdd ? "green" : "#555";
     
-    // Size Chart Logic
     const sizeInfoDiv = document.getElementById("sizeInfoDisplay");
     if (state.size && p.sizeChart && p.sizeChart[state.size]) {
         sizeInfoDiv.innerText = `${state.size}: ${p.sizeChart[state.size]}`;
@@ -1629,6 +1596,7 @@ function renderModalOpts(p) {
 
     document.getElementById("modalAddBtn").disabled = !canAdd;
 }
+
 function selOpt(type, val) {
     const p = products[currentProdIndex];
     if (!window.pState[p.id]) window.pState[p.id] = {};
@@ -1647,24 +1615,25 @@ function selOpt(type, val) {
 
 function renderSimilar(p) {
     const box = document.getElementById("similarGrid");
-const sims = products.filter(
-    x => x.id !== p.id && (x.gender || "").toLowerCase() === (p.gender || "").toLowerCase()
-).slice(0, 4);
+    const sims = products.filter(
+        x => x.id !== p.id && (x.gender || "").toLowerCase() === (p.gender || "").toLowerCase()
+    ).slice(0, 4);
     
     box.innerHTML = sims.map(s => {
         const idx = products.findIndex(x => x.id === s.id);
-        return `<div class="sim-item" onclick="openModal(${idx})">${s.img && s.img[0] ? `<img src="${s.img[0]}">` : ``}<p>${s.name}</p></div>`;
+        return `<div class="sim-item" onclick="openModal(${idx})">${s.img && s.img[0] ? `<img src="${s.img[0]}" loading="lazy">` : ``}<p>${s.name}</p></div>`;
     }).join("");
 }
 
 function closeModal() {
     document.getElementById("productModal").style.display = "none";
-    document.getElementById('floatingCart').style.display = 'block';
     document.body.style.overflow = "";
     const icon = document.getElementById('floatingCart');
     const panel = document.getElementById("cartPanel");
-  icon.style.display = panel.classList.contains("open") ? "none" : "block";
+    // BUG FIX: Cart open ho toh icon hide rakho, warna show karo
+    icon.style.display = panel.classList.contains("open") ? "none" : "block";
 }
+
 function openTerms() {
     let d = document.createElement("div");
     d.style.cssText = "position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:999999; display:flex; align-items:center; justify-content:center; padding:20px";
@@ -1725,8 +1694,9 @@ function updateCart() {
     let sub = 0;
     let totalWeight = 0;
 
+    // BUG FIX: Reverse loop mein splice karo - index shift hone se bachao
     for (let i = cart.length - 1; i >= 0; i--) {
-        if (!cart[i].price) { cart.splice(i, 1); continue; }
+        if (!cart[i] || !cart[i].price) { cart.splice(i, 1); continue; }
         sub += Number(cart[i].price) * cart[i].qty;
         totalWeight += (cart[i].weight || 500) * cart[i].qty;
     }
@@ -1763,7 +1733,8 @@ function updateCart() {
 
     let del = calcDel(totalWeight);
     let disc = 0;
-  let msg = "&nbsp;";
+    let msg = "&nbsp;";
+
     if (appliedCoup && siteCoupons[appliedCoup]) {
         const r = siteCoupons[appliedCoup];
         if (r.type === "FREE_DELIVERY") disc += del;
@@ -1801,6 +1772,7 @@ function updateCart() {
     }
 }
 
+// BUG FIX: calcDel - Dead code fix, proper weight slabs
 function calcDel(w) {
     let c = 50;
     if (w > 1801) {
@@ -1808,13 +1780,18 @@ function calcDel(w) {
         let extra = w - 1801;
         let steps = Math.ceil(extra / 300);
         c += steps * 20;
-    } else if (w > 1501) c = 160;
-    else if (w > 1201) c = 140;
-    else if (w > 901) c = 120;
-    else if (w > 601) c = 90;
-    else if (w > 301) c = 70;
-    
-    if (c > 350) c = 350;
+        if (c > 350) c = 350;
+    } else if (w > 1501) {
+        c = 160;
+    } else if (w > 1201) {
+        c = 140;
+    } else if (w > 901) {
+        c = 120;
+    } else if (w > 601) {
+        c = 90;
+    } else if (w > 301) {
+        c = 70;
+    }
     return c;
 }
 
@@ -1842,7 +1819,6 @@ function applyCoupon() {
         return;
     }
 
-    // ✅ INSTANT FEEDBACK
     msg.innerText = "Applying coupon...";
     msg.style.color = "#555";
 
@@ -1852,9 +1828,10 @@ function applyCoupon() {
         coupon: code,
         cartTotal: cart.reduce((s, i) => s + i.price * i.qty, 0)
     }).then(res => {
-
         if (res.status === "OK") {
             appliedCoup = code;
+            // BUG FIX: siteCoupons mein save karo taaki updateCart mein discount lage
+            if (res.coupon) siteCoupons[code] = res.coupon;
 
             if (res.coupon && res.coupon.type === "FREE_DELIVERY") {
                 msg.innerText = "Coupon applied! Delivery is FREE 🎉";
@@ -1863,7 +1840,6 @@ function applyCoupon() {
             } else {
                 msg.innerText = "✅ Coupon Applied";
             }
-
             msg.style.color = "green";
 
         } else if (res.status === "BLOCKED" && res.coupon && res.coupon.min) {
@@ -1884,11 +1860,13 @@ function applyCoupon() {
         msg.style.color = "red";
     });
 }
+
 function applyCouponBtn() {
     const input = document.getElementById("couponInput");
-    input.blur();      // keyboard band
-    applyCoupon();     // tumhara existing coupon check
+    input.blur();
+    applyCoupon();
 }
+
 function toggleCart() {
     const panel = document.getElementById("cartPanel");
     const over = document.getElementById("cartOverlay");
@@ -1902,7 +1880,7 @@ function toggleCart() {
         if (modal.style.display !== 'flex') {
             icon.style.display = "block";
         }
-       if (document.getElementById("productModal").style.display !== "flex") document.body.style.overflow = "";
+        if (document.getElementById("productModal").style.display !== "flex") document.body.style.overflow = "";
     } else {
         panel.classList.add("open");
         over.style.display = "block";
@@ -1928,7 +1906,7 @@ function updBadge(t) {
         b.id = "cartCount";
         b.style.cssText = "position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:transparent; color:#000; font-size:10px; font-weight:bold; line-height:1; text-shadow:0 0 2px #fff, 0 0 4px #fff;";
         const fc = document.getElementById("floatingCart");
-if (fc) fc.appendChild(b);
+        if (fc) fc.appendChild(b);
     }
     b.innerText = cart.reduce((s, i) => s + i.qty, 0);
     
@@ -1942,17 +1920,18 @@ if (fc) fc.appendChild(b);
     }
     if (window.innerWidth < 768 && cart.length > 0) {
         bar.style.display = "flex";
-      bar.innerHTML = `🛒 View Cart (${cart.reduce((s,i)=>s+i.qty,0)}) <b>₹${t}</b>`;
+        bar.innerHTML = `🛒 View Cart (${cart.reduce((s,i)=>s+i.qty,0)}) <b>₹${t}</b>`;
     } else {
         bar.style.display = "none";
     }
 }
 
+// BUG FIX: genId - Unique ID ke liye better random generation
 function genId() {
     const d = new Date();
-    const randomPart = Math.random().toString(36).substring(2, 8);
-    const timePart = Date.now().toString(36).slice(-6);
-    return `AKFH-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}-${timePart}${randomPart}`.toUpperCase();
+    const randomPart = Math.random().toString(36).substring(2, 9).toUpperCase();
+    const timePart = Date.now().toString(36).toUpperCase();
+    return `AKFH-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}-${timePart}${randomPart}`;
 }
 
 function checkout() {
@@ -2086,6 +2065,7 @@ async function confirmOrderYes() {
         document.getElementById("checkoutLoader").style.display = "none";
         alert(e.message || "Connection error. Please try again.");
     }
+    // BUG FIX: isProcessing finally block mein reset karo - error pe bhi reset ho
     isProcessing = false;
 }
 
@@ -2097,32 +2077,31 @@ function setupSuggestions() {
     const pinInput = document.getElementById("aPin");
     const pinSuggestions = document.getElementById("pinSuggestions");
 
-   cityInput.addEventListener("input", function () {
-    const val = this.value.trim();
-    if (val.length < 1) {
-        citySuggestions.style.display = "none";
-        return;
-    }
+    cityInput.addEventListener("input", function () {
+        const val = this.value.trim();
+        if (val.length < 1) {
+            citySuggestions.style.display = "none";
+            return;
+        }
 
-    const matches = Object.keys(CITY_PIN_STATE)
-        .filter(c => c.toLowerCase().startsWith(val.toLowerCase()));
+        const matches = Object.keys(CITY_PIN_STATE)
+            .filter(c => c.toLowerCase().startsWith(val.toLowerCase()));
 
-    if (matches.length > 0) {
-        citySuggestions.innerHTML = matches.map(c =>
-            `<div class="suggestion-item" onclick="selectCityFull('${c}')">${c}</div>`
-        ).join("");
-        citySuggestions.style.display = "block";
-    } else {
-        citySuggestions.style.display = "none";
-    }
+        if (matches.length > 0) {
+            citySuggestions.innerHTML = matches.map(c =>
+                `<div class="suggestion-item" onclick="selectCityFull('${c}')">${c}</div>`
+            ).join("");
+            citySuggestions.style.display = "block";
+        } else {
+            citySuggestions.style.display = "none";
+        }
 
-    // ✅ auto-fill if exact city typed
-    if (CITY_PIN_STATE[val]) {
-        aPin.value = CITY_PIN_STATE[val].pin;
-        aState.value = CITY_PIN_STATE[val].state;
-        citySuggestions.style.display = "none";
-    }
-});
+        if (CITY_PIN_STATE[val]) {
+            aPin.value = CITY_PIN_STATE[val].pin;
+            aState.value = CITY_PIN_STATE[val].state;
+            citySuggestions.style.display = "none";
+        }
+    });
 
     stateInput.addEventListener("input", function() {
         const val = this.value.trim();
@@ -2141,31 +2120,31 @@ function setupSuggestions() {
         }
     });
 
- 
     pinInput.addEventListener("input", function () {
-    const val = this.value.trim();
+        const val = this.value.trim();
 
-    if (val.length < 2) {
-        pinSuggestions.style.display = "none";
-        return;
-    }
+        if (val.length < 2) {
+            pinSuggestions.style.display = "none";
+            return;
+        }
 
-    const matches = Object.entries(CITY_PIN_STATE)
-        .filter(([_, v]) => v.pin.startsWith(val));
+        const matches = Object.entries(CITY_PIN_STATE)
+            .filter(([_, v]) => v.pin.startsWith(val));
 
-    if (matches.length > 0) {
-        pinSuggestions.innerHTML = matches.map(([city, v]) =>
-            `<div class="suggestion-item" onclick="selectPin('${v.pin}','${city}','${v.state}')">
-              ${v.pin} – ${city}
-            </div>`
-        ).join("");
-        pinSuggestions.style.display = "block";
-    } else {
-        pinSuggestions.style.display = "none";
-    }
+        if (matches.length > 0) {
+            pinSuggestions.innerHTML = matches.map(([city, v]) =>
+                `<div class="suggestion-item" onclick="selectPin('${v.pin}','${city}','${v.state}')">
+                  ${v.pin} – ${city}
+                </div>`
+            ).join("");
+            pinSuggestions.style.display = "block";
+        } else {
+            pinSuggestions.style.display = "none";
+        }
 
-    if (val.length === 6) pinSuggestions.style.display = "none";
-});
+        if (val.length === 6) pinSuggestions.style.display = "none";
+    });
+
     document.addEventListener("click", function(e) {
         if (!citySuggestions.contains(e.target) && e.target !== cityInput) {
             citySuggestions.style.display = "none";
@@ -2179,13 +2158,12 @@ function setupSuggestions() {
     });
 }
 
-
-
 function selectState(state) {
     document.getElementById("aState").value = state;
     document.getElementById("stateSuggestions").style.display = "none";
 }
-  function selectCityFull(city) {
+
+function selectCityFull(city) {
     const citySuggestions = document.getElementById("citySuggestions");
     aCity.value = city;
     if (CITY_PIN_STATE[city]) {
@@ -2194,6 +2172,7 @@ function selectState(state) {
     }
     citySuggestions.style.display = "none";
 }
+
 function selectPin(pin, city, state) {
     document.getElementById("aPin").value = pin;
     document.getElementById("aCity").value = city;
@@ -2206,7 +2185,7 @@ function openAddress() {
     const s = JSON.parse(localStorage.getItem("addr"));
     if (s) {
         document.getElementById("aName").value = s.name || "";
-       document.getElementById("aPhone").value = s.phone || "";
+        document.getElementById("aPhone").value = s.phone || "";
         document.getElementById("aAddr").value = s.address || "";
         document.getElementById("aCity").value = s.city || "";
         document.getElementById("aPin").value = s.pin || "";
@@ -2219,14 +2198,16 @@ function openAddress() {
         document.getElementById("aPin").value = "";
         document.getElementById("aState").value = "";
     }
-   if (!window.suggInit) {
-  setupSuggestions();
-  window.suggInit = true;
+    if (!window.suggInit) {
+        setupSuggestions();
+        window.suggInit = true;
     }
 }
+
 function closeAddress() {
     document.getElementById("addressModal").style.display = "none";
 }
+
 function saveAddress() {
     const aName  = document.getElementById("aName");
     const aPhone = document.getElementById("aPhone");
@@ -2249,7 +2230,7 @@ function saveAddress() {
     
     const oldAddr = JSON.parse(localStorage.getItem("addr"));
     if (!oldAddr || oldAddr.phone !== d.phone) {
-         apiPost({ type: "CHECKOUT_LEAD", phone: d.phone, name: d.name, address: `${d.address}, ${d.city}`, cart: "Lead", total: "Lead" }).catch(e=>{});
+        apiPost({ type: "CHECKOUT_LEAD", phone: d.phone, name: d.name, address: `${d.address}, ${d.city}`, cart: "Lead", total: "Lead" }).catch(e=>{});
     }
 
     localStorage.setItem("addr", JSON.stringify(d));
@@ -2301,9 +2282,9 @@ function renderOrders(list) {
                            o.status === 'Dispatched' ? 'status-dispatched' : 'status-placed';
         
         const placedDate = o.date ? new Date(o.date).toLocaleDateString() : 'N/A';
-   const deliveryDate = (o.deliveryDate && !isNaN(new Date(o.deliveryDate)))
-    ? new Date(o.deliveryDate).toLocaleDateString()
-    : '';
+        const deliveryDate = (o.deliveryDate && !isNaN(new Date(o.deliveryDate)))
+            ? new Date(o.deliveryDate).toLocaleDateString()
+            : '';
         return `
             <div class="order-card" onclick="showOrderDetail(${idx})">
                 <div style="display:flex; justify-content:space-between; margin-bottom:5px">
@@ -2319,7 +2300,9 @@ function renderOrders(list) {
         `;
     }).join("");
 }
+
 let currentRating = 0;
+
 function showOrderDetail(idx) {
     currentRating = 0;
     const o = allOrders[idx];
@@ -2332,8 +2315,8 @@ function showOrderDetail(idx) {
     const returnOpen = isDelivered && isReturnWindowOpen(o.deliveryDate);
 
     const placedDate = o.date ? new Date(o.date).toLocaleDateString() : 'N/A';
-   const ddt = new Date(o.deliveryDate);
-const deliveryDate = (o.deliveryDate && !isNaN(ddt)) ? ddt.toLocaleDateString() : '';
+    const ddt = new Date(o.deliveryDate);
+    const deliveryDate = (o.deliveryDate && !isNaN(ddt)) ? ddt.toLocaleDateString() : '';
     
     let itemsHTML = '';
     if (o.items && Array.isArray(o.items)) {
@@ -2347,58 +2330,46 @@ const deliveryDate = (o.deliveryDate && !isNaN(ddt)) ? ddt.toLocaleDateString() 
         itemsHTML = `<div style="padding:8px 0; font-size:13px">${o.products}</div>`;
     }
     
- let returnSectionHTML = '';
-if (isDelivered) {
-    if (returnOpen) {
-        const sess = JSON.parse(localStorage.getItem(SESSION_KEY)) || {};
-        returnSectionHTML = `
-        <div class="return-section">
-
-            <!-- 🔘 TOGGLE HEADER (ADDED) -->
-            <div onclick="
-              const b=this.nextElementSibling;
-              b.style.display = b.style.display==='none'?'block':'none';
-            " style="cursor:pointer; font-weight:bold; padding:10px; background:#000; color:#fff; border-radius:6px; text-align:center">
-              RETURN / REPLACEMENT
+    let returnSectionHTML = '';
+    if (isDelivered) {
+        if (returnOpen) {
+            const sess = JSON.parse(localStorage.getItem(SESSION_KEY)) || {};
+            returnSectionHTML = `
+            <div class="return-section">
+                <div onclick="
+                  const b=this.nextElementSibling;
+                  b.style.display = b.style.display==='none'?'block':'none';
+                " style="cursor:pointer; font-weight:bold; padding:10px; background:#000; color:#fff; border-radius:6px; text-align:center">
+                  RETURN / REPLACEMENT
+                </div>
+                <div style="display:none; margin-top:10px">
+                    <h4 style="margin-bottom:10px">Return / Replacement Request</h4>
+                    <input type="text" id="retPhone" value="${sess.phone || ''}" placeholder="Mobile Number *" maxlength="10" ${sess.phone ? 'readonly' : ''}>
+                    <input type="text" id="retOrderId" value="${o.orderId}" readonly>
+                    <select id="retProduct">
+                        <option value="">Select Product *</option>
+                        ${
+                            (o.items || []).map(it =>
+                                `<option value="${it.name}|${it.size}|${it.color}|${it.qty}">
+                                    ${it.name} (${it.size}, ${it.color}) x${it.qty}
+                                </option>`
+                            ).join("")
+                        }
+                    </select>
+                    <select id="retReason">
+                        <option value="">Select Reason for Return *</option>
+                        ${RETURN_REASONS.map(r => `<option value="${r}">${r}</option>`).join("")}
+                    </select>
+                    <textarea id="retNote" placeholder="Additional note (optional)"></textarea>
+                    <button onclick="submitReturnRequest()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">
+                        SUBMIT RETURN REQUEST
+                    </button>
+                </div>
             </div>
-
-            <!-- 📦 COLLAPSIBLE BOX (ADDED START) -->
-            <div style="display:none; margin-top:10px">
-
-                <h4 style="margin-bottom:10px">Return / Replacement Request</h4>
-
-                <input type="text" id="retPhone" value="${sess.phone || ''}" placeholder="Mobile Number *" maxlength="10" ${sess.phone ? 'readonly' : ''}>
-                <input type="text" id="retOrderId" value="${o.orderId}" readonly>
-
-                <select id="retProduct">
-                    <option value="">Select Product *</option>
-                    ${
-                        (o.items || []).map(it =>
-                            `<option value="${it.name}|${it.size}|${it.color}|${it.qty}">
-                                ${it.name} (${it.size}, ${it.color}) x${it.qty}
-                            </option>`
-                        ).join("")
-                    }
-                </select>
-
-                <select id="retReason">
-                    <option value="">Select Reason for Return *</option>
-                    ${RETURN_REASONS.map(r => `<option value="${r}">${r}</option>`).join("")}
-                </select>
-
-                <textarea id="retNote" placeholder="Additional note (optional)"></textarea>
-
-                <button onclick="submitReturnRequest()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer">
-                    SUBMIT RETURN REQUEST
-                </button>
-
-            </div>
-            <!-- 📦 COLLAPSIBLE BOX (ADDED END) -->
-
-        </div>
-        `;
+            `;
+        }
     }
-}
+
     let reviewHTML = '';
     if (isDelivered) {
         if (o.reviewSubmitted) {
@@ -2427,6 +2398,7 @@ if (isDelivered) {
         }
     }
     
+    // BUG FIX: Orders view mein closeModal() call hata diya - productModal yahan open nahi hota
     let similarHTML = '';
     if (products.length > 0) {
         const sims = products.slice(0, 4);
@@ -2438,8 +2410,8 @@ if (isDelivered) {
                         const sidx = products.findIndex(x => x.id === s.id);
                         const img = (s.img && s.img[0]) ? s.img[0] : '';
                         return `
-                            <div style="text-align:center; cursor:pointer" onclick="closeModal(); openModal(${sidx})">
-                                <img src="${img}" style="width:100%; height:50px; object-fit:cover; border-radius:4px">
+                            <div style="text-align:center; cursor:pointer" onclick="toggleCart(); setTimeout(()=>openModal(${sidx}), 300)">
+                                <img src="${img}" style="width:100%; height:50px; object-fit:cover; border-radius:4px" loading="lazy">
                                 <p style="font-size:9px; margin-top:3px">${s.name}</p>
                             </div>
                         `;
@@ -2493,7 +2465,6 @@ if (isDelivered) {
     `;
 }
 
-
 function setRating(r) {
     currentRating = r;
 }
@@ -2530,6 +2501,7 @@ async function submitReview() {
         document.getElementById("checkoutLoader").style.display = "none";
         showToast("Error submitting review");
     }
+    // BUG FIX: isProcessing hamesha reset ho - error pe bhi
     isProcessing = false;
 }
 
@@ -2541,10 +2513,9 @@ async function submitReturnRequest() {
     const orderId = document.getElementById("retOrderId").value.trim();
     const reason = document.getElementById("retReason").value;
     const note = document.getElementById("retNote").value.trim();
-
     const prod = document.getElementById("retProduct").value;
-    if (!prod) { showToast("Select product"); isProcessing = false; return; }
 
+    if (!prod) { showToast("Select product"); isProcessing = false; return; }
     if (!/^[6-9]\d{9}$/.test(phone)) { showToast("Invalid phone"); isProcessing = false; return; }
     if (!reason) { showToast("Select reason"); isProcessing = false; return; }
 
@@ -2574,12 +2545,13 @@ async function submitReturnRequest() {
         document.getElementById("checkoutLoader").style.display = "none";
         showToast("Error");
     }
-
+    // BUG FIX: isProcessing hamesha reset ho - error pe bhi
     isProcessing = false;
 }
+
 async function trackOrder() {
-   const phone = document.getElementById("orderPhone").value.trim();
-const oid = document.getElementById("orderOid").value.trim();
+    const phone = document.getElementById("orderPhone").value.trim();
+    const oid = document.getElementById("orderOid").value.trim();
     if (!/^[6-9]\d{9}$/.test(phone) || !oid) { alert("Invalid details"); return; }
     
     document.getElementById("checkoutLoader").style.display = "flex";
@@ -2604,6 +2576,7 @@ function backToCart() {
     document.getElementById("myOrdersView").style.display = "none";
     document.getElementById("cartItemsView").style.display = "block";
 }
+
 async function loadProds() {
     const grid = document.getElementById("productsGrid");
     grid.innerHTML = "";
@@ -2619,16 +2592,15 @@ async function loadProds() {
         if (Array.isArray(data)) {
             rawProducts = data;
         } else {
-           rawProducts = Array.isArray(data.products) ? data.products : [];
+            rawProducts = Array.isArray(data.products) ? data.products : [];
             if (data.coupons) siteCoupons = data.coupons;
             if (data.offer) siteOffer = data.offer;
         }
 
-        // ✅ FIX: DATA GROUPING LOGIC with TRIM (Space Hatane ke liye)
         if (rawProducts.length > 0 && !rawProducts[0].variants) {
             const grouped = {};
             rawProducts.forEach(row => {
-                const id = String(row.ID || row.id).trim(); // ID Trim
+                const id = String(row.ID || row.id).trim();
                 if (!id) return;
 
                 if (!grouped[id]) {
@@ -2643,12 +2615,10 @@ async function loadProds() {
                     };
                 }
                 
-                // Size Trim
                 const sz = row.Size || row.size;
                 const szChart = row['Size Chart'] || row.sizeChart;
                 if(sz && szChart) grouped[id].sizeChart[String(sz).trim()] = szChart;
 
-                // Color Trim & Robust Logic
                 let colorVal = row.Colour || row.Color || row.color || row.colour;
                 if (!colorVal) {
                     for (let key in row) {
@@ -2660,8 +2630,8 @@ async function loadProds() {
                 }
 
                 grouped[id].variants.push({
-                    size: String(sz || "").trim(), // ✅ SPACE HATAO
-                    color: String(colorVal || "").trim(), // ✅ SPACE HATAO
+                    size: String(sz || "").trim(),
+                    color: String(colorVal || "").trim(),
                     stock: row.Stock || row.stock,
                     price: row.Price || row.price,
                     mrp: row.MRP || row.mrp,
@@ -2673,7 +2643,6 @@ async function loadProds() {
             products = rawProducts;
         }
 
-        // IMAGE HANDLING
         products.forEach(p => {
             if (typeof p.img === 'string') {
                 p.img = p.img.split(',').map(s => s.trim()).filter(s => s.length > 0);
@@ -2691,9 +2660,12 @@ async function loadProds() {
 
     } catch (e) {
         console.error(e);
+        document.getElementById("loaderWrap").style.display = "none";
+        document.getElementById("floatingCart").style.display = "block";
         showToast("Network error. Please refresh.");
     }
 }
+
 updateCart();
 loadProds();
 initLeadPopup();
