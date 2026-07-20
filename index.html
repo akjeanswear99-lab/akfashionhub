@@ -1,650 +1,2121 @@
+isse check kar a 2 z sare logic working process ke har ek chij kam kar rahi h kya nahi sab sahi h kya nahi barcode print scan sab ek ek chij jo kuch h sab ke ye h toh ye kam kese kar rahi h or kam kar rahi h toh sahi kar raha h ya nhi  dono ka hi
 
-<!doctype html>
-<html lang="en" class="dark">
-  <head>
-    <!-- Prevent theme flash: Apply stored theme immediately before page renders -->
-    <script>
-      (function () {
-        try {
-          var theme = localStorage.getItem("emergent-theme");
-          if (!theme) {
-            var isLoggedIn = Object.keys(localStorage).some(function (k) {
-              return k.startsWith("sb-") && k.endsWith("-auth-token");
-            });
-            theme = isLoggedIn ? "dark" : "system";
-          }
-          if (theme === "light" || (theme === "system" && window.matchMedia("(prefers-color-scheme: light)").matches)) {
-            document.documentElement.classList.remove("dark");
-            document.documentElement.classList.add("light");
-          }
-        } catch (e) {}
-      })();
-    </script>
-    <!-- Tracking allowlist — gates GTM/VWO/Rewardful/PartnerStack/Meta/TikTok Pixel to prod hosts only.
-         Prevents third-party tracking scripts from firing on preview/CDN hosts (e.g. *.preview.emergentagent.com)
-         where our bundle is served as a wake-up page, which would attribute pixel events to user-preview domains. -->
-    <script>
-      (function () {
-        var ALLOWED_TRACKING_HOSTS = ["app.emergent.sh", "dev.emergentagent.com"];
-        window.__emergentTrackingAllowed = ALLOWED_TRACKING_HOSTS.indexOf(window.location.hostname) !== -1;
-        var h = window.location.hostname;
-        window.__wingmanTrackingAllowed = h.indexOf("getwingman.sh") !== -1 || h.indexOf("getwingman.com") !== -1;
-      })();
-    </script>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <!-- DNS Prefetch and Preconnect for external services -->
-    <link rel="dns-prefetch" href="https://assets.emergent.sh" />
-    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-    <link rel="preconnect" href="https://assets.emergent.sh" crossorigin />
-    <link rel="preconnect" href="https://dev.visualwebsiteoptimizer.com" />
-    <link rel="preconnect" href="https://js.stripe.com" />
-    <link rel="preconnect" href="https://analytics.tiktok.com" />
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AK FASHION HUB</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #000000;
+      --primary-dark: #1a1a1a;
+      --primary-light: #333333;
+      --accent: #D4AF37;
+      --accent-light: #E8D5A0;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --neutral-50: #F9FAFB;
+      --neutral-100: #F3F4F6;
+      --neutral-200: #E5E7EB;
+      --neutral-300: #D1D5DB;
+      --neutral-500: #6B7280;
+      --neutral-700: #374151;
+      --neutral-900: #111827;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
 
-    <!-- Primary Meta Tags -->
-    <title>Emergent</title>
-    <meta name="title" content="Emergent - AI-Powered App Development | No Code Required" />
-    <meta
-      name="description"
-      content="Transform ideas into production-ready applications with AI. Build web apps, mobile platforms, and custom software through simple conversation, no coding required."
-    />
-    <meta
-      name="keywords"
-      content="no-code development, AI app builder, software development, web app creator, mobile app development, AI coding assistant"
-    />
-    <meta name="author" content="Emergent" />
+    html, body { height: 100%; width: 100%; font-family: 'Segoe UI', Roboto, sans-serif; color: var(--neutral-900); background: var(--neutral-50); }
+    
+    /* ========== LOGIN SCREEN ========== */
+    .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%); }
+    .login-card { background: white; padding: 40px; border-radius: var(--radius); box-shadow: var(--shadow-lg); width: 100%; max-width: 480px; }
+    .login-header { text-align: center; margin-bottom: 30px; }
+    .login-logo-img { height: 80px; margin-bottom: 15px; object-fit: contain; }
+    .login-title { font-size: 24px; font-weight: 700; color: #000000; margin-bottom: 5px; }
+    .login-subtitle { font-size: 12px; color: var(--neutral-500); letter-spacing: 1.5px; text-transform: uppercase; }
+    
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--neutral-700); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-input, .form-select { width: 100%; padding: 11px 14px; border: 1px solid var(--neutral-300); border-radius: 6px; font-size: 14px; transition: border-color 0.2s; }
+    .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1); }
+    .form-error { font-size: 12px; color: var(--danger); margin-top: 4px; }
+    
+    .btn { padding: 12px 16px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary { background: #000000; color: white; }
+    .btn-primary:hover { background: #1a1a1a; }
+    .btn-secondary { background: var(--neutral-200); color: var(--neutral-900); }
+    .btn-secondary:hover { background: var(--neutral-300); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-small { padding: 8px 12px; font-size: 12px; }
+    .btn-block { width: 100%; }
+    
+    /* ========== APP SHELL ========== */
+    .app-shell { display: none; height: 100vh; overflow: hidden; }
+    .app-shell.active { display: grid; grid-template-columns: 260px 1fr; grid-template-rows: 60px 1fr; gap: 0; }
+    
+    .sidebar { grid-column: 1; grid-row: 1 / 3; background: #000000; color: white; padding: 20px 12px; overflow-y: auto; box-shadow: var(--shadow-lg); }
+    .sidebar-header { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-logo-img { height: 40px; object-fit: contain; }
+    .sidebar-text { font-size: 12px; font-weight: 700; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
+    .nav-item { padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s; display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.7); }
+    .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+    .nav-item.active { background: var(--accent); color: #000000; font-weight: 600; }
+    
+    .topbar { grid-column: 2; grid-row: 1; background: white; border-bottom: 1px solid var(--neutral-200); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-title { font-size: 18px; font-weight: 700; color: #000000; }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .user-menu { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 12px; border-radius: 6px; background: var(--neutral-100); font-size: 13px; font-weight: 600; }
+    
+    .content { grid-column: 2; grid-row: 2; overflow-y: auto; padding: 24px; }
+    
+    /* ========== SCREENS ========== */
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    /* ========== CARDS ========== */
+    .card { background: white; border: 1px solid var(--neutral-200); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--neutral-100); }
+    .card-title { font-size: 16px; font-weight: 700; color: var(--neutral-900); }
+    .card-subtitle { font-size: 12px; color: var(--neutral-500); margin-top: 4px; }
+    
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    
+    .stat-card { background: white; border: 1px solid var(--neutral-200); border-radius: var(--radius); padding: 16px; }
+    .stat-label { font-size: 12px; color: var(--neutral-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 600; }
+    .stat-value { font-size: 28px; font-weight: 700; color: #000000; }
+    
+    /* ========== TABLE ========== */
+    .table-wrapper { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--neutral-200); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead { background: var(--neutral-100); }
+    th { padding: 12px; text-align: left; font-weight: 700; color: var(--neutral-700); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 12px; border-bottom: 1px solid var(--neutral-200); }
+    tr:hover { background: var(--neutral-50); }
+    
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+    .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+    .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+    .badge-info { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    
+    /* ========== MODAL ========== */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: white; border-radius: var(--radius); box-shadow: var(--shadow-lg); max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; }
+    .modal-header { padding: 20px; border-bottom: 1px solid var(--neutral-200); display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-size: 16px; font-weight: 700; }
+    .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--neutral-500); }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid var(--neutral-200); display: flex; gap: 10px; justify-content: flex-end; }
+    
+    /* ========== PIN MODAL ========== */
+    #pinModal { background: rgba(0,0,0,0.7); z-index: 2000; }
+    .pin-input-group { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+    .pin-input { width: 50px; height: 50px; text-align: center; font-size: 24px; border: 2px solid var(--neutral-300); border-radius: 6px; }
+    .pin-input:focus { outline: none; border-color: #000000; }
+    
+    /* ========== BARCODE ========== */
+    .barcode-container { text-align: center; margin: 16px 0; }
+    .barcode-svg { height: 50px; }
+    
+    /* ========== CART ========== */
+    .cart-item { background: var(--neutral-50); border: 1px solid var(--neutral-200); border-radius: 6px; padding: 12px; margin-bottom: 8px; }
+    .cart-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .cart-item-name { font-weight: 600; font-size: 13px; }
+    .cart-item-remove { cursor: pointer; color: var(--danger); font-size: 18px; }
+    .cart-item-qty { display: flex; gap: 6px; align-items: center; font-size: 12px; }
+    .cart-item-qty input { width: 50px; padding: 4px; border: 1px solid var(--neutral-300); border-radius: 3px; }
+    
+    /* ========== PRINT STYLES ========== */
+    @media print {
+      body * { visibility: hidden; }
+      .print-area, .print-area * { visibility: visible; }
+      .print-area { position: absolute; top: 0; left: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+    
+   .bill-3-5 {
+  width: 3in;
+  margin: 0 auto;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+}
+    .bill-a4 { width: 8.5in; margin: 0 auto; font-family: 'Courier New', monospace; font-size: 12px; }
+    
+    .bill-header { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #000; padding-bottom: 8px; }
+    .bill-logo { height: 40px; margin-bottom: 4px; object-fit: contain; }
+    .bill-title { font-weight: bold; font-size: 13px; margin: 4px 0; }
+    .bill-items { margin: 12px 0; }
+    .bill-item { display: flex; justify-content: space-between; font-size: 11px; margin: 4px 0; }
+    .bill-total { font-weight: bold; font-size: 12px; text-align: right; margin-top: 8px; padding-top: 8px; border-top: 2px solid #000; }
+    
+    /* ========== MOBILE MENU TOGGLE ========== */
+    .mobile-menu-btn { display: none; font-size: 16px; padding: 8px 12px; }
+    .sidebar-backdrop { display: none; }
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://emergent.sh/" />
-    <meta property="og:title" content="Emergent - AI-Powered App Development | No Code Required" />
-    <meta
-      property="og:description"
-      content="From idea to app in minutes. AI-powered development platform for creators, entrepreneurs, and developers."
-    />
-    <meta property="og:image" content="https://app.emergent.sh/logo.png" />
-    <script>
-      (function () {
-        var h = window.location.hostname;
-        var isWingman = h.includes("getwingman.sh") || h.includes("getwingman.com");
-        var m = document.createElement("meta");
-        m.name = "facebook-domain-verification";
-        m.content = isWingman ? "669ilma0h2dlj0a8ou27f0f0gdq2at" : "v1096rpo7sp3nzp96d9ik3cvgwzodd";
-        document.head.appendChild(m);
-      })();
-    </script>
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .app-shell.active { grid-template-columns: 1fr; }
+      .sidebar { position: fixed; left: -260px; top: 0; height: 100vh; z-index: 999; transition: left 0.3s; }
+      .sidebar.open { left: 0; }
+      .mobile-menu-btn { display: inline-flex; }
+      .sidebar-backdrop.open { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 998; }
+      .topbar { grid-column: 1; }
+      .content { grid-column: 1; }
+      .grid, .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://emergent.sh/" />
-    <meta property="twitter:title" content="Emergent - AI-Powered App Development | No Code Required" />
-    <meta
-      property="twitter:description"
-      content="Build real products with Emergent's vibe-coding platform. Emergent AI creates production-ready applications from natural language—no developers required."
-    />
-    <meta property="twitter:image" content="https://app.emergent.sh/twitter-image.jpg" />
+    .template-editor { border: 2px dashed var(--neutral-300); padding: 16px; border-radius: 6px; min-height: 200px; background: white; }
+    .template-preview { background: white; border: 1px solid var(--neutral-200); padding: 20px; border-radius: 6px; margin-top: 16px; }
+  </style>
+</head>
+<body>
 
-    <!-- Favicon -->
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-    <link rel="manifest" href="/site.webmanifest" />
+<!-- LOGIN SCREEN -->
+<div class="login-container" id="loginContainer">
+  <div class="login-card">
+    <div class="login-header">
+      <img id="loginLogoImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 100'%3E%3Ctext x='0' y='80' font-size='80' font-weight='bold' fill='%23000'%3Ea%3C/text%3E%3Ctext x='120' y='75' font-size='60' font-weight='bold' fill='%23000'%3EFASHION HUB%3C/text%3E%3C/svg%3E" class="login-logo-img" alt="Shop Logo">
+      <h1 class="login-title" id="loginTitleText">AK FASHION HUB</h1>
+      <p class="login-subtitle">Complete ERP & POS System</p>
+    </div>
+    <form onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label">Mobile Number</label>
+        <input type="text" class="form-input" id="loginMobile" placeholder="10-digit mobile" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="loginPassword" placeholder="Enter password" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+      <div id="loginError" class="form-error" style="margin-top: 12px;"></div>
+    </form>
+  </div>
+</div>
 
-    <!-- Preload cloud background only for light-mode users -->
-    <script>
-      (function () {
-        try {
-          var theme = localStorage.getItem("emergent-theme");
-          if (!theme) {
-            var isLoggedIn = Object.keys(localStorage).some(function (k) {
-              return k.startsWith("sb-") && k.endsWith("-auth-token");
-            });
-            theme = isLoggedIn ? "dark" : "system";
-          }
-          var isLight =
-            theme === "light" || (theme === "system" && window.matchMedia("(prefers-color-scheme: light)").matches);
-          if (isLight) {
-            var link = document.createElement("link");
-            link.rel = "preload";
-            link.as = "image";
-            link.type = "image/webp";
-            link.href = "/backgrounds/light_cloud_bg.webp";
-            document.head.appendChild(link);
-          }
-        } catch (e) {}
-      })();
-    </script>
+<!-- APP SHELL -->
+<div class="app-shell" id="appShell">
+  <!-- SIDEBAR BACKDROP (mobile only) -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
-    <!-- Fonts and Styles - Preconnect for better performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Istok+Web:wght@400&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://emergent.sh/" />
-    <script>
-      if (window.__emergentTrackingAllowed) {
-        (function (w, d, s, l, i) {
-          w[l] = w[l] || [];
-          w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-          var f = d.getElementsByTagName(s)[0],
-            j = d.createElement(s),
-            dl = l != "dataLayer" ? "&l=" + l : "";
-          j.async = true;
-          j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-          f.parentNode.insertBefore(j, f);
-        })(window, document, "script", "dataLayer", "GTM-NCCB99P9");
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img id="sidebarLogoImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Ctext x='5' y='40' font-size='40' font-weight='bold' fill='%23fff'%3Ea%3C/text%3E%3C/svg%3E" class="sidebar-logo-img" alt="Logo">
+      <span class="sidebar-text" id="sidebarNameText">AK HUB</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div data-screen="dashboard" class="nav-item active">📊 Dashboard</div>
+      <div data-screen="billing" class="nav-item">🧾 Billing</div>
+      <div data-screen="products" class="nav-item">👕 Products</div>
+      <div data-screen="inventory" class="nav-item">📦 Inventory</div>
+      <div data-screen="preorders" class="nav-item">📋 Pre-Orders</div>
+      <div data-screen="returns" class="nav-item">↩️ Returns</div>
+      <div data-screen="pricetags" class="nav-item">🏷️ Price Tags</div>
+      <div data-screen="customers" class="nav-item">👤 Customers</div>
+      <div data-screen="suppliers" class="nav-item">🚚 Suppliers</div>
+      <div data-screen="expenses" class="nav-item">💰 Expenses</div>
+      <div data-screen="reports" class="nav-item">📈 Reports</div>
+      <div data-screen="staff" class="nav-item">👥 Staff</div>
+      <div data-screen="templates" class="nav-item">🎨 Templates</div>
+      <div data-screen="settings" class="nav-item">⚙️ Settings</div>
+    </nav>
+  </aside>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="btn btn-secondary btn-small mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()">☰</button>
+      <h2 class="topbar-title" id="screenTitle">Dashboard</h2>
+    </div>
+    <div class="topbar-right">
+      <div class="user-menu" id="userMenu">
+        <span>👤 <span id="userName">User</span></span>
+      </div>
+      <button class="btn btn-secondary btn-small" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    
+    <!-- ========== DASHBOARD ========== -->
+    <div class="screen active" id="dashboardScreen">
+      <div class="grid grid-2">
+        <div class="stat-card">
+          <div class="stat-label">Today's Sales</div>
+          <div class="stat-value" id="todaysSales">₹0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Today's Profit</div>
+          <div class="stat-value" id="todaysProfit">₹0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Inventory</div>
+          <div class="stat-value" id="totalInventory">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Pre-Orders</div>
+          <div class="stat-value" id="pendingOrders">0</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Recent Bills</h3>
+        </div>
+        <div class="table-wrapper">
+          <table id="recentBillsTable"><thead><tr><th>Bill#</th><th>Customer</th><th>Amount</th><th>Mode</th><th>Date</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== BILLING / POS ========== -->
+    <div class="screen" id="billingScreen">
+      <div style="display: grid; grid-template-columns: 1fr 380px; gap: 20px;">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Point of Sale</h3>
+          </div>
+          <div class="form-group" style="display:flex; gap:8px;">
+            <input type="text" class="form-input" id="billingScan" placeholder="🔍 Scan barcode / UID" autofocus style="flex:1;">
+            <button type="button" class="btn btn-secondary" onclick="openCameraScanner(addToCart, true)">📷 Scan</button>
+          </div>
+          <div id="billItems" style="min-height: 250px; border: 1px solid var(--neutral-200); border-radius: 6px; padding: 12px; background: var(--neutral-50);"><div style="text-align: center; color: var(--neutral-500);">Empty cart - scan a product</div></div>
+        </div>
+        <div class="card" style="position: sticky; top: 20px; height: fit-content;">
+          <div class="card-header">
+            <h3 class="card-title">Bill Summary</h3>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Customer Mobile</label>
+            <input type="text" class="form-input" id="billCustomerMobile" placeholder="10-digit">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Customer Name</label>
+            <input type="text" class="form-input" id="billCustomerName" placeholder="Name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Discount (₹)</label>
+            <input type="number" class="form-input" id="billDiscountAmount" value="0" min="0" oninput="updateBillTotals()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Mode</label>
+            <select class="form-input" id="billPaymentMode" onchange="toggleBillQrDisplay()">
+              <option value="Cash">Cash</option>
+              <option value="UPI_QR">UPI (Scan QR)</option>
+              <option value="UPI">UPI (Razorpay)</option>
+              <option value="Card">Card</option>
+            </select>
+          </div>
+          <div id="billQrDisplay" style="display:none; text-align:center; margin-bottom: 12px; padding: 10px; border: 1px solid var(--neutral-200); border-radius: 6px; background: var(--neutral-50);">
+            <img id="billQrImg" src="" alt="UPI QR" style="max-width: 160px; width: 100%; height: auto;">
+            <div style="font-size: 11px; color: var(--neutral-500); margin-top: 6px;">Customer ko yeh QR scan karwayein</div>
+          </div>
+          <div style="background: var(--neutral-100); padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span>Subtotal:</span>
+              <span id="billSubtotal">₹0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span>Discount:</span>
+              <span id="billDiscount">-₹0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 14px; color: #000;">
+              <span>Total:</span>
+              <span id="billTotal">₹0</span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="completeBill()" style="margin-bottom: 6px;">✓ Complete Sale</button>
+          <button class="btn btn-secondary btn-block" onclick="printBill()" style="margin-bottom: 6px;">🖨️ Print</button>
+          <button class="btn btn-secondary btn-block" id="whatsappShareBtn" onclick="shareBillToWhatsApp()">📱 WhatsApp Bill</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== PRODUCTS ========== -->
+    <div class="screen" id="productsScreen">
+      <div class="card-header">
+        <h3 class="card-title">Products</h3>
+        <button class="btn btn-primary btn-small" onclick="openAddProductModal()">+ Add Product</button>
+      </div>
+      <div style="margin-bottom: 16px; display:flex; gap:8px;">
+        <input type="text" class="form-input" id="productSearch" placeholder="Search products..." oninput="refreshProducts()" style="flex:1;">
+        <button type="button" class="btn btn-secondary" onclick="openCameraScanner(function(code){ document.getElementById('productSearch').value = code; refreshProducts(); })">📷 Scan</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="productsTable"><thead><tr><th>UID</th><th>Name</th><th>Brand</th><th>Stock</th><th>CP</th><th>SP</th><th>MRP</th><th>Actions</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- ========== INVENTORY ========== -->
+    <div class="screen" id="inventoryScreen">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Inventory Management</h3>
+        </div>
+        <div style="margin-bottom: 16px; display:flex; gap:8px;">
+          <input type="text" class="form-input" id="inventoryScan" placeholder="Scan barcode for stock check" style="flex:1;">
+          <button type="button" class="btn btn-secondary" onclick="openCameraScanner(lookupStock)">📷 Scan</button>
+        </div>
+        <div class="table-wrapper">
+          <table id="inventoryTable"><thead><tr><th>UID</th><th>Product</th><th>Color/Size</th><th>Stock</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== PRE-ORDERS ========== -->
+    <div class="screen" id="preordersScreen">
+      <div class="card-header">
+        <h3 class="card-title">Pre-Order Management</h3>
+        <button class="btn btn-primary btn-small" onclick="openAddPreorderModal()">+ New Pre-Order</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="preordersTable"><thead><tr><th>Order #</th><th>Customer</th><th>Mobile</th><th>Product</th><th>Size/Color</th><th>Qty</th><th>Total</th><th>Paid</th><th>Pending</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- ========== RETURNS & EXCHANGES ========== -->
+    <div class="screen" id="returnsScreen">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Returns & Exchanges</h3>
+          <p class="card-subtitle">Look up a bill to process return or exchange</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bill Number or Customer Mobile</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" class="form-input" id="rxSearchInput" placeholder="Enter bill # or mobile">
+            <button class="btn btn-primary" onclick="searchBillForReturn()">Search</button>
+          </div>
+        </div>
+        <div id="rxResult"></div>
+      </div>
+    </div>
+
+    <!-- ========== PRICE TAGS ========== -->
+    <div class="screen" id="pricetagsScreen">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Price Tag Printing</h3>
+          <p class="card-subtitle">Print 2×3 or 4×6 thermal labels with smart packing</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 320px; gap: 20px; margin-bottom: 20px;">
+          <div>
+            <div class="form-group">
+              <label class="form-label">Filter Products</label>
+              <input type="text" class="form-input" id="tagFilterValue" placeholder="Search..." oninput="renderTagPicker()">
+            </div>
+            <div id="tagPicker" style="border: 1px solid var(--neutral-200); border-radius: 6px; padding: 12px; max-height: 400px; overflow-y: auto;"></div>
+          </div>
+
+          <div class="card" style="position: sticky; top: 20px;">
+            <h3 class="card-title" style="margin-top: 0;">Print Queue</h3>
+            <div id="tagQueueList" style="max-height: 250px; overflow-y: auto; font-size: 12px; margin-bottom: 12px;"></div>
+            <div style="background: var(--neutral-100); padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 12px;">
+              <div>Total queued: <strong id="queueTotal">0</strong></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tag Size</label>
+              <select class="form-input" id="tagSize" onchange="updateTagSize()">
+                <option value="2x3">2×3 inch</option>
+                <option value="4x6">4×6 inch</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="generateLabelSheets()">🏷️ Preview & Print</button>
+            <button class="btn btn-secondary" style="width: 100%;" onclick="clearTagQueue()">Clear</button>
+          </div>
+        </div>
+
+        <div id="sheetPreview"></div>
+      </div>
+    </div>
+
+    <!-- ========== CUSTOMERS ========== -->
+    <div class="screen" id="customersScreen">
+      <div class="card-header">
+        <h3 class="card-title">Customers</h3>
+        <button class="btn btn-primary btn-small" onclick="openAddCustomerModal()">+ Add Customer</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="customersTable"><thead><tr><th>Name</th><th>Mobile</th><th>Total Spend</th><th>Loyalty Points</th><th>Due Balance</th><th>Actions</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- ========== SUPPLIERS ========== -->
+    <div class="screen" id="suppliersScreen">
+      <div class="card-header">
+        <h3 class="card-title">Suppliers</h3>
+        <button class="btn btn-primary btn-small" onclick="openAddSupplierModal()">+ Add Supplier</button>
+      </div>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3 class="card-title" style="margin-bottom: 12px;">Suppliers List</h3>
+          <div class="table-wrapper">
+            <table id="suppliersTable"><thead><tr><th>Name</th><th>Mobile</th><th>City</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="card-title" style="margin-bottom: 12px;">Add Purchase</h3>
+          <div class="form-group">
+            <label class="form-label">Supplier</label>
+            <select class="form-input" id="purchaseSupplier"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Product UID</label>
+            <input type="text" class="form-input" id="purchaseProductUID">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quantity</label>
+            <input type="number" class="form-input" id="purchaseQty" value="10">
+          </div>
+          <button class="btn btn-primary btn-block">Add Purchase</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== EXPENSES ========== -->
+    <div class="screen" id="expensesScreen">
+      <div class="card-header">
+        <h3 class="card-title">Expense Management</h3>
+        <button class="btn btn-primary btn-small" onclick="openAddExpenseModal()">+ Add Expense</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="expensesTable"><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th>Staff</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- ========== REPORTS ========== -->
+    <div class="screen" id="reportsScreen">
+      <div class="grid">
+        <div class="card">
+          <h3 class="card-title">Sales Summary</h3>
+          <div style="font-size: 24px; font-weight: 700; color: #000; margin: 16px 0;">₹<span id="totalSales">0</span></div>
+          <div style="font-size: 12px; color: var(--neutral-500);">Total bills: <span id="totalBills">0</span></div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Inventory Value</h3>
+          <div style="font-size: 24px; font-weight: 700; color: var(--success); margin: 16px 0;">₹<span id="inventoryValue">0</span></div>
+          <div style="font-size: 12px; color: var(--neutral-500);">Total units: <span id="totalUnits">0</span></div>
+        </div>
+        <div class="card">
+          <h3 class="card-title">Staff Performance</h3>
+          <div class="table-wrapper">
+            <table id="staffPerformanceTable"><thead><tr><th>Staff</th><th>Bills</th><th>Revenue</th></tr></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== STAFF MANAGEMENT ========== -->
+    <div class="screen" id="staffScreen">
+      <div class="card-header">
+        <h3 class="card-title">Staff Management</h3>
+        <button class="btn btn-primary btn-small" onclick="openAddStaffModal()">+ Add Staff</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="staffTable"><thead><tr><th>Name</th><th>Mobile</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- ========== BILL & TAG TEMPLATES ========== -->
+    <div class="screen" id="templatesScreen">
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Bill Template</h3>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Template Type</label>
+            <select class="form-input" id="billTemplateType" onchange="loadBillTemplate()">
+              <option value="thermal">Thermal (3.5 inch)</option>
+              <option value="a4">A4 (Paper)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Header Text</label>
+            <input type="text" class="form-input" id="billHeaderText" value="AK FASHION HUB" oninput="updateBillPreview()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Footer Text</label>
+            <input type="text" class="form-input" id="billFooterText" value="Thank You! Visit Again" oninput="updateBillPreview()">
+          </div>
+          <button class="btn btn-primary btn-block" onclick="saveBillTemplate()">Save Template</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Price Tag Template</h3>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Show MRP?</label>
+            <input type="checkbox" id="tagShowMRP" checked oninput="updateTagPreview()"> Show with strikethrough
+          </div>
+          <div class="form-group">
+            <label class="form-label">Show Product Name?</label>
+            <input type="checkbox" id="tagShowName" checked oninput="updateTagPreview()"> Include in tag
+          </div>
+          <div class="form-group">
+            <label class="form-label">Show Barcode?</label>
+            <input type="checkbox" id="tagShowBarcode" checked oninput="updateTagPreview()"> Print barcode
+          </div>
+          <button class="btn btn-primary btn-block" onclick="savePriceTagTemplate()">Save Template</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="card-title" style="margin-bottom: 16px;">Preview</h3>
+        <div id="templatePreview"></div>
+      </div>
+    </div>
+
+    <!-- ========== SETTINGS ========== -->
+    <div class="screen" id="settingsScreen">
+      <div class="grid">
+        <div class="card">
+          <h3 class="card-title">Shop Profile</h3>
+          <p style="font-size: 12px; color: var(--neutral-500); margin-bottom: 12px;">Set your shop name and logo — this appears on the login screen, sidebar, and bills/tags</p>
+          <div class="form-group">
+            <label class="form-label">Shop Name</label>
+            <input type="text" class="form-input" id="shopNameInput" placeholder="AK FASHION HUB">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Shop Mobile Number (bill par print hoga)</label>
+            <input type="text" class="form-input" id="shopMobileInput" placeholder="9599497909">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Logo</label>
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom: 8px;">
+              <div id="logoPreviewBox" style="width:70px; height:70px; border:1px dashed var(--neutral-300); border-radius:6px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#fff;">
+                <img id="logoPreviewImg" src="" alt="Logo preview" style="max-width:100%; max-height:100%; object-fit:contain; display:none;">
+                <span id="logoPreviewPlaceholder" style="font-size:10px; color:var(--neutral-500);">No logo</span>
+              </div>
+              <div>
+                <input type="file" id="logoFileInput" accept="image/*" style="display:none;" onchange="handleLogoUpload(event)">
+                <button class="btn btn-secondary btn-small" type="button" onclick="document.getElementById('logoFileInput').click()">⬆ Upload Logo</button>
+                <button class="btn btn-danger btn-small" type="button" onclick="removeShopLogo()">Remove</button>
+              </div>
+            </div>
+            <p style="font-size: 11px; color: var(--neutral-500);">Square images work best (the logo box auto-fits/contains your image, so it won't stretch or get cut off).</p>
+          </div>
+          <button class="btn btn-primary btn-small btn-block" onclick="saveShopProfile()">Save Shop Profile</button>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Google Sheets Integration</h3>
+          <p style="font-size: 12px; color: var(--neutral-500); margin-bottom: 12px;">Connect your Google Sheet for cloud backup</p>
+          <div class="form-group">
+            <label class="form-label">Google Apps Script URL</label>
+            <input type="text" class="form-input" id="apiUrl" placeholder="Paste your Web App URL">
+          </div>
+          <button class="btn btn-primary btn-small" onclick="testApiConnection()">Test Connection</button>
+          <button class="btn btn-secondary btn-small" onclick="syncNow()">Sync Now</button>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Backup & Restore</h3>
+          <p style="font-size: 12px; color: var(--neutral-500); margin-bottom: 12px;">Download or restore your complete data</p>
+          <button class="btn btn-primary btn-small btn-block" onclick="downloadBackup()" style="margin-bottom: 8px;">⬇ Download Backup</button>
+          <input type="file" id="restoreFile" accept=".json" style="display: none;">
+          <button class="btn btn-secondary btn-small btn-block" onclick="document.getElementById('restoreFile').click()">⬆ Restore Backup</button>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">UPI QR Code (Scan to Pay)</h3>
+          <p style="font-size: 12px; color: var(--neutral-500); margin-bottom: 12px;">Apna UPI QR code (GPay/PhonePe/Paytm se) yahan upload karein — billing screen me "UPI (Scan QR)" chunte hi yeh dikhega aur bill par bhi print hoga</p>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom: 8px;">
+            <div id="upiQrPreviewBox" style="width:90px; height:90px; border:1px dashed var(--neutral-300); border-radius:6px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#fff;">
+              <img id="upiQrPreviewImg" src="" alt="UPI QR preview" style="max-width:100%; max-height:100%; object-fit:contain; display:none;">
+              <span id="upiQrPreviewPlaceholder" style="font-size:10px; color:var(--neutral-500);">No QR</span>
+            </div>
+            <div>
+              <input type="file" id="upiQrFileInput" accept="image/*" style="display:none;" onchange="handleUpiQrUpload(event)">
+              <button class="btn btn-secondary btn-small" type="button" onclick="document.getElementById('upiQrFileInput').click()">⬆ Upload QR</button>
+              <button class="btn btn-danger btn-small" type="button" onclick="removeUpiQr()">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Razorpay Payment</h3>
+          <p style="font-size: 12px; color: var(--neutral-500); margin-bottom: 12px;">Setup online payment processing</p>
+          <div class="form-group">
+            <label class="form-label">Razorpay Key ID</label>
+            <input type="text" class="form-input" id="razorpayKeyId" placeholder="rzp_live_xxxxx">
+          </div>
+          <button class="btn btn-primary btn-small btn-block" onclick="saveRazorpayKey()">Save Key</button>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Session</h3>
+          <button class="btn btn-danger btn-block" onclick="logout()">🚪 Logout</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Modal</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- PIN MODAL -->
+<div class="modal-overlay" id="pinModal">
+  <div class="modal" style="width: 350px;">
+    <div class="modal-header">
+      <h3 class="modal-title">Verify PIN</h3>
+    </div>
+    <div class="modal-body">
+      <p style="text-align: center; margin-bottom: 16px; color: var(--neutral-500);" id="pinReason">Enter your 4-digit PIN</p>
+      <div class="pin-input-group">
+        <input type="password" class="pin-input" id="pinInput1" maxlength="1" placeholder="•">
+        <input type="password" class="pin-input" id="pinInput2" maxlength="1" placeholder="•">
+        <input type="password" class="pin-input" id="pinInput3" maxlength="1" placeholder="•">
+        <input type="password" class="pin-input" id="pinInput4" maxlength="1" placeholder="•">
+      </div>
+      <div id="pinError" style="color: var(--danger); font-size: 12px; text-align: center; margin-bottom: 12px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closePinModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="verifyPin()">Verify</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAMERA SCANNER MODAL -->
+<div class="modal-overlay" id="scannerModal">
+  <div class="modal" style="width: 380px;">
+    <div class="modal-header">
+      <h3 class="modal-title">📷 Scan Barcode / QR</h3>
+      <button class="modal-close" onclick="closeCameraScanner()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="scannerReader" style="width: 100%;"></div>
+      <div id="scannerError" style="color: var(--danger); font-size: 12px; text-align: center; margin-top: 10px;"></div>
+      <p id="scannerHint" style="font-size: 11px; color: var(--neutral-500); text-align: center; margin-top: 10px;">Camera ko barcode/QR ke saamne rakhein — scan hote hi apne aap band ho jayega.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeCameraScanner()">Cancel</button>
+      <button class="btn btn-primary" id="scannerDoneBtn" style="display:none;" onclick="closeCameraScanner()">✓ Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT AREA -->
+<div id="printArea" style="display: none;"></div>
+
+<script>
+// ============================================================================
+// CONFIG & STATE
+// ============================================================================
+const CONFIG = {
+  API_URL: 'https://script.google.com/macros/s/AKfycbyp77RG4mkSSfhcXkLyTfrkWFhF2ep0cfmSK2DmwNW6UuxR3XMMniuJoX0LpEbaglqa/exec',
+  RAZORPAY_KEY: '',
+  SHOP_NAME: 'AK FASHION HUB',
+  SHOP_LOGO: '',
+  SHOP_MOBILE: '9599497909',
+  UPI_QR: '',
+  BILL_TEMPLATE: { type: 'thermal', headerText: 'AK FASHION HUB', footerText: 'Thank You! Visit Again' },
+  TAG_TEMPLATE: { showMRP: true, showName: true, showBarcode: true }
+};
+
+let APP_STATE = {
+  currentUser: null,
+  cart: [],
+  tagQueue: [],
+  labelSheets: [],
+  pinPromiseResolve: null,
+  data: {
+    products: [],
+    variants: [],
+    customers: [],
+    bills: [],
+    billItems: [],
+    suppliers: [],
+    purchases: [],
+    staff: [],
+    preorders: [],
+    expenses: [],
+    activityLog: []
+  }
+};
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+window.addEventListener('DOMContentLoaded', () => {
+  loadConfig();
+  checkSession();
+  setupBarcodeScanning();
+});
+
+function setupBarcodeScanning() {
+  // USB/handheld barcode scanners act like a keyboard — they type the code fast and
+  // send Enter. This same path also handles manual typing, so both work identically.
+  document.getElementById('billingScan')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      const code = e.target.value.trim();
+      e.target.value = '';
+      if (!code) return;
+      if (isDuplicateScan(code)) {
+        showToast('Barcode already scanned recently.', true);
+        return;
       }
-    </script>
-    <!-- Google tag (gtag.js) — Wingman only (gated by __wingmanTrackingAllowed) -->
-    <script>
-      (function () {
-        if (!window.__wingmanTrackingAllowed) return;
-        var s = document.createElement("script");
-        s.async = true;
-        s.src = "https://www.googletagmanager.com/gtag/js?id=G-Y61DH5D90B";
-        document.head.appendChild(s);
-        window.dataLayer = window.dataLayer || [];
-        function gtag() {
-          window.dataLayer.push(arguments);
-        }
-        gtag("js", new Date());
-        gtag("config", "G-Y61DH5D90B");
-      })();
-    </script>
-    <!-- Conditionally load Rewardful for affiliate users only -->
-    <script>
-      (function () {
-        if (!window.__emergentTrackingAllowed) return;
-        // Helper to get cookie by name
-        function getCookieValue(name) {
-          var match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-          return match ? match[2] : null;
-        }
+      playBeep();
+      addToCart(code);
+    }
+  });
 
-        // Check if user is from affiliate link
-        function isAffiliateUser() {
-          var urlParams = new URLSearchParams(window.location.search);
-          var affiliateParams = ["via", "referral", "ref", "affiliate", "aff", "affid"];
+  document.getElementById('inventoryScan')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      lookupStock(e.target.value);
+      e.target.value = '';
+    }
+  });
 
-          // Check URL parameters
-          for (var i = 0; i < affiliateParams.length; i++) {
-            if (urlParams.get(affiliateParams[i])) {
-              // console.log('[Rewardful] ✅ Affiliate param found:', affiliateParams[i]);
-              return true;
-            }
-          }
+  // PIN input auto-focus
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById('pinInput' + i)?.addEventListener('input', (e) => {
+      if (e.target.value) {
+        document.getElementById('pinInput' + (i + 1))?.focus();
+      }
+    });
+  }
+}
 
-          // Check if rewardful cookie already exists (returning affiliate user)
-          // Use proper cookie parsing to avoid false positives from other cookies containing the string
-          var rewardfulReferral = getCookieValue("rewardful.referral");
-          var rewardfulAffiliate = getCookieValue("rewardful_affiliate");
-          var viaCookie = getCookieValue("via");
+// ============================================================================
+// TOAST / BEEP — lightweight, non-blocking feedback (alert() would freeze
+// continuous scanning, since it pauses JS until manually dismissed)
+// ============================================================================
+function showToast(message, isError = false) {
+  let container = document.getElementById('toastContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toastContainer';
+    container.style.cssText = 'position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:3000; display:flex; flex-direction:column; gap:8px; align-items:center;';
+    document.body.appendChild(container);
+  }
 
-          if (rewardfulReferral || rewardfulAffiliate || viaCookie) {
-            // console.log('[Rewardful] ✅ Returning affiliate user (cookie found)');
-            return true;
-          }
+  const toast = document.createElement('div');
+  toast.textContent = message;
+  toast.style.cssText = `padding:10px 18px; border-radius:6px; font-size:13px; font-weight:600; color:#fff; box-shadow:var(--shadow-lg); background:${isError ? '#EF4444' : '#10B981'}; animation: fadeIn 0.2s;`;
+  container.appendChild(toast);
 
-          // console.log('[Rewardful] ⛔ Organic user - skipping Rewardful');
-          return false;
-        }
+  setTimeout(() => toast.remove(), 2200);
+}
 
-        // Only load Rewardful for affiliate users
-        if (isAffiliateUser()) {
-          // console.log('[Rewardful] 🎯 Loading Rewardful script');
+let audioCtx = null;
+function playBeep() {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 1300;
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.12);
+  } catch (e) { /* audio not available — silently skip, scanning still works */ }
+}
 
-          // Initialize queue
-          (function (w, r) {
-            w._rwq = r;
-            w[r] =
-              w[r] ||
-              function () {
-                (w[r].q = w[r].q || []).push(arguments);
-              };
-          })(window, "rewardful");
+// ============================================================================
+// DUPLICATE SCAN PROTECTION — same barcode within 60s is ignored
+// ============================================================================
+function isDuplicateScan(code) {
+  let recent;
+  try { recent = JSON.parse(localStorage.getItem('recentScans') || '{}'); } catch (e) { recent = {}; }
 
-          // Load script
-          var script = document.createElement("script");
-          script.src = "https://r.wdfl.co/rw.js";
-          script.async = true;
-          script.setAttribute("data-rewardful", "981168");
-          document.head.appendChild(script);
-        }
-      })();
-    </script>
-    <!-- Start VWO Async SmartCode -->
-    <script type="text/javascript" id="vwoCode">
-      window._vwo_code ||
-        (function () {
-          if (!window.__emergentTrackingAllowed) return;
-          var w = window,
-            d = document;
-          var account_id = 1188541,
-            version = 2.2,
-            settings_tolerance = 2000,
-            hide_element = "body",
-            hide_element_style = "opacity:0 !important;filter:alpha(opacity=0) !important;background:none !important",
-            f = 0;
-          /* DO NOT EDIT BELOW THIS LINE */
-          if (
-            ((f = !1),
-            (v = d.querySelector("#vwoCode")),
-            (cc = {}),
-            -1 < d.URL.indexOf("__vwo_disable__") || w._vwo_code)
-          )
-            return;
-          try {
-            var e = JSON.parse(localStorage.getItem("_vwo_" + account_id + "_config"));
-            cc = e && "object" == typeof e ? e : {};
-          } catch (e) {}
-          function r(t) {
-            try {
-              return decodeURIComponent(t);
-            } catch (e) {
-              return t;
-            }
-          }
-          var s = (function () {
-            var e = {
-                combination: [],
-                combinationChoose: [],
-                split: [],
-                exclude: [],
-                uuid: null,
-                consent: null,
-                optOut: null,
-              },
-              t = d.cookie || "";
-            if (!t) return e;
-            for (
-              var n,
-                i,
-                o =
-                  /(?:^|;\s*)(?:(_vis_opt_exp_(\d+)_combi=([^;]*))|(_vis_opt_exp_(\d+)_combi_choose=([^;]*))|(_vis_opt_exp_(\d+)_split=([^:;]*))|(_vis_opt_exp_(\d+)_exclude=[^;]*)|(_vis_opt_out=([^;]*))|(_vwo_global_opt_out=[^;]*)|(_vwo_uuid=([^;]*))|(_vwo_consent=([^;]*)))/g;
-              null !== (n = o.exec(t));
-            )
-              try {
-                n[1]
-                  ? e.combination.push({ id: n[2], value: r(n[3]) })
-                  : n[4]
-                    ? e.combinationChoose.push({ id: n[5], value: r(n[6]) })
-                    : n[7]
-                      ? e.split.push({ id: n[8], value: r(n[9]) })
-                      : n[10]
-                        ? e.exclude.push({ id: n[11] })
-                        : n[12]
-                          ? (e.optOut = r(n[13]))
-                          : n[14]
-                            ? (e.optOut = !0)
-                            : n[15]
-                              ? (e.uuid = r(n[16]))
-                              : n[17] && ((i = r(n[18])), (e.consent = i && 3 <= i.length ? i.substring(0, 3) : null));
-              } catch (e) {}
-            return e;
-          })();
-          function i() {
-            var e = (function () {
-                if (w.VWO && Array.isArray(w.VWO))
-                  for (var e = 0; e < w.VWO.length; e++) {
-                    var t = w.VWO[e];
-                    if (Array.isArray(t) && ("setVisitorId" === t[0] || "setSessionId" === t[0])) return !0;
-                  }
-                return !1;
-              })(),
-              t =
-                "a=" +
-                account_id +
-                "&u=" +
-                encodeURIComponent(w._vis_opt_url || d.URL) +
-                "&vn=" +
-                version +
-                "&ph=1" +
-                ("undefined" != typeof platform ? "&p=" + platform : "") +
-                "&st=" +
-                w.performance.now();
-            (e ||
-              ((n = (function () {
-                var e,
-                  t = [],
-                  n = {},
-                  i = (w.VWO && w.VWO.appliedCampaigns) || {};
-                for (e in i) {
-                  var o = i[e] && i[e].v;
-                  o && (t.push(e + "-" + o + "-1"), (n[e] = !0));
-                }
-                if (s && s.combination)
-                  for (var r = 0; r < s.combination.length; r++) {
-                    var a = s.combination[r];
-                    n[a.id] || t.push(a.id + "-" + a.value);
-                  }
-                return t.join("|");
-              })()) && (t += "&c=" + n),
-              (n = (function () {
-                var e = [],
-                  t = {};
-                if (s && s.combinationChoose)
-                  for (var n = 0; n < s.combinationChoose.length; n++) {
-                    var i = s.combinationChoose[n];
-                    (e.push(i.id + "-" + i.value), (t[i.id] = !0));
-                  }
-                if (s && s.split)
-                  for (var o = 0; o < s.split.length; o++) t[(i = s.split[o]).id] || e.push(i.id + "-" + i.value);
-                return e.join("|");
-              })()) && (t += "&cc=" + n),
-              (n = (function () {
-                var e = {},
-                  t = [];
-                if (w.VWO && Array.isArray(w.VWO))
-                  for (var n = 0; n < w.VWO.length; n++) {
-                    var i = w.VWO[n];
-                    if (Array.isArray(i) && "setVariation" === i[0] && i[1] && Array.isArray(i[1]))
-                      for (var o = 0; o < i[1].length; o++) {
-                        var r,
-                          a = i[1][o];
-                        a && "object" == typeof a && ((r = a.e), (a = a.v), r && a && (e[r] = a));
-                      }
-                  }
-                for (r in e) t.push(r + "-" + e[r]);
-                return t.join("|");
-              })()) && (t += "&sv=" + n)),
-              s && s.optOut && (t += "&o=" + s.optOut));
-            var n = (function () {
-              var e = [],
-                t = {};
-              if (s && s.exclude)
-                for (var n = 0; n < s.exclude.length; n++) {
-                  var i = s.exclude[n];
-                  t[i.id] || (e.push(i.id), (t[i.id] = !0));
-                }
-              return e.join("|");
-            })();
-            return (
-              n && (t += "&e=" + n),
-              s && s.uuid && (t += "&id=" + s.uuid),
-              s && s.consent && (t += "&consent=" + s.consent),
-              w.name && -1 < w.name.indexOf("_vis_preview") && (t += "&pM=true"),
-              w.VWO && w.VWO.ed && (t += "&ed=" + w.VWO.ed),
-              t
-            );
-          }
-          code = {
-            nonce: v && v.nonce,
-            library_tolerance: function () {
-              return "undefined" != typeof library_tolerance ? library_tolerance : void 0;
-            },
-            settings_tolerance: function () {
-              return cc.sT || settings_tolerance;
-            },
-            hide_element_style: function () {
-              return "{" + (cc.hES || hide_element_style) + "}";
-            },
-            hide_element: function () {
-              return performance.getEntriesByName("first-contentful-paint")[0]
-                ? ""
-                : "string" == typeof cc.hE
-                  ? cc.hE
-                  : hide_element;
-            },
-            getVersion: function () {
-              return version;
-            },
-            finish: function (e) {
-              var t;
-              f ||
-                ((f = !0),
-                (t = d.getElementById("_vis_opt_path_hides")) && t.parentNode.removeChild(t),
-                e && (new Image().src = "https://dev.visualwebsiteoptimizer.com/ee.gif?a=" + account_id + e));
-            },
-            finished: function () {
-              return f;
-            },
-            addScript: function (e) {
-              var t = d.createElement("script");
-              ((t.type = "text/javascript"),
-                e.src ? (t.src = e.src) : (t.text = e.text),
-                v && t.setAttribute("nonce", v.nonce),
-                d.getElementsByTagName("head")[0].appendChild(t));
-            },
-            load: function (e, t) {
-              t = t || {};
-              var n = new XMLHttpRequest();
-              (n.open("GET", e, !0),
-                (n.withCredentials = !t.dSC),
-                (n.responseType = t.responseType || "text"),
-                (n.onload = function () {
-                  if (t.onloadCb) return t.onloadCb(n, e);
-                  200 === n.status
-                    ? _vwo_code.addScript({ text: n.responseText })
-                    : _vwo_code.finish("&e=loading_failure:" + e);
-                }),
-                (n.onerror = function () {
-                  if (t.onerrorCb) return t.onerrorCb(e);
-                  _vwo_code.finish("&e=loading_failure:" + e);
-                }),
-                n.send());
-            },
-            init: function () {
-              var e,
-                t = this.settings_tolerance();
-              ((w._vwo_settings_timer = setTimeout(function () {
-                _vwo_code.finish();
-              }, t)),
-                "body" !== this.hide_element()
-                  ? ((n = d.createElement("style")),
-                    (e = (t = this.hide_element()) ? t + this.hide_element_style() : ""),
-                    (t = d.getElementsByTagName("head")[0]),
-                    n.setAttribute("id", "_vis_opt_path_hides"),
-                    v && n.setAttribute("nonce", v.nonce),
-                    n.setAttribute("type", "text/css"),
-                    n.styleSheet ? (n.styleSheet.cssText = e) : n.appendChild(d.createTextNode(e)),
-                    t.appendChild(n))
-                  : ((n = d.getElementsByTagName("head")[0]),
-                    ((e = d.createElement("div")).style.cssText =
-                      "z-index: 2147483647 !important;position: fixed !important;left: 0 !important;top: 0 !important;width: 100% !important;height: 100% !important;background: white !important;"),
-                    e.setAttribute("id", "_vis_opt_path_hides"),
-                    e.classList.add("_vis_hide_layer"),
-                    n.parentNode.insertBefore(e, n.nextSibling)));
-              var n = "https://dev.visualwebsiteoptimizer.com/j.php?" + i();
-              -1 !== w.location.search.indexOf("_vwo_xhr")
-                ? this.addScript({ src: n })
-                : this.load(n + "&x=true", { l: 1 });
-            },
-          };
-          w._vwo_code = code;
-          code.init();
-        })();
-    </script>
-    <!-- End VWO Async SmartCode -->
-    <!-- Add Google Identity Services script -->
-    <script src="https://accounts.google.com/gsi/client" async></script>
-    <!-- Paddle.js for checkout overlay (initialized in paddleService.ts with env token) -->
-    <script src="https://cdn.paddle.com/paddle/v2/paddle.js" defer></script>
-    <!-- Meta Pixel Code — gated via window.__emergentTrackingAllowed (see allowlist at top of <head>) -->
-    <script>
-      (function () {
-        if (!window.__emergentTrackingAllowed) return;
+  const now = Date.now();
+  // Housekeeping: drop anything older than a minute so this map never grows unbounded
+  Object.keys(recent).forEach(k => { if (now - recent[k] > 5000) delete recent[k]; });
 
-        !(function (f, b, e, v, n, t, s) {
-          if (f.fbq) return;
-          n = f.fbq = function () {
-            n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
-          };
-          if (!f._fbq) f._fbq = n;
-          n.push = n;
-          n.loaded = !0;
-          n.version = "2.0";
-          n.queue = [];
-          t = b.createElement(e);
-          t.async = !0;
-          t.src = v;
-          s = b.getElementsByTagName(e)[0];
-          s.parentNode.insertBefore(t, s);
-        })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
-        fbq("init", "1326372205570201");
-        fbq("track", "PageView");
-      })();
-    </script>
-    <!-- End Meta Pixel Code -->
-    <!-- TikTok Pixel Code — gated via window.__emergentTrackingAllowed (see allowlist at top of <head>) -->
-    <script>
-      (function (w, d, t) {
-        if (!w.__emergentTrackingAllowed) return;
+  const isDup = recent[code] && (now - recent[code] < 5000);
+  recent[code] = now;
+  localStorage.setItem('recentScans', JSON.stringify(recent));
+  return isDup;
+}
 
-        w.TiktokAnalyticsObject = t;
-        var ttq = (w[t] = w[t] || []);
-        ttq.methods = [
-          "page",
-          "track",
-          "identify",
-          "instances",
-          "debug",
-          "on",
-          "off",
-          "once",
-          "ready",
-          "alias",
-          "group",
-          "enableCookie",
-          "disableCookie",
-          "holdConsent",
-          "revokeConsent",
-          "grantConsent",
-        ];
-        ttq.setAndDefer = function (queue, method) {
-          queue[method] = function () {
-            queue.push([method].concat(Array.prototype.slice.call(arguments, 0)));
-          };
-        };
-        for (var i = 0; i < ttq.methods.length; i++) {
-          ttq.setAndDefer(ttq, ttq.methods[i]);
-        }
-        ttq.instance = function (pixelId) {
-          ttq._i = ttq._i || {};
-          var instance = ttq._i[pixelId] || [];
-          for (var j = 0; j < ttq.methods.length; j++) {
-            ttq.setAndDefer(instance, ttq.methods[j]);
-          }
-          return instance;
-        };
-        ttq.load = function (pixelId, options) {
-          var source = "https://analytics.tiktok.com/i18n/pixel/events.js";
-          ttq._i = ttq._i || {};
-          ttq._i[pixelId] = [];
-          ttq._i[pixelId]._u = source;
-          ttq._t = ttq._t || {};
-          ttq._t[pixelId] = +new Date();
-          ttq._o = ttq._o || {};
-          ttq._o[pixelId] = options || {};
-          var script = d.createElement("script");
-          script.type = "text/javascript";
-          script.async = true;
-          script.src = source + "?sdkid=" + pixelId + "&lib=" + t;
-          var firstScript = d.getElementsByTagName("script")[0];
-          firstScript.parentNode.insertBefore(script, firstScript);
-        };
+// ============================================================================
+// CAMERA BARCODE / QR SCANNER (mobile camera or laptop webcam — no external service)
+// Supports EAN-13, UPC, Code128, QR and other common formats via html5-qrcode/ZXing.
+// ============================================================================
+let activeScanner = null;
+let scannerResultCallback = null;
+let scannerContinuous = false;
 
-        var configuredPixelId = "D8LPE6JC77UDGOQM9GI0";
-        if (!configuredPixelId || configuredPixelId.indexOf("%") === 0) {
-          console.warn("[tiktokPixel] VITE_TIKTOK_PIXEL_ID is not configured");
+// continuous=true keeps the camera running and calls onResult for every new
+// (non-duplicate) code — used for billing, so dozens of items can be scanned
+// one after another without reopening the camera each time.
+function openCameraScanner(onResult, continuous = false) {
+  if (typeof Html5Qrcode === 'undefined') {
+    alert('Camera scanner library load nahi hui — internet connection check karein.');
+    return;
+  }
+  scannerResultCallback = onResult;
+  scannerContinuous = continuous;
+  document.getElementById('scannerError').textContent = '';
+  document.getElementById('scannerModal').classList.add('active');
+  document.getElementById('scannerDoneBtn').style.display = continuous ? 'inline-flex' : 'none';
+  document.getElementById('scannerHint').textContent = continuous
+    ? 'Camera chalu rahega — ek ke baad ek jitne chahiye scan karte jaayein, phir "Done" dabayein.'
+    : 'Camera ko barcode/QR ke saamne rakhein — scan hote hi apne aap band ho jayega.';
+
+  activeScanner = new Html5Qrcode('scannerReader');
+  const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+
+  Html5Qrcode.getCameras().then(cameras => {
+    if (!cameras || !cameras.length) {
+      document.getElementById('scannerError').textContent = 'Koi camera nahi mila.';
+      return;
+    }
+    // Prefer the back/rear camera on phones
+    const backCam = cameras.find(c => /back|rear|environment/i.test(c.label)) || cameras[cameras.length - 1];
+    activeScanner.start(
+      backCam.id,
+      config,
+      (decodedText) => {
+        if (isDuplicateScan(decodedText)) {
+          showToast('Barcode already scanned recently.', true);
           return;
         }
-        ttq.load(configuredPixelId);
-        ttq.page();
-      })(window, document, "ttq");
-    </script>
-    <!-- End TikTok Pixel Code -->
-    <!-- Conditionally load PartnerStack for partner users only -->
-    <script>
-      (function () {
-        if (!window.__emergentTrackingAllowed) return;
-        // Helper to get cookie by name (reuse pattern from Rewardful)
-        function getCookieValue(name) {
-          var match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-          return match ? match[2] : null;
-        }
+        playBeep();
 
-        // Check if user is from partner link
-        function isPartnerUser() {
-          var urlParams = new URLSearchParams(window.location.search);
-
-          if (urlParams.get("ps_partner_key")) {
-            return true;
-          }
-          // Check if ps_partner_key cookie exists (returning partner user)
-          if (getCookieValue("ps_partner_key")) {
-            return true;
-          }
-          return false;
+        if (scannerContinuous) {
+          if (scannerResultCallback) scannerResultCallback(decodedText);
+          // camera keeps running for the next item — don't close
+        } else {
+          closeCameraScanner();
+          if (scannerResultCallback) scannerResultCallback(decodedText);
         }
+      },
+      () => { /* ignore per-frame scan errors */ }
+    ).catch(err => {
+      document.getElementById('scannerError').textContent = 'Camera access fail hua: ' + err;
+    });
+  }).catch(err => {
+    document.getElementById('scannerError').textContent = 'Camera permission chahiye. Browser settings check karein.';
+  });
+}
 
-        // Only load PartnerStack for partner users
-        if (isPartnerUser()) {
-          var gs = document.createElement("script");
-          gs.src = "https://js.partnerstack.com/v1/";
-          gs.type = "text/javascript";
-          gs.async = true;
-          gs.onload = gs.onreadystatechange = function () {
-            var rs = this.readyState;
-            if (rs && rs != "complete" && rs != "loaded") return;
-            try {
-              growsumo._initialize("pk_X807fuc0nfNQX8tFKDm3PatW0ZZNyDUd", [
-                "emergentlabsinc.partnerlinks.io",
-                "get.emergent.sh",
-                "trialcoig7l2s8gsenk14emergent.partnerlinks.io",
-              ]);
-              if (typeof growsumoInit === "function") {
-                growsumoInit();
-              }
-            } catch (e) {}
-          };
-          var s = document.getElementsByTagName("script")[0];
-          s.parentNode.insertBefore(gs, s);
-        }
-      })();
-    </script>
-    <!-- End PartnerStack -->
-    <script type="module" crossorigin src="/main-gEAVv69Q.js"></script>
-    <link rel="modulepreload" crossorigin href="/chunks/chunk-B_X6-vQW.js">
-    <link rel="modulepreload" crossorigin href="/chunks/chunk-DU-IuZwe.js">
-    <link rel="modulepreload" crossorigin href="/chunks/chunk-DBlzyxOQ.js">
-    <link rel="modulepreload" crossorigin href="/chunks/chunk-B4B3jR2j.js">
-    <link rel="modulepreload" crossorigin href="/chunks/chunk-CzCANnSr.js">
-    <link rel="modulepreload" crossorigin href="/chunks/chunk-c-tuZ59N.js">
-    <link rel="modulepreload" crossorigin href="/chunks/chunk-CJvBaPsI.js">
-    <link rel="modulepreload" crossorigin href="/chunks/chunk-U4cForja.js">
-    <link rel="modulepreload" crossorigin href="/chunks/index.mjs-DbbkfLbM.js">
-    <link rel="modulepreload" crossorigin href="/chunks/chunk-CcRikmTX.js">
-    <link rel="stylesheet" crossorigin href="/assets/monaco-editor-BetWCQm5.css">
-    <link rel="stylesheet" crossorigin href="/assets/main-C8NBYv1F.css">
-  </head>
-  <body>
-    <!-- Meta Pixel Code (noscript) -->
-    <noscript
-      ><img
-        height="1"
-        width="1"
-        style="display: none"
-        src="https://www.facebook.com/tr?id=1326372205570201&ev=PageView&noscript=1"
-    /></noscript>
-    <!-- End Meta Pixel Code (noscript) -->
-    <div id="root"></div>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript
-      ><iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-NCCB99P9"
-        height="0"
-        width="0"
-        style="display: none; visibility: hidden"
-      ></iframe
-    ></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1d21ed9cf5587ce',t:'MTc4NDM4NDM1Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-</html>
+function closeCameraScanner() {
+  document.getElementById('scannerModal').classList.remove('active');
+  if (activeScanner) {
+    activeScanner.stop().then(() => {
+      activeScanner.clear();
+      activeScanner = null;
+    }).catch(() => { activeScanner = null; });
+  }
+}
+
+function loadConfig() {
+  const saved = localStorage.getItem('appConfig');
+  if (saved) {
+    Object.assign(CONFIG, JSON.parse(saved));
+    if (document.getElementById('apiUrl')) document.getElementById('apiUrl').value = CONFIG.API_URL || '';
+    if (document.getElementById('razorpayKeyId')) document.getElementById('razorpayKeyId').value = CONFIG.RAZORPAY_KEY || '';
+  }
+  applyShopProfile();
+  applyUpiQrPreview();
+}
+
+function saveConfig() {
+  CONFIG.API_URL = document.getElementById('apiUrl').value;
+  CONFIG.RAZORPAY_KEY = document.getElementById('razorpayKeyId').value;
+  localStorage.setItem('appConfig', JSON.stringify(CONFIG));
+}
+
+// ============================================================================
+// SHOP PROFILE (name + logo) — shown on login screen, sidebar, and printed bills
+// ============================================================================
+function applyShopProfile() {
+  const name = CONFIG.SHOP_NAME || 'AK FASHION HUB';
+  const shortName = name.length > 10 ? name.split(' ').map(w => w[0]).join('').slice(0, 4).toUpperCase() : name;
+
+  const loginTitle = document.getElementById('loginTitleText');
+  if (loginTitle) loginTitle.textContent = name;
+  const sidebarText = document.getElementById('sidebarNameText');
+  if (sidebarText) sidebarText.textContent = shortName;
+
+  const loginLogo = document.getElementById('loginLogoImg');
+  const sidebarLogo = document.getElementById('sidebarLogoImg');
+  if (CONFIG.SHOP_LOGO) {
+    if (loginLogo) loginLogo.src = CONFIG.SHOP_LOGO;
+    if (sidebarLogo) sidebarLogo.src = CONFIG.SHOP_LOGO;
+  }
+
+  // Reflect into settings screen inputs/preview if present
+  const nameInput = document.getElementById('shopNameInput');
+  if (nameInput && !nameInput.value) nameInput.value = name;
+  const mobileInput = document.getElementById('shopMobileInput');
+  if (mobileInput && !mobileInput.value) mobileInput.value = CONFIG.SHOP_MOBILE || '';
+  const previewImg = document.getElementById('logoPreviewImg');
+  const previewPlaceholder = document.getElementById('logoPreviewPlaceholder');
+  if (previewImg && previewPlaceholder) {
+    if (CONFIG.SHOP_LOGO) {
+      previewImg.src = CONFIG.SHOP_LOGO;
+      previewImg.style.display = 'block';
+      previewPlaceholder.style.display = 'none';
+    } else {
+      previewImg.style.display = 'none';
+      previewPlaceholder.style.display = 'block';
+    }
+  }
+}
+
+function handleLogoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('Please choose an image file'); return; }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      // Resize/fit onto a square canvas so any logo (portrait, landscape, off-center)
+      // ends up neatly centered and "contained" instead of being stretched or cut off.
+      const size = 300;
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+      const scale = Math.min(size / img.width, size / img.height);
+      const w = img.width * scale;
+      const h = img.height * scale;
+      ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+      const dataUrl = canvas.toDataURL('image/png');
+
+      CONFIG.SHOP_LOGO = dataUrl;
+      applyShopProfile();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeShopLogo() {
+  CONFIG.SHOP_LOGO = '';
+  document.getElementById('logoFileInput').value = '';
+  applyShopProfile();
+}
+
+// ============================================================================
+// UPI QR CODE (for "UPI (Scan QR)" payment mode) — stored as-is, NOT forced onto
+// a square canvas like the logo, since distorting a QR code can break its scannability.
+// ============================================================================
+function applyUpiQrPreview() {
+  const previewImg = document.getElementById('upiQrPreviewImg');
+  const previewPlaceholder = document.getElementById('upiQrPreviewPlaceholder');
+  if (!previewImg || !previewPlaceholder) return;
+  if (CONFIG.UPI_QR) {
+    previewImg.src = CONFIG.UPI_QR;
+    previewImg.style.display = 'block';
+    previewPlaceholder.style.display = 'none';
+  } else {
+    previewImg.style.display = 'none';
+    previewPlaceholder.style.display = 'block';
+  }
+}
+
+function handleUpiQrUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('Please choose an image file'); return; }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    CONFIG.UPI_QR = e.target.result;
+    localStorage.setItem('appConfig', JSON.stringify(CONFIG));
+    applyUpiQrPreview();
+    showToast('✓ UPI QR saved');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeUpiQr() {
+  CONFIG.UPI_QR = '';
+  document.getElementById('upiQrFileInput').value = '';
+  localStorage.setItem('appConfig', JSON.stringify(CONFIG));
+  applyUpiQrPreview();
+}
+
+function saveShopProfile() {
+  CONFIG.SHOP_NAME = document.getElementById('shopNameInput').value.trim() || 'AK FASHION HUB';
+  CONFIG.SHOP_MOBILE = document.getElementById('shopMobileInput').value.trim() || CONFIG.SHOP_MOBILE || '9599497909';
+  CONFIG.BILL_TEMPLATE.headerText = CONFIG.SHOP_NAME;
+  localStorage.setItem('appConfig', JSON.stringify(CONFIG));
+  applyShopProfile();
+  alert('✓ Shop profile saved');
+}
+
+// ============================================================================
+// AUTHENTICATION
+// ============================================================================
+async function handleLogin(e) {
+  e.preventDefault();
+  const mobile = document.getElementById('loginMobile').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errorEl = document.getElementById('loginError');
+  errorEl.textContent = '';
+if (mobile === '9599497909' && password === '111208') {
+
+  APP_STATE.currentUser = {
+    staffID: 'ADMIN001',
+    name: 'ABHISHEK KUMAR',
+    mobile: '9599497909',
+    role: 'admin',
+    permissions: ['all']
+  };
+
+  successfulLogin();
+  return;
+}
+  if (!CONFIG.API_URL) {
+    errorEl.textContent = 'Google Sheet API URL set nahi hai — Settings me set karein.';
+    return;
+  }
+
+  try {
+    const response = await fetch(CONFIG.API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'login', data: { mobile, password } })
+    });
+    const result = await response.json();
+    const loginResult = result.data || result; // doPost wraps in {success,data}
+
+    if (loginResult && loginResult.success && loginResult.user) {
+      APP_STATE.currentUser = {
+        staffID: loginResult.user.staffID,
+        name: loginResult.user.name,
+        mobile: loginResult.user.mobile,
+        role: loginResult.user.role,
+        permissions: loginResult.user.permissions
+      };
+      successfulLogin();
+      return;
+    }
+
+    errorEl.textContent = (loginResult && loginResult.error) || 'Login fail hua';
+  } catch (err) {
+    console.error('Login request failed:', err);
+    errorEl.textContent = 'Google Sheet se connect nahi ho paya. Internet ya API URL check karein.';
+  }
+}
+
+function successfulLogin() {
+  localStorage.setItem('currentUser', JSON.stringify(APP_STATE.currentUser));
+  localStorage.setItem('loginTime', Date.now().toString());
+  
+  document.getElementById('loginContainer').style.display = 'none';
+  document.getElementById('appShell').classList.add('active');
+  document.getElementById('userName').textContent = APP_STATE.currentUser.name;
+  
+  loadDataFromSheet();
+  restoreActiveCart();
+  syncPendingBills();
+  navigateToScreen('dashboard');
+}
+
+function logout() {
+  if (confirm('Are you sure?')) {
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('loginTime');
+    APP_STATE.currentUser = null;
+    document.getElementById('appShell').classList.remove('active');
+    document.getElementById('loginContainer').style.display = 'flex';
+    document.getElementById('loginMobile').value = '';
+    document.getElementById('loginPassword').value = '';
+  }
+}
+
+function checkSession() {
+  const user = localStorage.getItem('currentUser');
+  if (user) {
+    APP_STATE.currentUser = JSON.parse(user);
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('appShell').classList.add('active');
+    document.getElementById('userName').textContent = APP_STATE.currentUser.name;
+    loadDataFromSheet();
+    restoreActiveCart();
+    syncPendingBills();
+    navigateToScreen('dashboard');
+  }
+}
+
+// If the page reloaded (connection drop, accidental refresh) while items were
+// still scanned but not yet billed, bring them back instead of losing the cart.
+function restoreActiveCart() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('activeCart') || '[]');
+    if (Array.isArray(saved) && saved.length) {
+      APP_STATE.cart = saved;
+      renderCart();
+      updateBillTotals();
+      showToast('Pichla cart restore ho gaya (' + saved.length + ' items)');
+    }
+  } catch (e) { /* corrupt/missing cache — just start fresh */ }
+}
+
+// Loads all data fresh from the Google Sheet. Falls back to whatever was cached
+// in localStorage the last time it succeeded, so the app still works offline —
+// but that cached copy is never treated as up to date once the Sheet is reachable.
+async function loadDataFromSheet() {
+  if (!CONFIG.API_URL) {
+    const cached = localStorage.getItem('appData');
+    if (cached) APP_STATE.data = JSON.parse(cached);
+    refreshDashboard();
+    return;
+  }
+
+  try {
+    const response = await fetch(CONFIG.API_URL + '?action=getAll');
+    const data = await response.json();
+
+    if (data.error) throw new Error(data.error);
+
+    APP_STATE.data.products = (data.products || []).map(p => ({
+      ...p,
+      variants: (p.variants || []).map(v => ({ ...v, Stock: Number(v.Stock) || 0 })),
+      TotalStock: Number(p.TotalStock) || 0,
+      CostPrice: Number(p.CostPrice) || 0,
+      SalePrice: Number(p.SalePrice) || 0,
+      MRP: Number(p.MRP) || 0
+    }));
+    APP_STATE.data.customers = data.customers || [];
+    APP_STATE.data.bills = data.bills || [];
+    APP_STATE.data.billItems = data.billItems || [];
+    APP_STATE.data.suppliers = data.suppliers || [];
+    APP_STATE.data.purchases = data.purchases || [];
+    APP_STATE.data.staff = data.staff || [];
+    APP_STATE.data.expenses = data.expenses || [];
+    APP_STATE.data.preorders = data.orders || [];
+
+    localStorage.setItem('appData', JSON.stringify(APP_STATE.data));
+    refreshDashboard();
+  } catch (err) {
+    console.error('Google Sheet load failed, using last cached copy:', err);
+    const cached = localStorage.getItem('appData');
+    if (cached) APP_STATE.data = JSON.parse(cached);
+    alert('⚠️ Google Sheet se data load nahi ho paya — internet ya API URL check karein. Purana cached data dikha rahe hain.');
+    refreshDashboard();
+  }
+}
+
+// Generic helper for every write action — POSTs to the backend and returns
+// { success, data } or { success:false, error } consistently. Used by every
+// save/update/delete function below so writes actually reach the Google Sheet.
+async function backendCall(action, data) {
+  if (!CONFIG.API_URL) {
+    return { success: false, error: 'Google Sheet API URL configured nahi hai (Settings me set karein)' };
+  }
+  try {
+    const response = await fetch(CONFIG.API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action, data })
+    });
+    const result = await response.json();
+    if (!result.success) return { success: false, error: result.error || 'Unknown error' };
+
+    // doPost always wraps as {success:true, data:...} unless it actually throws — but some
+    // backend functions (updateProduct, deleteProduct, updateStock, updateCustomer, returnBill...)
+    // return their OWN {success:false, error:'...'} for business-logic failures (e.g. "not found")
+    // without throwing. Surface those too, or a real failure would look like a success here.
+    if (result.data && typeof result.data === 'object' && result.data.success === false) {
+      return { success: false, error: result.data.error || 'Backend rejected the request' };
+    }
+
+    return { success: true, data: result.data };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
+// ============================================================================
+// NAVIGATION
+// ============================================================================
+function navigateToScreen(screenName) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenName + 'Screen').classList.add('active');
+  
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.screen === screenName);
+  });
+
+  const titles = {
+    dashboard: '📊 Dashboard',
+    billing: '🧾 Billing / POS',
+    products: '👕 Products',
+    inventory: '📦 Inventory',
+    preorders: '📋 Pre-Orders',
+    returns: '↩️ Returns & Exchanges',
+    pricetags: '🏷️ Price Tags',
+    customers: '👤 Customers',
+    suppliers: '🚚 Suppliers',
+    expenses: '💰 Expenses',
+    reports: '📈 Reports',
+    staff: '👥 Staff Management',
+    templates: '🎨 Bill & Tag Templates',
+    settings: '⚙️ Settings'
+  };
+  document.getElementById('screenTitle').textContent = titles[screenName] || screenName;
+
+  // Refresh screen data
+  setTimeout(() => {
+    if (screenName === 'dashboard') refreshDashboard();
+    if (screenName === 'products') refreshProducts();
+    if (screenName === 'inventory') refreshInventory();
+    if (screenName === 'customers') refreshCustomers();
+    if (screenName === 'suppliers') refreshSuppliers();
+    if (screenName === 'expenses') refreshExpenses();
+    if (screenName === 'reports') refreshReports();
+    if (screenName === 'staff') refreshStaff();
+    if (screenName === 'pricetags') renderTagPicker();
+    if (screenName === 'preorders') refreshPreorders();
+    if (screenName === 'billing') toggleBillQrDisplay();
+  }, 100);
+}
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    navigateToScreen(item.dataset.screen);
+    closeSidebar(); // on mobile, picking a screen should close the menu automatically
+  });
+});
+
+// ============================================================================
+// MOBILE SIDEBAR MENU
+// ============================================================================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarBackdrop').classList.toggle('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('open');
+}
+
+// ============================================================================
+// DASHBOARD
+// ============================================================================
+function refreshDashboard() {
+  const bills = APP_STATE.data.bills || [];
+  const today = new Date().toISOString().split('T')[0];
+  const todaysBills = bills.filter(b => b.CreatedDate && b.CreatedDate.includes(today));
+  
+  const todaysSales = todaysBills.reduce((sum, b) => sum + (Number(b.TotalAmount) || 0), 0);
+  const todaysProfit = todaysSales * 0.3;
+
+  let totalInventory = 0;
+  (APP_STATE.data.products || []).forEach(p => {
+    (p.variants || []).forEach(v => {
+      totalInventory += Number(v.Stock) || 0;
+    });
+  });
+
+  const pendingOrders = (APP_STATE.data.preorders || []).filter(p => p.Status !== 'Completed').length;
+
+  document.getElementById('todaysSales').textContent = '₹' + todaysSales.toLocaleString('en-IN');
+  document.getElementById('todaysProfit').textContent = '₹' + Math.round(todaysProfit).toLocaleString('en-IN');
+  document.getElementById('totalInventory').textContent = totalInventory;
+  document.getElementById('pendingOrders').textContent = pendingOrders;
+
+  const recentBillsTable = document.getElementById('recentBillsTable').querySelector('tbody');
+  recentBillsTable.innerHTML = (bills.slice(-5).reverse()).map(b => `
+    <tr>
+      <td>${b.BillNumber || '—'}</td>
+      <td>${b.CustomerName || 'Walk-in'}</td>
+      <td>₹${Number(b.TotalAmount || 0).toLocaleString('en-IN')}</td>
+      <td>${b.PaymentMode || '—'}</td>
+      <td>${b.CreatedDate ? new Date(b.CreatedDate).toLocaleDateString() : '—'}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" style="text-align: center; color: #999;">No bills</td></tr>';
+}
+
+// ============================================================================
+// BILLING / POS
+// ============================================================================
+function addToCart(code) {
+
+  let foundProduct = null;
+  let foundVariant = null;
+
+  // Match on variant-specific identifiers FIRST, and stop at the first hit. This
+  // guarantees that scanning any one variant's own barcode always adds THAT exact
+  // variant — previously this kept looping through every product/variant and let
+  // a later match silently overwrite an earlier correct one (or a shared product-level
+  // UID match could win over the actual scanned variant), which made it look like
+  // only one particular item ever got added no matter which tag was scanned.
+  outer:
+  for (const product of APP_STATE.data.products) {
+    for (const variant of (product.variants || [])) {
+      if (
+        variant.Barcode === code ||
+        variant.VariantBarcode === code ||
+        variant.VariantID === code
+      ) {
+        foundProduct = product;
+        foundVariant = variant;
+        break outer;
+      }
+    }
+  }
+
+  // Only fall back to the product-level UID when no variant-specific barcode matched,
+  // and only if that product has a single variant — so it can never guess between
+  // multiple colors/sizes of the same product.
+  if (!foundVariant) {
+    for (const product of APP_STATE.data.products) {
+      if (product.UID === code && product.variants && product.variants.length === 1) {
+        foundProduct = product;
+        foundVariant = product.variants[0];
+        break;
+      }
+    }
+  }
+
+  if (!foundProduct || !foundVariant) {
+    console.log("SCAN =", code);
+console.log(APP_STATE.data.products);
+    showToast('Product not found: ' + code, true);
+    return;
+  }
+
+  const stock = Number(foundVariant.Stock) || 0;
+
+  if (stock <= 0) {
+    showToast('Out of Stock: ' + foundProduct.Name, true);
+    return;
+  }
+
+  const existingItem = APP_STATE.cart.find(
+    item => item.variantID === foundVariant.VariantID
+  );
+
+  if (existingItem) {
+
+    if (existingItem.quantity + 1 > stock) {
+      showToast('Only ' + stock + ' in stock', true);
+      return;
+    }
+
+    existingItem.quantity++;
+
+  } else {
+
+    APP_STATE.cart.push({
+      productID: foundProduct.ProductID,
+      variantID: foundVariant.VariantID,
+      uid: foundProduct.UID,
+      barcode: foundVariant.Barcode || '',
+      name: foundProduct.Name,
+      color: foundVariant.Color,
+      size: foundVariant.Size,
+      quantity: 1,
+      salePrice: Number(foundVariant.SalePrice || foundProduct.SalePrice || 0)
+    });
+
+  }
+
+  showToast(
+    '✓ Added: ' +
+    foundProduct.Name +
+    ' (' +
+    foundVariant.Color +
+    '/' +
+    foundVariant.Size +
+    ')'
+  );
+
+  renderCart();
+  updateBillTotals();
+}
+let billSubmitting = false;
+
+async function completeBill() {
+  if (billSubmitting) return; // block double-clicks from creating duplicate bills
+  if (APP_STATE.cart.length === 0) {
+    alert('Cart is empty');
+    return;
+  }
+
+  billSubmitting = true;
+  try {
+    const customerMobile = document.getElementById('billCustomerMobile').value.trim();
+    const customerName = document.getElementById('billCustomerName').value.trim() || 'Walk-in';
+
+    const subtotal = APP_STATE.cart.reduce((sum, item) => sum + (item.quantity * item.salePrice), 0);
+    const discountAmount = Math.min(subtotal, Number(document.getElementById('billDiscountAmount').value) || 0);
+    const totalAmount = subtotal - discountAmount;
+    const paymentMode = document.getElementById('billPaymentMode').value;
+
+    if (paymentMode === 'UPI' || paymentMode === 'Card') {
+      if (!CONFIG.RAZORPAY_KEY) {
+        alert('Razorpay not configured. Use Cash payment.');
+        return;
+      }
+      initiateRazorpayPayment(customerName, customerMobile, totalAmount, subtotal, discountAmount);
+    } else {
+      await createBillDirectly(customerName, customerMobile, totalAmount, subtotal, discountAmount, paymentMode);
+    }
+  } finally {
+    billSubmitting = false;
+  }
+}
+
+function toggleBillQrDisplay() {
+  const mode = document.getElementById('billPaymentMode').value;
+  const box = document.getElementById('billQrDisplay');
+  if (mode === 'UPI_QR' && CONFIG.UPI_QR) {
+    document.getElementById('billQrImg').src = CONFIG.UPI_QR;
+    box.style.display = 'block';
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+function initiateRazorpayPayment(customerName, customerMobile, totalAmount, subtotal, discountAmount) {
+  const options = {
+    key: CONFIG.RAZORPAY_KEY,
+    amount: Math.round(totalAmount * 100),
+    currency: 'INR',
+    name: 'AK FASHION HUB',
+    description: 'Garment Purchase',
+    prefill: {
+      name: customerName,
+      contact: customerMobile,
+    },
+    theme: { color: '#000000' },
+    handler: function(response) {
+      createBillDirectly(customerName, customerMobile, totalAmount, subtotal, discountAmount, document.getElementById('billPaymentMode').value, response.razorpay_payment_id);
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+}
+
+async function createBillDirectly(customerName, customerMobile, totalAmount, subtotal, discountAmount, paymentMode, paymentID = null) {
+  const staffID = APP_STATE.currentUser && APP_STATE.currentUser.staffID;
+
+  const completeBtn = document.querySelector('.btn-primary.btn-block');
+  if (completeBtn) { completeBtn.disabled = true; completeBtn.textContent = 'Saving...'; }
+
+  const payload = {
+    customerID: customerMobile ? 'cust_' + customerMobile : 'walk-in',
+    customerName, customerMobile,
+    staffID, staffName: APP_STATE.currentUser.name,
+    subtotal, discountPercent: 0, discountAmount: Math.round(discountAmount),
+    taxAmount: 0, totalAmount: Math.round(totalAmount), paymentMode,
+    items: APP_STATE.cart.map(item => ({
+      variantID: item.variantID, productID: item.productID, uid: item.uid,
+      color: item.color, size: item.size, quantity: item.quantity, salePrice: item.salePrice
+    }))
+  };
+
+  // Weak/no internet — don't lose the sale. Queue it locally and finish the
+  // checkout as normal; it auto-syncs to the Sheet the moment we're back online.
+  if (!navigator.onLine) {
+    if (completeBtn) { completeBtn.disabled = false; completeBtn.textContent = '✓ Complete Sale'; }
+    finishBillLocally('local_' + Date.now(), 'BILL-OFFLINE-' + Date.now(), customerName, customerMobile, totalAmount, subtotal, discountAmount, paymentMode, paymentID, payload, true);
+    return;
+  }
+
+  const result = await backendCall('addBill', payload);
+
+  if (completeBtn) { completeBtn.disabled = false; completeBtn.textContent = '✓ Complete Sale'; }
+
+  if (!result.success) {
+    // A genuine network failure mid-request — same safety net as being offline.
+    if (/fetch|network|failed/i.test(result.error || '')) {
+      finishBillLocally('local_' + Date.now(), 'BILL-OFFLINE-' + Date.now(), customerName, customerMobile, totalAmount, subtotal, discountAmount, paymentMode, paymentID, payload, true);
+      return;
+    }
+    alert('❌ Bill Google Sheet me save nahi hua: ' + result.error + '\n\nDobara try karein — koi partial/duplicate bill nahi bana.');
+    return;
+  }
+
+  const { billID, billNumber } = result.data;
+  finishBillLocally(billID, billNumber, customerName, customerMobile, totalAmount, subtotal, discountAmount, paymentMode, paymentID, null, false);
+}
+
+// Shared by both the normal (online) and offline-queued paths — updates local
+// bill/stock records and resets the cart the same way either way.
+function finishBillLocally(billID, billNumber, customerName, customerMobile, totalAmount, subtotal, discountAmount, paymentMode, paymentID, queuedPayload, isOffline) {
+  const bill = {
+    BillID: billID, BillNumber: billNumber, CustomerName: customerName, CustomerMobile: customerMobile,
+    StaffName: APP_STATE.currentUser.name, Subtotal: subtotal, DiscountPercent: 0,
+    DiscountAmount: Math.round(discountAmount), TotalAmount: Math.round(totalAmount),
+    PaymentMode: paymentMode, PaymentID: paymentID || '',
+    Status: isOffline ? 'Pending Sync' : 'Completed', CreatedDate: new Date().toISOString()
+  };
+  APP_STATE.data.bills.push(bill);
+
+  APP_STATE.cart.forEach(item => {
+    APP_STATE.data.billItems.push({
+      BillID: billID, VariantID: item.variantID, UID: item.uid, Color: item.color,
+      Size: item.size, Quantity: item.quantity, SalePrice: item.salePrice
+    });
+
+    // Deduct stock locally right away (whether synced yet or not) so the UI/Cart
+    // reflects reality immediately; the Sheet gets the same deduction once synced.
+    APP_STATE.data.products.forEach(p => {
+      const v = p.variants?.find(v => v.VariantID === item.variantID);
+      if (v) {
+        v.Stock = Math.max(0, Number(v.Stock) - item.quantity);
+        p.TotalStock = p.variants.reduce((s, vr) => s + Number(vr.Stock), 0);
+      }
+    });
+  });
+
+  if (isOffline && queuedPayload) {
+    const pending = JSON.parse(localStorage.getItem('pendingBills') || '[]');
+    pending.push({ localBillID: billID, payload: queuedPayload });
+    localStorage.setItem('pendingBills', JSON.stringify(pending));
+    showToast('⚠️ Internet nahi hai — bill local me save ho gaya, connection wapas aate hi Sheet me chala jaayega', true);
+  } else {
+    alert('✓ Bill #' + billNumber + ' Google Sheet me save ho gaya\nAmount: ₹' + totalAmount.toLocaleString('en-IN'));
+  }
+
+  APP_STATE.cart = [];
+  document.getElementById('billDiscountAmount').value = 0;
+  renderCart();
+  updateBillTotals();
+  document.getElementById('billCustomerMobile').value = '';
+  document.getElementById('billCustomerName').value = '';
+  refreshDashboard();
+  refreshInventory();
+  refreshProducts();
+
+  localStorage.setItem('appData', JSON.stringify(APP_STATE.data));
+}
+
+// ============================================================================
+// OFFLINE BILL SYNC — retries any bills that were saved locally while offline
+// ============================================================================
+async function syncPendingBills() {
+  let pending;
+  try { pending = JSON.parse(localStorage.getItem('pendingBills') || '[]'); } catch (e) { pending = []; }
+  if (!pending.length || !navigator.onLine) return;
+
+  const stillPending = [];
+  let syncedCount = 0;
+
+  for (const entry of pending) {
+    const result = await backendCall('addBill', entry.payload);
+    if (result.success) {
+      syncedCount++;
+      // Update the local bill record so it stops showing as "Pending Sync"
+      const localBill = APP_STATE.data.bills.find(b => b.BillID === entry.localBillID);
+      if (localBill) {
+        localBill.BillID = result.data.billID;
+        localBill.BillNumber = result.data.billNumber;
+        localBill.Status = 'Completed';
+      }
+      APP_STATE.data.billItems.forEach(bi => { if (bi.BillID === entry.localBillID) bi.BillID = result.data.billID; });
+    } else {
+      stillPending.push(entry); // leave it queued, try again next time
+    }
+  }
+
+  localStorage.setItem('pendingBills', JSON.stringify(stillPending));
+  localStorage.setItem('appData', JSON.stringify(APP_STATE.data));
+
+  if (syncedCount > 0) {
+    showToast('✓ ' + syncedCount + ' offline bill(s) ab Google Sheet me sync ho gaye');
+    refreshDashboard();
+  }
+}
+
+window.addEventListener('online', syncPendingBills);
+setInterval(syncPendingBills, 30000); // safety-net retry every 30s in case the 'online' event is missed
+
+function buildBillHTML() {
+  const templateType = CONFIG.BILL_TEMPLATE.type || 'thermal';
+  const headerText = CONFIG.BILL_TEMPLATE.headerText || 'AK FASHION HUB';
+  const footerText = CONFIG.BILL_TEMPLATE.footerText || 'Thank You!';
+
+  const subtotal = APP_STATE.cart.reduce((sum, item) => sum + (item.quantity * item.salePrice), 0);
+  const discount = Math.min(subtotal, Number(document.getElementById('billDiscountAmount').value) || 0);
+  const total = subtotal - discount;
+
+  return `
+    <div class="print-area bill-${templateType}" style="background:#fff;">
+      <div class="bill-header" style="text-align:center;">
+        ${CONFIG.SHOP_LOGO ? `<img src="${CONFIG.SHOP_LOGO}" class="bill-logo" alt="Logo">` : ''}
+        <div class="bill-title">${headerText}</div>
+        <div style="font-size: 10px; margin-top: 2px;">📞 ${CONFIG.SHOP_MOBILE || '9599497909'}</div>
+      </div>
+      
+      <div style="font-size: 11px; margin: 8px 0; text-align: center; border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 4px 0;">
+        <div><strong>Bill Date:</strong> ${new Date().toLocaleDateString()}</div>
+        <div><strong>Customer:</strong> ${document.getElementById('billCustomerName').value || 'Walk-in'}</div>
+      </div>
+
+      <div class="bill-items">
+        <div style="display: flex; font-weight: bold; font-size: 10px; border-bottom: 1px dashed #000; margin-bottom: 4px;">
+          <div style="flex: 1;">Item</div>
+          <div style="width: 30px; text-align: center;">Qty</div>
+          <div style="width: 40px; text-align: right;">Price</div>
+        </div>
+        ${APP_STATE.cart.map(item => `
+          <div style="display: flex; font-size: 10px; margin: 2px 0;">
+            <div style="flex: 1;">${item.name}<br><span style="font-size: 9px; color: #666;">${item.color}/${item.size}</span></div>
+            <div style="width: 30px; text-align: center;">${item.quantity}</div>
+            <div style="width: 40px; text-align: right;">₹${(item.quantity * item.salePrice).toLocaleString('en-IN')}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="bill-total">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+          <span>Subtotal:</span>
+          <span>₹${subtotal.toLocaleString('en-IN')}</span>
+        </div>
+        ${discount > 0 ? `
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <span>Discount:</span>
+            <span>-₹${Math.round(discount).toLocaleString('en-IN')}</span>
+          </div>
+        ` : ''}
+        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+          <span>TOTAL:</span>
+          <span>₹${Math.round(total).toLocaleString('en-IN')}</span>
+        </div>
+      </div>
+
+      <div style="text-align: center; font-size: 11px; margin-top: 8px; border-top: 1px solid #000; padding-top: 4px;">
+        ${footerText}
+        <div style="margin-top: 4px; font-size: 9px; color: #666;">Payment: ${paymentModeLabel(document.getElementById('billPaymentMode').value)}</div>
+        ${(document.getElementById('billPaymentMode').value === 'UPI_QR' && CONFIG.UPI_QR) ? `
+          <div style="margin-top: 8px;">
+            <img src="${CONFIG.UPI_QR}" style="height: 90px; width: 90px; object-fit: contain;">
+            <div style="font-size: 9px; color: #666;">Scan to Pay</div>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function paymentModeLabel(mode) {
+  if (mode === 'UPI_QR') return 'UPI (QR)';
+  return mode;
+}
+
+// Prints through a hidden iframe rather than window.open('', '_blank') — mobile
+// browsers (and some in-app webviews) block that popup silently, which was the
+// reason printing wasn't working. An iframe isn't a popup, so it can't be blocked.
+function printViaIframe(bodyHTML, extraCSS) {
+  let iframe = document.getElementById('hiddenPrintFrame');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.id = 'hiddenPrintFrame';
+    iframe.style.cssText = 'position:fixed; right:0; bottom:0; width:0; height:0; border:0;';
+    document.body.appendChild(iframe);
+  }
+
+  const doc = iframe.contentWindow.document;
+  doc.open();
+  doc.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { margin: 0; padding: 0; font-family: 'Courier New', monospace; }
+        ${extraCSS || ''}
+      </style>
+    </head>
+    <body>${bodyHTML}</body>
+    </html>
+  `);
+  doc.close();
+
+  iframe.onload = () => {
+  iframe.contentWindow.focus();
+  iframe.contentWindow.print();
+};
+}
+
+function printBill() {
+  if (APP_STATE.cart.length === 0) {
+    alert('No items to print');
+    return;
+  }
+
+  const billHTML = buildBillHTML();
+  printViaIframe(billHTML, `
+    .bill-thermal {
+  width: 3in;
+  min-height: auto;
+  height: auto;
+  overflow: visible;
+  font-size: 11px;
+}
+    .bill-a4 { width: 8.5in; font-size: 12px; }
+    .bill-header { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #000; padding-bottom: 8px; }
+    .bill-logo { height: 40px; margin-bottom: 4px; object-fit: contain; }
+    .bill-title { font-weight: bold; font-size: 13px; margin: 4px 0; }
+    .bill-items { margin: 12px 0; }
+    .bill-total { font-weight: bold; font-size: 12px; text-align: right; margin-top: 8px; padding-top: 8px; border-top: 2px solid #000; }
+  `);
+}
+
+// Renders the bill as a PNG image (via html2canvas — free, no paid API) and shares it
+// through the device's native share sheet, where WhatsApp shows up as one of the options
+// (if installed). This is the only way a browser can hand an image to WhatsApp without a
+// paid WhatsApp Business API — there's no way to auto-attach a file to a wa.me link.
+async function shareBillToWhatsApp() {
+  if (APP_STATE.cart.length === 0) {
+    alert('No items to share');
+    return;
+  }
+  if (typeof html2canvas === 'undefined') {
+    alert('Image library load nahi hui — internet connection check karein.');
+    return;
+  }
+
+  const shareBtn = document.getElementById('whatsappShareBtn');
+  if (shareBtn) { shareBtn.disabled = true; shareBtn.textContent = 'Photo bana rahe hain...'; }
+
+  const holder = document.createElement('div');
+  holder.style.cssText = 'position:fixed; left:-9999px; top:0; background:#fff; padding:12px;';
+  holder.innerHTML = buildBillHTML();
+  document.body.appendChild(holder);
+
+  try {
+    const canvas = await html2canvas(holder, { backgroundColor: '#ffffff', scale: 2 });
+    document.body.removeChild(holder);
+
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    const customerMobile = document.getElementById('billCustomerMobile').value.trim();
+    const fileName = 'bill-' + Date.now() + '.png';
+    const file = new File([blob], fileName, { type: 'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: CONFIG.SHOP_NAME || 'Bill',
+        text: 'Aapka bill'
+      });
+    } else {
+      // Fallback for browsers without file-sharing support (e.g. desktop):
+      // download the image, then open WhatsApp so it can be attached manually.
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      const waURL = customerMobile
+        ? `https://wa.me/91${customerMobile}?text=${encodeURIComponent('Aapka bill photo download ho gaya hai — use yahan attach kar dijiye.')}`
+        : `https://wa.me/?text=${encodeURIComponent('Bill photo download ho gaya hai — WhatsApp me attach kar dijiye.')}`;
+      window.open(waURL, '_blank');
+      alert('Bill photo download ho gayi — WhatsApp khul raha hai, usme photo attach kar dijiye (yeh browser file seedha attach nahi kar sakta).');
+    }
+  } catch (err) {
+    if (holder.parentNode) document.body.removeChild(holder);
+    if (err.name !== 'AbortError') { // user cancelling the share sheet isn't an error
+      console.error(err);
+      alert('❌ Bill photo share nahi ho payi: ' + err.message);
+    }
+  } finally {
+    if (shareBtn) { shareBtn.disabled = false; shareBtn.textContent = '📱 WhatsApp Bill'; }
+  }
+}
+
+// ============================================================================
+// PRODUCTS
+// ============================================================================
+function refreshProducts() {
+  const table = document.getElementById('productsTable').querySelector('tbody');
+  const searchTerm = (document.getElementById('productSearch').value || '').toLowerCase();
+  
+  const filtered = (APP_STATE.data.products || []).filter(p =>
+    p.Name.toLowerCase().includes(searchTerm) ||
+    p.UID.toLowerCase().includes(searchTerm)
+  );
+
+  table.innerHTML = filtered.map(p => `
+    <tr>
+      <td><strong>${p.UID}</strong></td>
+      <td>${p.Name}</td>
+      <td>${p.Brand || '—'}</td>
+      <td>${p.TotalStock || 0}</td>
+      <td>₹${Number(p.CostPrice || 0).toLocaleString('en-IN')}</td>
+      <td>₹${Number(p.SalePrice || 0).toLocaleString('en-IN')}</td>
+      <td>₹${Number(p.MRP || 0).toLocaleString('en-IN')}</td>
+      <td>
+        <button class="btn btn-secondary btn-small" onclick="editProduct('${p.ProductID}')">Edit</button>
+        <button class="btn btn-danger btn-small" onclick="deleteProduct('${p.ProductID}')">Delete</button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="8" style="text-align: center; color: #999;">No products</td></tr>';
+}
+
+function openAddProductModal() {
+  const body = `
+    <div class="form-group">
+      <label class="form-label">Product Name</label>
+      <input type="text" class="form-input" id="modalProductName" placeholder="Product name">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Gender</label>
+      <select class="form-input" id="modalGender">
+        <option>Men</option>
+        <option>Women</option>
+        <option>Kids</option>
+        <option>Unisex</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Brand</label>
+      <input type="text" class="form-input" id="modalBrand">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cost Price</label>
+      <input type="number" class="form-input" id="modalCP" placeholder="0">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Sale Price</label>
+      <input type="number" class="form-input" id="modalSP" placeholder="0">
+    </div>
+    <div class="form-group">
+      <label class="form-label">MRP</label>
+      <input type="number" class="form-input" id="modalMRP" placeholder="0">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Stock — Color / Size / Qty (yahi se inventory add hoti hai)</label>
+      <div id="editVariantsList"></div>
+      <button class="btn btn-secondary btn-small" type="button" style="margin-top:6px;" onclick="addVariantRow()">+ Add Color/Size</button>
+    </div>
+  `;
+
+  const footer = `
+    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveProduct()">Save</button>
+  `;
+
+  openModal('Add Product', body, footer);
+  addVariantRow();
+}
+
+async function saveProduct() {
+  const name = document.getElementById('modalProductName').value.trim();
+  if (!name) { alert('Product name is required'); return; }
+
+  const variants = collectVariantRows([]);
+  const gender = document.getElementById('modalGender').value;
+  const brand = document.getElementById('modalBrand').value;
+  const costPrice = Number(document.getElementById('modalCP').value) || 0;
+  const salePrice = Number(document.getElementById('modalSP').value) || 0;
+  const mrp = Number(document.getElementById('modalMRP').value) || 0;
+
+  const saveBtn = document.querySelector('#modalFooter .btn-primary');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
+
+  const result = await backendCall('addProduct', {
+    name, gender, description: '', brand, fabricType: 'Cotton',
+    costPrice, salePrice, mrp, batchNumber: '', tags: [], seasonTags: [],
+    imageURL: '', sizeChartURL: '', supplierID: '',
+    staffID: APP_STATE.currentUser && APP_STATE.currentUser.staffID
+  });
+
+  if (!result.success) {
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
+    alert('❌ Google Sheet me product save nahi hua: ' + result.error + '\n\n(Local copy me bhi save nahi kiya gaya, taaki data mismatch na ho)');
+    return;
+  }
+
+  const { productID, uid, barcode } = result.data;
+
+  // Save each variant to the Variants sheet too, using the real ProductID/UID
+  const savedVariants = [];
+  for (const v of variants) {
+    const vResult = await backendCall('addVariant', {
+      productID, uid, color: v.Color, size: v.Size, stock: v.Stock,
+      floor: v.Floor, rack: v.Rack, shelf: v.Shelf,
+      staffID: APP_STATE.currentUser && APP_STATE.currentUser.staffID
+    });
+    if (vResult.success) {
+      savedVariants.push({ VariantID: vResult.data.variantID, Color: v.Color, Size: v.Size, Stock: v.Stock, Floor: v.Floor, Rack: v.Rack, Shelf: v.Shelf, Barcode: (vResult.data.barcode || v.Barcode) });
+    }
+  }
+
+  const product = {
+    ProductID: productID, UID: uid, Barcode: barcode, Name: name,
+    Gender: gender, Brand: brand, FabricType: 'Cotton', Status: 'Active',
+    CostPrice: costPrice, SalePrice: salePrice, MRP: mrp,
+    TotalStock: savedVariants.reduce((s, v) => s + (Number(v.Stock) || 0), 0),
+    variants: savedVariants
+  };
+
+  APP_STATE.data.products.push(product);
+  closeModal();
+  refreshProducts();
+  refreshInventory();
+  localStorage.setItem('appData', JSON.stringify(APP_STATE.data));
+  alert('✓ Product Google Sheet me save ho gaya: ' + uid);
+}
+
+function editProduct(id) {
+  const p = (APP_STATE.data.products || []).find(x => x.ProductID === id);
+  if (!p) { alert('Product not found'); return; }
+
+  const variantsHtml = (p.variants || []).map(v => variantRowHtml(v)).join('');
+
+  const body = `
+    <div class="form-group">
+      <label class="form-label">Product Name</label>
+      <input type="text" class="form-input" id="modalProductName" value="${p.Name || ''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Gender</label>
+      <select class="form-input" id="modalGender">
+        <option ${p.Gender === 'Men' ? 'selected' : ''}>Men</option>
+        <option ${p.Gender === 'Women' ? 'selected' : ''}>Women</option>
+        <option ${p.Gender === 'Kids' ? 'selected' : ''}>Kids</option>
+        <option ${p.Gender === 'Unisex' ? 'selected' : ''}>Unisex</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Brand</label>
+      <input type="text" class="form-input" id="modalBrand" value="${p.Brand || ''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cost Price</label>
+      <input type="number" class="form-input" id="modalCP" value="${p.CostPrice || 0}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Sale Price</label>
+      <input type="number" class="form-input" id="modalSP" value="${p.SalePrice || 0}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">MRP</label>
+      <input type="number" class="form-input" id="modalMRP" value="${p.MRP || 0}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-input" id="modalStatus">
+        <option ${p.Status === 'Active' ? 'selected' : ''}>Active</option>
+        <option ${p.Status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+        <option ${p.Status === 'Discontinued' ? 'selected' : ''}>Discontinued</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Stock — Color / Size / Qty (yahi se inventory add/update hoti hai)</label>
+      <div id="editVariantsList">${variantsHtml}</div>
+      <button class="btn btn-secondary btn-small" type="button" style="margin-top:6px;" onclick="addVariantRow()">+ Add Color/Size</button>
+    </div>
+  `;
+
+  const footer = `
+    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="updateProduct('${id}')">Save Changes</button>
+  `;
+
+  openModal('Edit Product', body, footer);
+}
+
+// Builds one variant row. Uses a data-vid attribute (not a positional index) to track
+// which existing variant a row belongs to, so removing a row from the middle of the
+// list can never shift/drop the rows that come after it when saving.
+function variantRowHtml(v) {
+  const vid = (v && v.VariantID) || '';
+  return `
+    <div class="variant-row" data-vid="${vid}" data-floor="${(v && v.Floor) || ''}" data-rack="${(v && v.Rack) || ''}" data-shelf="${(v && v.Shelf) || ''}" style="display:flex; gap:6px; align-items:center; margin-bottom:6px; font-size:12px;">
+      <input type="text" class="form-input var-color" style="padding:6px;" value="${(v && v.Color) || ''}" placeholder="Color">
+      <input type="text" class="form-input var-size" style="padding:6px;" value="${(v && v.Size) || ''}" placeholder="Size">
+      <input type="number" class="form-input var-stock" style="padding:6px; width:80px;" value="${(v && v.Stock) || 0}" placeholder="Stock">
+      <button class="btn btn-danger btn-small" type="button" onclick="this.parentElement.remove()">✕</button>
+    </div>
+  `;
+}
+
+function addVariantRow() {
+  const list = document.getElementById('editVariantsList');
+  list.insertAdjacentHTML('beforeend', variantRowHtml(null));
+}
+
+// Reads all variant rows currently in the modal, in DOM order — safe against rows
+// having been removed or added in any order, unlike matching by array index.
+function collectVariantRows(existingVariants) {
+  const rows = document.querySelectorAll('#editVariantsList .variant-row');
+  const byId = {};
+  (existingVariants || []).forEach(v => { byId[v.VariantID] = v; });
+
+  const variants = [];
+  rows.forEach(row => {
+    const color = row.querySelector('.var-color').value.trim();
+    const size = row.querySelector('.var-size').value.trim();
+    const stock = Number(row.querySelector('.var-stock').value) || 0;
+    if (!color && !size) return;
+
+    const vid = row.dataset.vid;
+    const existing = vid && byId[vid];
+    variants.push({
+  VariantID: (existing && existing.VariantID) || ('var_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)),
+
+  Barcode:
+    (
+      (existing && existing.Barcode)
+      ||
+      (
+        color.replace(/\s+/g,'').toUpperCase()
+        + '-' +
+        size.replace(/\s+/g,'').toUpperCase()
+        + '-' +
+        Date.now().toString().slice(-6)
+        + '-' +
+        Math.random().toString(36).slice(2, 6).toUpperCase()
+      )
+    ),
+
+  Color: color,
+  Size: size,
+  Stock: stock,
+
+  Floor: (existing && existing.Floor) || row.dataset.floor || '',
+  Rack: (existing && existing.Rack) || row.dataset.rack || '',
+  Shelf: (existing && existing.Shelf) || row.dataset.shelf || ''
+});
+  });
+  return variants;
+}
+
