@@ -607,7 +607,7 @@ async function confirmYes(){
     const t=calcTotals();
     const res=await apiPost({type:"PLACE_ORDER",orderId:pendingOid,name:a.name,phone:a.phone,
       products:cart.map(c=>`${c.name}(${c.size},${c.color})x${c.qty}`).join(", "),items:cart,
-      totalQty:cart.reduce((s,i)=>s+i.qty,0),productsPrice:t.sub,deliveryCharge:t.del,totalAmount:t.total,
+      coupon:appliedCoup||"",totalQty:cart.reduce((s,i)=>s+i.qty,0),productsPrice:t.sub,deliveryCharge:t.del,totalAmount:t.total,
       address:`${a.address}, ${a.city}, ${a.state} - ${a.pin}`});
     loader("checkoutLoader",false);
     if(res.status!=="SUCCESS"){alert(res.message||"Order failed. Please try again.");return}
