@@ -366,10 +366,10 @@ let confirmTimer=null,confirmLeft=120,isProcessing=false,pendingOid=null,searchT
 const pState={};
 const findProd=id=>products.find(p=>String(p.id)===String(id));
 
-async function apiPost(data){
+async function apiPost(data,ms){
   let sid=localStorage.getItem("akfh_session_id");
   if(!sid){sid=Math.random().toString(36).slice(2);try{localStorage.setItem("akfh_session_id",sid)}catch(e){}}
-  const res=await timedFetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({...data,_sid:sid,_ts:Date.now()})},25000);
+  const res=await timedFetch(API,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({...data,_sid:sid,_ts:Date.now()})},ms||25000);
   try{return JSON.parse(await res.text())}catch(e){return{status:"error"}}
 }
 async function timedFetch(url,opts,ms){
@@ -923,7 +923,17 @@ setupSuggestions();
 /* ================= ACCOUNT & ADMIN ================= */
 const SUPPORT_NO="9599497909";
 let acc=jget("acc",null),admTok="",admGate="",admSheet="Orders",admRows={head:[],rows:[]},admCols=[],admSizes=[];
-const accPost=async d=>{try{return await apiPost(d)}catch(e){return{status:"FAILED",message:e.name==="AbortError"?"The connection is slow. Please try again.":"Network error. Try again."}}};
+const accPost=async d=>{
+  const adm=String(d.type).indexOf("ADMIN_")===0,ro=d.type==="ADMIN_STATS"||d.type==="ADMIN_DATA",ms=d.type==="ADMIN_UPLOAD"?120000:adm?70000:25000;
+  for(let n=0;;n++){
+    try{return await apiPost(d,ms)}
+    catch(e){
+      if(ro&&n<1)continue;
+      return{status:"FAILED",message:e.name==="AbortError"?"The server is taking longer than usual. Please tap Retry.":"Network error. Please check your connection and try again."};
+    }
+  }
+};
+const admErr=m=>`<div style="padding:20px"><p style="color:#c0392b;margin-bottom:12px">${esc(m||"Something went wrong.")}</p><button class="gold-btn" style="max-width:200px" data-act="admRefresh">Retry</button></div>`;
 const xClose='<div data-act="accClose" style="margin-top:14px;font-size:13px;color:#999;cursor:pointer">Close</div>';
 const lnk=(v,t)=>`<b data-act="accView" data-v="${v}" style="color:#8f7127;cursor:pointer">${t}</b>`;
 function accView(v){
@@ -989,7 +999,7 @@ function admTab(k){
 async function admLoad(s){
   admSheet=s;const b=$("admBody");b.innerHTML="<p style='padding:20px'>Loading...</p>";
   const r=await accPost({type:"ADMIN_DATA",sheet:s,token:admTok});
-  if(r.status!=="SUCCESS"){b.innerHTML=`<p style="color:red;padding:20px">${esc(r.message||"Error")}</p>`;return}
+  if(r.status!=="SUCCESS"){b.innerHTML=admErr(r.message);return}
   admRows=r;
   const ORD=["Placed","Dispatched","Delivered","Cancelled"],RET=["Requested","Approved","Rejected","Completed"],ed=s==="Products"||s==="Coupons";
   const sel=(o,v)=>`<select class="adS">${(o.includes(v)?o:[v,...o]).map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}</select>`;
@@ -1122,7 +1132,7 @@ document.addEventListener("change",e=>{if(e.target.id==="admF")admFilter()});
 async function admDash(){
   admSheet="DASH";const b=$("admBody");b.innerHTML="<p style='padding:20px'>Loading...</p>";
   const r=await accPost({type:"ADMIN_STATS",token:admTok});
-  if(r.status!=="SUCCESS"){b.innerHTML=`<p style="color:red;padding:20px">${esc(r.message||"Error")}</p>`;return}
+  if(r.status!=="SUCCESS"){b.innerHTML=admErr(r.message);return}
   const s=r.stats,card=(t,v,c)=>`<div class="adm-box" style="margin:0;text-align:center"><div style="font-size:12px;color:#777">${t}</div><div style="font-size:24px;font-weight:700;color:${c||"#8f7127"}">${esc(v)}</div></div>`;
   b.innerHTML=`<div class="adm-grid">${card("Orders Today",s.ordersToday)}${card("Sales Today","₹"+s.salesToday)}${card("Orders This Month",s.ordersMonth)}${card("Sales This Month","₹"+s.salesMonth)}${card("New Orders (Placed)",s.placed,s.placed?"#c0392b":"")}${card("Dispatched",s.dispatched)}${card("Return Requests",s.returnsPending,s.returnsPending?"#c0392b":"")}${card("Low Stock (5 or fewer)",s.lowStock,s.lowStock?"#e67e22":"")}${card("Out of Stock",s.outOfStock,s.outOfStock?"#c0392b":"")}${card("Customers",s.customers)}${card("Products",s.products)}</div><p style="font-size:12px;color:#777;margin-top:12px">Cancelled orders are excluded from sales. Cancelling an order automatically returns its items to stock.</p>`;
 }
