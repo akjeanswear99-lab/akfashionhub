@@ -94,7 +94,8 @@ header .address{font-size:10px;opacity:.55;margin-top:8px;letter-spacing:.5px}
 .sim-item p{font-size:11px;margin-top:5px}
 .floating{position:fixed;top:70px;padding:10px;font-size:22px;cursor:pointer;z-index:99999;opacity:.9;display:none;background:none;border:none}
 #floatingCart{left:20px;color:var(--gold-dark)}
-#floatingWishlist{right:20px;color:#c0392b}
+#floatingWishlist{right:64px;color:#c0392b}
+#floatingAcc{right:20px;color:var(--gold-light)}
 .badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;font-weight:700;line-height:1;pointer-events:none}
 #cartCount{color:#000;text-shadow:0 0 2px #e6cf9c,0 0 4px #e6cf9c}
 #wishlistCount{color:#fff;text-shadow:0 0 2px #c0392b,0 0 4px #c0392b}
@@ -168,8 +169,26 @@ footer p{font-size:9px!important}
 .name-tag{font-size:12px}
 .floating{top:4px;font-size:20px}
 #floatingCart{left:10px}
-#floatingWishlist{right:10px}
+#floatingWishlist{right:52px}
+#floatingAcc{right:10px}
 }
+
+#accModal{background:rgba(0,0,0,.7);z-index:100001}
+#admModal{position:fixed;inset:0;background:var(--ivory);z-index:999990;display:none;flex-direction:column;overflow:auto;-webkit-user-select:text;user-select:text}
+.adm-top{background:var(--black);color:var(--gold-light);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:700;flex-shrink:0;font-family:'Playfair Display',serif}
+.adm-tabs{display:flex;gap:6px;overflow-x:auto;padding:10px;background:#fff;border-bottom:1px solid #eee;flex-shrink:0}
+.adm-tabs button{white-space:nowrap;padding:8px 14px;border:1px solid var(--gold);background:#fff;color:var(--gold-dark);border-radius:18px;font-weight:600;font-size:13px;cursor:pointer}
+.adm-tabs button.on{background:var(--grad);color:#fff}
+#admBody{padding:12px;max-width:1100px;width:100%;margin:0 auto}
+.adm-tbl{border-collapse:collapse;font-size:12px;background:#fff;width:max-content;min-width:100%}
+.adm-tbl th{position:sticky;top:0;background:var(--charcoal);color:var(--gold-light);padding:8px;text-align:left;white-space:nowrap}
+.adm-tbl td{padding:6px 8px;border-bottom:1px solid #eee;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:top}
+.adm-tbl td.ed{cursor:pointer}.adm-tbl td.ed:hover{background:#fff7e0}
+.adm-tbl button{padding:4px 8px;font-size:11px;cursor:pointer;border:1px solid #ccc;background:#fff;border-radius:4px}
+.adm-box{background:#fff;border:1px solid #eee;border-radius:10px;padding:14px;margin-bottom:12px}
+.adm-box .field{margin-top:8px}
+.adm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.adm-grid .field{margin:0}
 </style>
 </head>
 <body>
@@ -178,6 +197,10 @@ footer p{font-size:9px!important}
 <div id="zoomOverlay" data-act="closeZoom"><img id="zoomImg" src="" alt="Zoom"></div>
 <button id="floatingCart" class="floating" data-act="toggleCart" aria-label="Open cart">🛒<span id="cartCount" class="badge"></span></button>
 <button id="floatingWishlist" class="floating" data-act="toggleWish" aria-label="Open wishlist"><span id="wishIcon">♡</span><span id="wishlistCount" class="badge"></span></button>
+
+<button id="floatingAcc" class="floating" data-act="accOpen" aria-label="My account">👤</button>
+<div id="accModal" class="center-modal" data-act="accBg"><div class="box" id="accBox" style="max-height:92vh;overflow-y:auto"></div></div>
+<div id="admModal"></div>
 
 <div id="leadModal" class="center-modal">
   <div style="background:#faf9f7;padding:35px 30px;width:90%;max-width:380px;border-radius:12px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.15)">
@@ -363,6 +386,7 @@ function syncLayers(){
   const show=!any&&$("loaderWrap").style.display!=="flex";
   $("floatingCart").style.display=show?"block":"none";
   $("floatingWishlist").style.display=show?"block":"none";
+  $("floatingAcc").style.display=show?"block":"none";
 }
 
 /* ---------- pricing ---------- */
@@ -620,7 +644,7 @@ async function confirmYes(){
     loadProds(true);
   }catch(e){
     loader("checkoutLoader",false);
-    alert(e.name==="AbortError"?"Connection slow hai. Please dobara try karein (duplicate order nahi banega).":(e.message||"Connection error. Please try again."));
+    alert(e.name==="AbortError"?"The connection is slow. Please try again. Your order will not be duplicated.":(e.message||"Connection error. Please try again."));
   }finally{isProcessing=false}
 }
 function closeThanks(){$("thankYouModal").style.display="none"}
@@ -643,7 +667,7 @@ function saveAddress(){
   if(!d.state)return alert("Enter State");
   const old=jget("addr",null);
   if(!old||old.phone!==d.phone)apiPost({type:"CHECKOUT_LEAD",phone:d.phone,name:d.name,address:`${d.address}, ${d.city}`,cart:"Lead",total:"Lead"}).catch(()=>{});
-  jset("addr",d);closeAddr();updateCart();showToast("Address saved!");
+  jset("addr",d);accSyncAddr(d);closeAddr();updateCart();showToast("Address saved!");
 }
 function setupSuggestions(){
   const ci=$("aCity"),si=$("aState"),pi=$("aPin"),cs=$("citySuggestions"),ss=$("stateSuggestions"),ps=$("pinSuggestions");
@@ -895,6 +919,253 @@ $("searchInput").addEventListener("input",e=>{clearTimeout(searchT);searchT=setT
 $("leadPhone").addEventListener("input",e=>e.target.value=e.target.value.replace(/\D/g,""));
 $("orderPhone").addEventListener("input",e=>e.target.value=e.target.value.replace(/\D/g,""));
 setupSuggestions();
+
+/* ================= ACCOUNT & ADMIN ================= */
+const SUPPORT_NO="9599497909";
+let acc=jget("acc",null),admTok="",admGate="",admSheet="Orders",admRows={head:[],rows:[]},admCols=[],admSizes=[];
+const accPost=async d=>{try{return await apiPost(d)}catch(e){return{status:"FAILED",message:e.name==="AbortError"?"The connection is slow. Please try again.":"Network error. Try again."}}};
+const xClose='<div data-act="accClose" style="margin-top:14px;font-size:13px;color:#999;cursor:pointer">Close</div>';
+const lnk=(v,t)=>`<b data-act="accView" data-v="${v}" style="color:#8f7127;cursor:pointer">${t}</b>`;
+function accView(v){
+  const H=t=>`<h3 style="font-family:'Playfair Display',serif;margin-bottom:14px">${t}</h3>`;
+  const ph='<input id="acPhone" class="field" type="tel" inputmode="numeric" maxlength="10" placeholder="Mobile Number" autocomplete="username">';
+  let h="";
+  if(v==="login")h=H("My Account")+ph+'<input id="acPass" class="field" type="password" placeholder="Password" autocomplete="current-password"><button class="gold-btn" data-act="accLogin">LOGIN</button>'+
+    `<p style="margin-top:12px;font-size:13px">New to AK Fashion Hub? ${lnk("signup","Create an account")}</p><p style="margin-top:6px;font-size:13px">${lnk("forgot","Forgot your password?")}</p>`+xClose;
+  else if(v==="signup")h=H("Create Account")+'<input id="acName" class="field" placeholder="Full Name" autocomplete="name">'+ph+'<input id="acPass" class="field" type="password" placeholder="Password (minimum 6 characters)" autocomplete="new-password"><input id="acPass2" class="field" type="password" placeholder="Confirm password" autocomplete="new-password"><button class="gold-btn" data-act="accSignup">CREATE ACCOUNT</button>'+
+    `<p style="margin-top:12px;font-size:13px">Already have an account? ${lnk("login","Login")}</p>`+xClose;
+  else if(v==="forgot")h=H("Forgot Password")+`<p style="font-size:14px;color:#555;line-height:1.6;margin-bottom:14px">To reset your password, please contact our Customer Support team by phone or WhatsApp. We will verify your details and update your password for you.</p><a class="gold-btn" style="display:block;text-decoration:none;padding:12px;margin-bottom:8px" href="tel:${SUPPORT_NO}">📞 ${SUPPORT_NO}</a><a style="display:block;text-decoration:none;padding:12px;background:#25D366;color:#fff;border-radius:6px;font-weight:700" target="_blank" rel="noopener" href="https://wa.me/91${SUPPORT_NO}?text=Hello%20AK%20Fashion%20Hub%2C%20I%20would%20like%20to%20reset%20my%20password.">WhatsApp Support</a><p style="margin-top:12px;font-size:13px">${lnk("login","← Back to Login")}</p>`+xClose;
+  else if(v==="admin")h=H("Admin Login")+'<input id="adPass" class="field" type="password" placeholder="Step 1: Admin Password" autocomplete="off"><input id="adPin" class="field" type="password" inputmode="numeric" placeholder="Step 2: Secret PIN" autocomplete="off"><button class="gold-btn" data-act="admLogin">LOGIN AS ADMIN</button>'+`<p style="margin-top:12px;font-size:13px">${lnk("login","← Back")}</p>`+xClose;
+  else h=H("Welcome, "+esc(acc.name))+`<p style="font-size:14px;color:#555;margin-bottom:16px">📱 ${esc(acc.phone)}</p><button class="gold-btn" data-act="accOrders" style="margin-bottom:8px">MY ORDERS</button><button class="gold-btn" data-act="accAddr" style="margin-bottom:8px">DELIVERY ADDRESS</button><button data-act="accLogout" style="width:100%;padding:12px;background:#fff;color:#c0392b;border:1px solid #c0392b;border-radius:6px;font-weight:700;cursor:pointer">LOGOUT</button>`+xClose;
+  $("accBox").innerHTML=h;
+  ["acPhone"].forEach(i=>{const e=$(i);if(e)e.addEventListener("input",()=>e.value=e.value.replace(/\D/g,""))});
+}
+async function accAuth(btn,type){
+  const phone=$("acPhone").value.trim(),pass=$("acPass").value,d={type,phone,password:pass};
+  if(type==="LOGIN"&&!validPhone(phone)&&/^\d{4,10}$/.test(phone)){
+    btn.disabled=true;const g=await accPost({type:"ADMIN_GATE",code:phone});btn.disabled=false;
+    if(g.status==="SUCCESS"){admGate=g.gate;accView("admin");return}
+    return showToast("Please enter a valid 10-digit mobile number");
+  }
+  if(!validPhone(phone))return showToast("Please enter a valid 10-digit mobile number");
+  if(type==="SIGNUP"){d.name=$("acName").value.trim();
+    if(d.name.length<2)return showToast("Please enter your full name");
+    if(pass.length<6)return showToast("Password must be at least 6 characters");
+    if(pass!==$("acPass2").value)return showToast("Passwords do not match")}
+  else if(!pass)return showToast("Please enter your password");
+  btn.disabled=true;const old=btn.innerText;btn.innerText="Please wait...";
+  const r=await accPost(d);btn.disabled=false;btn.innerText=old;
+  if(r.status!=="SUCCESS")return showToast(r.message||"Something went wrong. Please try again.");
+  acc={phone:r.phone,name:r.name,token:r.token};jset("acc",acc);
+  try{localStorage.setItem("lead_verified","true")}catch(e){}
+  let a=null;try{a=JSON.parse(r.address)}catch(e){}
+  if(a&&a.phone)jset("addr",a);else if(!jget("addr",null))jset("addr",{name:acc.name,phone:acc.phone});
+  updateCart();accView("me");showToast(type==="SIGNUP"?"Welcome! Your account has been created.":"Signed in successfully.");
+}
+function accSyncAddr(d){
+  if(!acc)return;
+  accPost({type:"ACC_SAVE",phone:acc.phone,token:acc.token,addr:d}).then(r=>{if(r.status!=="SUCCESS"&&/expire/i.test(r.message||"")){acc=null;try{localStorage.removeItem("acc")}catch(e){}}});
+}
+async function accOrders(){
+  $("accModal").style.display="none";
+  if(!isOpen("cartPanel"))toggleCart();
+  $("cartItemsView").style.display="none";$("myOrdersView").style.display="block";$("orderInputArea").style.display="none";
+  $("orderList").innerHTML="<p style='text-align:center;padding:20px'>Loading...</p>";
+  const r=await accPost({type:"ACC_ORDERS",phone:acc.phone,token:acc.token});
+  if(r.status==="SUCCESS"&&r.orders&&r.orders.length){allOrders=r.orders;renderOrders(allOrders)}
+  else $("orderList").innerHTML=`<p style="text-align:center;color:#666;padding:20px">${esc(r.message||"You have no orders yet.")}</p>`;
+}
+
+/* ---------- admin panel ---------- */
+const ADM_TABS=[["📊 Dashboard","DASH"],["Orders","Orders"],["Products","Products"],["+ Add Product","ADD"],["Customers","Customers"],["Returns","Returns"],["Reviews","Reviews"],["Leads","Leads"],["Coupons","Coupons"],["+ Coupon","ADDC"],["Clicks","PRODUCT_CLICKS"]];
+function admOpen(){
+  $("admModal").innerHTML=`<div class="adm-top"><span>AK FASHION HUB · Admin</span><span><button data-act="admRefresh" style="background:none;border:0;color:#fff;font-size:18px;cursor:pointer">↻</button> <button data-act="admClose" style="background:none;border:1px solid var(--gold);color:var(--gold-light);padding:5px 12px;border-radius:14px;cursor:pointer">Logout</button></span></div><div class="adm-tabs">${ADM_TABS.map(t=>`<button data-act="admTab" data-v="${t[1]}">${t[0]}</button>`).join("")}</div><div id="admBody"></div><div id="admDet"></div>`;
+  $("admModal").style.display="flex";document.body.style.overflow="hidden";admTab("DASH");
+}
+function admTab(k){
+  document.querySelectorAll(".adm-tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===k));
+  k==="ADD"?admForm():k==="DASH"?admDash():k==="ADDC"?admCouponForm():admLoad(k);
+}
+async function admLoad(s){
+  admSheet=s;const b=$("admBody");b.innerHTML="<p style='padding:20px'>Loading...</p>";
+  const r=await accPost({type:"ADMIN_DATA",sheet:s,token:admTok});
+  if(r.status!=="SUCCESS"){b.innerHTML=`<p style="color:red;padding:20px">${esc(r.message||"Error")}</p>`;return}
+  admRows=r;
+  const ORD=["Placed","Dispatched","Delivered","Cancelled"],RET=["Requested","Approved","Rejected","Completed"],ed=s==="Products"||s==="Coupons";
+  const sel=(o,v)=>`<select class="adS">${(o.includes(v)?o:[v,...o]).map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}</select>`;
+  const extra=true;
+  const rows=r.rows.map((row,ri)=>{
+    const c=row.c,key=s==="Returns"?c[1]:c[0];
+    const tds=c.map((v,i)=>{
+      if(s==="Orders"&&i===11)return`<td>${sel(ORD,v)}</td>`;
+      if(s==="Orders"&&i===12)return`<td>${esc(v)}<br><input type="date" class="adD"></td>`;
+      if(s==="Returns"&&i===6)return`<td>${sel(RET,v)}</td>`;
+      if(ed)return`<td class="ed" data-act="admCell" data-n="${row.n}" data-i="${i}" data-e="${esc(c[0])}">${esc(v)}</td>`;
+      return`<td title="${esc(v)}">${esc(v)}</td>`}).join("");
+    const vb=`<button data-act="admView" data-k="${ri}">View</button> `;const act0=s==="Customers"?`<td><button data-act="admPw" data-p="${esc(c[0])}">Reset Password</button> <button data-act="admBlock" data-p="${esc(c[0])}" data-b="${c[c.length-1]==="Blocked"?"unblock":"block"}">${c[c.length-1]==="Blocked"?"Unblock":"Block"}</button></td>`:
+      ed?`<td><button data-act="admDel" data-n="${row.n}" data-e="${esc(c[0])}">Delete</button></td>`:"";
+    const act=`<td>${vb}${act0.replace(/^<td>|<\/td>$/g,"")}</td>`;
+    return`<tr data-k="${esc(key)}" data-q="${esc(c.join(" ").toLowerCase())}">${tds}${act}</tr>`}).join("");
+  b.innerHTML=`<div style="display:flex;gap:8px;margin-bottom:8px"><input id="admQ" class="field" placeholder="🔍 Search..." style="margin:0">${s==="Orders"?'<select id="admF" class="field" style="margin:0;width:auto"><option value="">All status</option><option>Placed</option><option>Dispatched</option><option>Delivered</option><option>Cancelled</option></select>':""}</div><p style="font-size:12px;color:#666;margin-bottom:8px">${r.rows.length} rows (newest first).${ed?" Tap any cell to edit it.":""}${s==="Orders"?" Status and date changes are saved automatically.":""}</p><div style="overflow:auto;max-height:calc(100vh - 170px)"><table class="adm-tbl"><tr>${r.head.map(h=>`<th>${esc(h)}</th>`).join("")}${extra?"<th>Action</th>":""}</tr>${rows}</table></div>`;
+}
+document.addEventListener("change",async e=>{
+  const t=e.target;if(!t.matches||!t.matches(".adS,.adD"))return;
+  const tr=t.closest("tr"),dd=tr.querySelector(".adD"),st=tr.querySelector(".adS").value;
+  const r=await accPost(admSheet==="Orders"?{type:"ADMIN_ORDER",token:admTok,orderId:tr.dataset.k,status:st,deliveryDate:dd?dd.value:""}:{type:"ADMIN_RETURN",token:admTok,orderId:tr.dataset.k,status:st});
+  showToast(r.status==="SUCCESS"?"Saved ✓":r.message||"Failed");
+});
+
+/* ---------- add product (colours x sizes) ---------- */
+function admForm(){
+  const i=(id,ph,ty)=>`<input id="${id}" class="field" ${ty?`type="${ty}" `:""}placeholder="${ph}">`;
+  $("admBody").innerHTML=`<div class="adm-box"><b>1. Product Details</b><div class="adm-grid" style="margin-top:8px">${i("pName","Product Name *")}<select id="pGen" class="field"><option>Men</option><option>Women</option></select>${i("pPrio","Display priority (1 = shown first)","number")}${i("pId","Product ID (leave blank to auto-generate)")}</div><textarea id="pDesc" class="field" rows="4" placeholder="Description (one detail per line, e.g. Fabric: Cotton)"></textarea></div>
+  <div class="adm-box"><b>2. Colours and Sizes</b>${i("pCols","Colours: Black, Navy Blue, Red")}${i("pSizes","Sizes: S, M, L, XL")}<button class="gold-btn" data-act="admGen">GENERATE TABLE</button></div><div id="admGen"></div><p id="admMsg" style="margin:10px 0;font-size:13px"></p>`;
+}
+function admGen(){
+  const sp=s=>[...new Set($(s).value.split(",").map(x=>x.trim()).filter(Boolean))];
+  admCols=sp("pCols");admSizes=sp("pSizes");
+  if(!admCols.length||!admSizes.length)return showToast("Please enter both colours and sizes");
+  if(admCols.length*admSizes.length>300)return showToast("Too many colour and size combinations");
+  const i=(c,ph)=>`<input class="field ${c}" type="number" inputmode="decimal" placeholder="${ph}" style="margin:0">`;
+  $("admGen").innerHTML=`<div class="adm-box"><b>3. Photos by Colour</b>${admCols.map((c,k)=>`<div style="margin-top:10px"><div style="font-size:13px;font-weight:600">${esc(c)}</div><input type="file" accept="image/*" multiple class="cImg" data-c="${k}"><input class="field cUrl" data-c="${k}" placeholder="or paste photo links (comma separated)" style="margin-top:4px"></div>`).join("")}</div>
+  <div class="adm-box"><b>4. Size Chart</b><div class="adm-grid" style="margin-top:8px">${admSizes.map((s,k)=>`<input class="field sChart" data-s="${k}" placeholder="${esc(s)}: Chest 38 in" style="margin:0">`).join("")}</div></div>
+  <div class="adm-box"><b>5. Price / Stock</b><div class="adm-grid" style="margin:8px 0"><input id="aP" class="field" type="number" placeholder="Price" style="margin:0"><input id="aM" class="field" type="number" placeholder="MRP" style="margin:0"><input id="aS" class="field" type="number" placeholder="Stock" style="margin:0"><input id="aW" class="field" type="number" placeholder="Weight gm" style="margin:0"></div><button data-act="admApply" style="padding:8px 14px;margin-bottom:10px">Apply to all rows</button>
+  ${admCols.map((c,ci)=>admSizes.map((s,si)=>`<div class="vr" data-c="${ci}" data-s="${si}" style="display:grid;grid-template-columns:1.3fr repeat(4,1fr);gap:4px;margin-bottom:4px;align-items:center"><span style="font-size:12px">${esc(c)} / ${esc(s)}</span>${i("vP","Price")}${i("vM","MRP")}${i("vS","Stock")}${i("vW","Wt")}</div>`).join("")).join("")}</div>
+  <button class="gold-btn" data-act="admSave">SAVE PRODUCT</button>`;
+}
+function admApply(){
+  [["aP","vP"],["aM","vM"],["aS","vS"],["aW","vW"]].forEach(([a,c])=>{const v=$(a).value;if(v!=="")document.querySelectorAll("."+c).forEach(x=>x.value=v)});
+}
+async function admUp(file){
+  const img=await new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src=URL.createObjectURL(file)});
+  if(!img){showToast("Could not read photo: "+file.name);return""}
+  const sc=Math.min(1,1000/Math.max(img.width,img.height)),c=document.createElement("canvas");
+  c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
+  const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);
+  const r=await accPost({type:"ADMIN_UPLOAD",token:admTok,name:file.name.replace(/\.\w+$/,""),b64:c.toDataURL("image/jpeg",.82).split(",")[1]});
+  if(r.status!=="SUCCESS"){showToast(r.message||"Upload failed");return""}
+  return r.url;
+}
+async function admSave(btn){
+  const name=$("pName").value.trim(),msg=$("admMsg");
+  if(!name)return showToast("Please enter the product name");
+  const urls=admCols.map((c,k)=>document.querySelector(`.cUrl[data-c="${k}"]`).value.split(",").map(x=>x.trim()).filter(Boolean));
+  const files=admCols.map((c,k)=>[...document.querySelector(`.cImg[data-c="${k}"]`).files]);
+  if(admCols.some((c,k)=>!urls[k].length&&!files[k].length))return showToast("Please add at least one photo for every colour");
+  const vars=[...document.querySelectorAll(".vr")].map(r=>({c:+r.dataset.c,s:+r.dataset.s,p:num(r.querySelector(".vP").value),m:r.querySelector(".vM").value,st:num(r.querySelector(".vS").value),w:num(r.querySelector(".vW").value,500)}));
+  if(vars.some(v=>v.p<=0))return showToast("Please enter a price in every row");
+  btn.disabled=true;
+  for(let k=0;k<admCols.length;k++)for(let j=0;j<files[k].length;j++){
+    msg.innerText=`Photo upload: ${admCols[k]} ${j+1}/${files[k].length}...`;
+    const u=await admUp(files[k][j]);if(!u){btn.disabled=false;msg.innerText="";return}urls[k].push(u);
+  }
+  const ch=[...document.querySelectorAll(".sChart")].map(x=>x.value.trim());
+  msg.innerText="Saving product...";
+  const rows=vars.map(v=>[$("pId").value.trim(),name,$("pGen").value,$("pDesc").value.trim(),urls[v.c].join(","),ch[v.s]||"",admSizes[v.s],admCols[v.c],v.p,v.m===""?"":num(v.m),v.st,v.w,$("pPrio").value===""?"":num($("pPrio").value)]);
+  const r=await accPost({type:"ADMIN_ADD",token:admTok,rows});
+  btn.disabled=false;
+  if(r.status!=="SUCCESS"){msg.innerText="";return showToast(r.message||"Could not save the product")}
+  showToast(`Product ${r.id} added successfully (${r.count} variants) ✓`);admForm();loadProds(true);
+}
+
+/* ---------- click handlers ---------- */
+const AC={
+  accOpen(){accView(acc?"me":"login");$("accModal").style.display="flex"},
+  accClose(){$("accModal").style.display="none"},
+  accView(t){accView(t.dataset.v)},
+  accLogin(t){accAuth(t,"LOGIN")},
+  accSignup(t){accAuth(t,"SIGNUP")},
+  accLogout(){acc=null;try{localStorage.removeItem("acc")}catch(e){}accView("login");showToast("You have been signed out.")},
+  accOrders(){accOrders()},
+  accAddr(){$("accModal").style.display="none";openAddr()},
+  async admLogin(t){
+    const password=$("adPass").value,pin=$("adPin").value;
+    if(!password||!pin)return showToast("Please enter both the password and the PIN");
+    t.disabled=true;const r=await accPost({type:"ADMIN_LOGIN",password,pin,gate:admGate});t.disabled=false;
+    if(r.status!=="SUCCESS"){if(/secret/i.test(r.message||"")){admGate="";accView("login")}return showToast(r.message||"Sign-in failed")}
+    admGate="";admTok=r.token;$("accModal").style.display="none";admOpen();
+  },
+  admClose(){admTok="";$("admModal").style.display="none";$("admModal").innerHTML="";document.body.style.overflow=""},
+  admTab(t){admTab(t.dataset.v)},
+  admRefresh(){admSheet&&document.querySelector(".adm-tabs .on")&&admTab(document.querySelector(".adm-tabs .on").dataset.v)},
+  admGen,admApply,
+  admSave(t){admSave(t)},
+  async admCell(t){
+    const nv=prompt(`New value for ${admRows.head[t.dataset.i]}:`,t.innerText);if(nv===null)return;
+    const r=await accPost({type:"ADMIN_SETCELL",token:admTok,sheet:admSheet,row:t.dataset.n,col:Number(t.dataset.i)+1,expect:t.dataset.e,value:nv});
+    if(r.status==="SUCCESS"){t.innerText=nv;showToast("Saved ✓");loadProds(true)}else showToast(r.message||"Failed");
+  },
+  async admDel(t){
+    if(!confirm("Are you sure you want to delete this row?"))return;
+    const r=await accPost({type:"ADMIN_DELROW",token:admTok,sheet:admSheet,row:t.dataset.n,expect:t.dataset.e});
+    if(r.status==="SUCCESS"){showToast("Deleted ✓");admLoad(admSheet);loadProds(true)}else showToast(r.message||"Failed");
+  },
+  async admPw(t){
+    const np=prompt("Enter a new password for this customer (minimum 6 characters):");if(!np)return;
+    const r=await accPost({type:"ADMIN_CUST",token:admTok,phone:t.dataset.p,action:"reset",newPassword:np});
+    showToast(r.status==="SUCCESS"?"Password updated ✓":r.message||"Failed");
+  },
+  async admBlock(t){
+    const r=await accPost({type:"ADMIN_CUST",token:admTok,phone:t.dataset.p,action:t.dataset.b});
+    if(r.status==="SUCCESS")admLoad("Customers");else showToast(r.message||"Failed");
+  }
+};
+
+/* ---------- dashboard / coupon / view ---------- */
+function admFilter(){
+  const q=($("admQ")?$("admQ").value:"").toLowerCase().trim(),f=$("admF")?$("admF").value:"";
+  document.querySelectorAll(".adm-tbl tr[data-k]").forEach(tr=>{const s=tr.querySelector(".adS");
+    tr.style.display=(!f||(s&&s.value===f))&&(!q||tr.dataset.q.includes(q))?"":"none"});
+}
+document.addEventListener("input",e=>{if(e.target.id==="admQ")admFilter()});
+document.addEventListener("change",e=>{if(e.target.id==="admF")admFilter()});
+async function admDash(){
+  admSheet="DASH";const b=$("admBody");b.innerHTML="<p style='padding:20px'>Loading...</p>";
+  const r=await accPost({type:"ADMIN_STATS",token:admTok});
+  if(r.status!=="SUCCESS"){b.innerHTML=`<p style="color:red;padding:20px">${esc(r.message||"Error")}</p>`;return}
+  const s=r.stats,card=(t,v,c)=>`<div class="adm-box" style="margin:0;text-align:center"><div style="font-size:12px;color:#777">${t}</div><div style="font-size:24px;font-weight:700;color:${c||"#8f7127"}">${esc(v)}</div></div>`;
+  b.innerHTML=`<div class="adm-grid">${card("Orders Today",s.ordersToday)}${card("Sales Today","₹"+s.salesToday)}${card("Orders This Month",s.ordersMonth)}${card("Sales This Month","₹"+s.salesMonth)}${card("New Orders (Placed)",s.placed,s.placed?"#c0392b":"")}${card("Dispatched",s.dispatched)}${card("Return Requests",s.returnsPending,s.returnsPending?"#c0392b":"")}${card("Low Stock (5 or fewer)",s.lowStock,s.lowStock?"#e67e22":"")}${card("Out of Stock",s.outOfStock,s.outOfStock?"#c0392b":"")}${card("Customers",s.customers)}${card("Products",s.products)}</div><p style="font-size:12px;color:#777;margin-top:12px">Cancelled orders are excluded from sales. Cancelling an order automatically returns its items to stock.</p>`;
+}
+function admCouponForm(){
+  admSheet="ADDC";
+  $("admBody").innerHTML=`<div class="adm-box"><b>New Coupon / Offer</b>
+  <select id="cType" class="field"><option value="FLAT">FLAT (₹ off)</option><option value="FREE_DELIVERY">FREE_DELIVERY</option><option value="OFFER">OFFER (automatic cart discount)</option></select>
+  <input id="cCode" class="field" placeholder="Coupon code (optional for OFFER)">
+  <input id="cVal" class="field" type="number" placeholder="Discount amount ₹ (use 0 for FREE_DELIVERY)">
+  <input id="cMin" class="field" type="number" placeholder="Minimum cart amount ₹ (0 = no minimum)">
+  <input id="cMax" class="field" type="number" placeholder="Maximum uses (blank = 9999)">
+  <input id="cExp" class="field" type="date" title="Expiry date">
+  <button class="gold-btn" style="margin-top:8px" data-act="admCSave">SAVE COUPON</button></div>
+  <p style="font-size:12px;color:#777">To deactivate a coupon, open the Coupons tab and change its "Active" cell to NO. If several OFFER rows exist, the last one is applied.</p>`;
+}
+Object.assign(AC,{
+  async admCSave(t){
+    t.disabled=true;
+    const r=await accPost({type:"ADMIN_ADDCOUPON",token:admTok,ctype:$("cType").value,code:$("cCode").value,val:$("cVal").value,min:$("cMin").value,maxUse:$("cMax").value,expiry:$("cExp").value});
+    t.disabled=false;
+    if(r.status==="SUCCESS"){showToast("Coupon saved ✓");admCouponForm();loadProds(true)}else showToast(r.message||"Failed");
+  },
+  admView(t){
+    const row=admRows.rows[+t.dataset.k];if(!row)return;
+    let items=null;if(admSheet==="Orders"){try{items=JSON.parse(row.c[6])}catch(e){}}
+    const body=admRows.head.map((k,i)=>{let v=row.c[i];if(items&&i===6&&Array.isArray(items))v=items.map(x=>`${x.name} (${x.size}, ${x.color}) x${x.qty} - ₹${x.price}`).join("\n");
+      return`<div style="margin-bottom:8px"><div style="font-size:11px;color:#888">${esc(k)}</div><div style="white-space:pre-wrap;word-break:break-word;font-size:14px">${esc(v)}</div></div>`}).join("");
+    const ph=row.c.map(v=>String(v).trim()).find(v=>/^[6-9]\d{9}$/.test(v));
+    const btn=ph?`<div style="display:flex;gap:8px;margin-bottom:12px"><a class="gold-btn" style="flex:1;text-align:center;text-decoration:none" href="tel:${ph}">📞 Call</a><a style="flex:1;text-align:center;text-decoration:none;padding:12px;background:#25D366;color:#fff;border-radius:6px;font-weight:700" target="_blank" rel="noopener" href="https://wa.me/91${ph}">WhatsApp</a></div>`:"";
+    $("admDet").innerHTML=`<div style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:5;display:flex;align-items:center;justify-content:center;padding:16px" data-act="admDetClose"><div style="background:#fff;border-radius:10px;padding:18px;width:100%;max-width:480px;max-height:88vh;overflow:auto">${btn}${body}<button class="gold-btn" data-act="admDetClose">CLOSE</button></div></div>`;
+  },
+  admDetClose(t,e){if(t.tagName==="BUTTON"||e.target===t)$("admDet").innerHTML=""}
+});
+
+/* ---------- deterrent: blocks view-source and right-click (real security is enforced on the server) ---------- */
+document.addEventListener("contextmenu",e=>{if(!/^(INPUT|TEXTAREA)$/.test(e.target.tagName))e.preventDefault()});
+document.addEventListener("keydown",e=>{
+  const k=(e.key||"").toLowerCase();
+  if(e.key==="F12"||((e.ctrlKey||e.metaKey)&&(k==="u"||k==="s"))||((e.ctrlKey||e.metaKey)&&e.shiftKey&&["i","j","c"].includes(k)))e.preventDefault();
+});
+
+AC.accBg=(t,e)=>{if(e.target===t)AC.accClose()};
+document.addEventListener("click",e=>{const t=e.target.closest("[data-act]");if(t&&Object.prototype.hasOwnProperty.call(AC,t.dataset.act))AC[t.dataset.act](t,e)});
 
 updateCart();updateWishBadge();syncLayers();loadProds();initLeadPopup();
 </script>
