@@ -941,6 +941,13 @@ function processData(data){
     return p;
   });
 }
+let lastTxt="",polling=false,pollFail=0;
+function applyData(data){
+  processData(data);
+  syncCart();renderProducts();updateCart();
+  if(isOpen("wishlistPanel"))renderWishlistItems();
+  if(modalOpen()){const p=findProd(curId);if(p){gal.cur=p;renderModalOpts(p);galShow(gal.i)}}
+}
 async function loadProds(silent){
   const cached=jget("prodCache",null);
   if(!silent&&cached&&cached.data&&!products.length){try{processData(cached.data);syncCart();renderProducts();updateCart()}catch(e){}}
@@ -948,16 +955,39 @@ async function loadProds(silent){
   if(showLoad){loader("loaderWrap",true);syncLayers()}
   try{
     const res=await timedFetch(`${API}?t=${Date.now()}`,{cache:"no-store"},25000);
-    const data=JSON.parse(await res.text());
-    processData(data);jset("prodCache",{t:Date.now(),data});
-    syncCart();renderProducts();updateCart();
-    if(isOpen("wishlistPanel"))renderWishlistItems();
-    if(modalOpen()){const p=findProd(curId);if(p)renderModalOpts(p)}
+    const txt=await res.text(),data=JSON.parse(txt);
+    lastTxt=txt;jset("prodCache",{t:Date.now(),data});
+    applyData(data);
   }catch(e){
     console.error(e);
     if(!products.length)$("productsGrid").innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px 0;color:#999">Network error.<br><br><button class="gold-btn" style="width:auto;padding:10px 24px" data-act="retry">Retry</button></div>';
     else if(!silent)showToast("Could not refresh. Showing saved products.");
   }finally{loader("loaderWrap",false);syncLayers()}
+}
+/* ---------- live auto-update every 3s (no refresh needed) ----------
+   - one request at a time (no pile-up if the server is slow)
+   - page is redrawn ONLY when something actually changed (no lag/flicker)
+   - paused while the tab is hidden or an order is being placed
+   - backs off to 15s if the connection keeps failing */
+async function pollProds(){
+  if(document.hidden||polling||isProcessing)return;
+  polling=true;
+  try{
+    const res=await timedFetch(`${API}?t=${Date.now()}`,{cache:"no-store"},15000);
+    const txt=await res.text();
+    if(txt&&txt!==lastTxt){
+      const data=JSON.parse(txt);
+      lastTxt=txt;jset("prodCache",{t:Date.now(),data});
+      applyData(data);
+    }
+    pollFail=0;
+  }catch(e){pollFail++}
+  finally{polling=false}
+}
+function startPolling(){
+  const tick=async()=>{await pollProds();setTimeout(tick,pollFail>3?15000:3000)};
+  setTimeout(tick,3000);
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)pollProds()});
 }
 
 /* ================= ACCOUNT (stays logged in) ================= */
@@ -1303,7 +1333,7 @@ document.addEventListener("keydown",e=>{
 
 /* ---------- start ---------- */
 if(navigator.storage&&navigator.storage.persist&&acc)navigator.storage.persist().catch(()=>{});
-updateCart();updateWishBadge();syncLayers();loadProds();initLeadPopup();
+updateCart();updateWishBadge();syncLayers();loadProds().then(startPolling);initLeadPopup();
 </script>
 </body>
 </html>
