@@ -842,7 +842,7 @@ async function confirmYes(){
       coupon:appliedCoup||"",totalQty:cart.reduce((s,i)=>s+i.qty,0),productsPrice:t.sub,deliveryCharge:t.del,totalAmount:t.total,
       address:`${a.address}, ${a.city}, ${a.state} - ${a.pin}`});
     loader("checkoutLoader",false);
-    if(res.status!=="SUCCESS"){alert(res.message||"Order failed. Please try again.");return}
+    if(res.status!=="SUCCESS"){if(res.code==="TOTAL_CHANGED"){appliedCoup=null;$("couponMsg").innerText="";loadProds(true)}alert(res.message||"Order failed. Please try again.");return}
     const oid=pendingOid;pendingOid=null;
     jset(SESSION_KEY,{phone:a.phone,lastOid:oid,time:Date.now()});
     cart=[];appliedCoup=null;$("couponInput").value="";$("couponMsg").innerText="";
@@ -942,7 +942,7 @@ function isReturnWindowOpen(dt){
 function showOrderDetail(idx){
   const o=allOrders[idx];if(!o)return;currentOrderDetail=o;currentRating=0;
   const delivered=o.status==="Delivered",canReturn=delivered&&!o.returnStatus&&isReturnWindowOpen(o.deliveryDate),dd=fmtDate(o.deliveryDate);
-  const items=Array.isArray(o.items)?o.items.map(it=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;gap:8px"><span>${esc(it.name)} (${esc(it.size)}, ${esc(it.color)}) x${esc(it.qty)}</span><span>₹${num(it.price)*num(it.qty)}</span></div>`).join(""):o.products?`<div style="padding:8px 0;font-size:13px">${esc(o.products)}</div>`:"";
+  const items=Array.isArray(o.items)&&o.items.length?o.items.map(it=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;gap:8px"><span>${esc(it.name)} (${esc(it.size)}, ${esc(it.color)}) x${esc(it.qty)}</span><span>₹${num(it.price)*num(it.qty)}</span></div>`).join(""):o.products?`<div style="padding:8px 0;font-size:13px">${esc(o.products)}</div>`:"";
   let ret="";
   if(canReturn){
     const s=jget(SESSION_KEY,{})||{},rp=acc?acc.phone:(s.phone||"");
@@ -1038,7 +1038,7 @@ function saveLeadNumber(){
 function processData(data){
   let raw=[];
   if(Array.isArray(data))raw=data;
-  else{raw=Array.isArray(data.products)?data.products:[];if(data.coupons)siteCoupons=data.coupons;if(data.offer)siteOffer=data.offer}
+  else{raw=Array.isArray(data.products)?data.products:[];if(data.coupons)Object.assign(siteCoupons,data.coupons);if(data.offer)siteOffer=data.offer}
   if(raw.length&&!raw[0].variants){
     const g={};
     raw.forEach(row=>{
@@ -1063,7 +1063,7 @@ function processData(data){
     p.img=imgs;
     p.variants=(p.variants||[]).map(v=>({size:String(v.size==null?"":v.size).trim()||"Free Size",color:String(v.color==null?"":v.color).trim()||"Standard",stock:Math.max(num(v.stock),0),price:num(v.price),mrp:num(v.mrp),weight:num(v.weight,500)||500})).filter(v=>v.price>0);
     return p;
-  });
+  }).filter(p=>p.variants.length);
 }
 let lastTxt="",polling=false,pollFail=0;
 function applyData(data){
@@ -1179,7 +1179,7 @@ async function accAuth(btn,type){
   const r=await accPost(d);btn.disabled=false;btn.innerText=old;
   if(r.status!=="SUCCESS")return showToast(r.message||"Something went wrong. Please try again.");
   acc={phone:r.phone,name:r.name,token:r.token};jset("acc",acc);
-  jset("accCred",{p:phone,w:btoa(unescape(encodeURIComponent(pass)))});   // remembered on this phone only
+  jdel("accCred");   // the password is never stored; the session renews itself on every visit
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   try{localStorage.setItem("lead_verified","true")}catch(e){}
   let a=null;try{a=JSON.parse(r.address)}catch(e){}
@@ -1493,6 +1493,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ---------- start ---------- */
+jdel("accCred");   // remove any password saved by an older version
 if(navigator.storage&&navigator.storage.persist&&acc)navigator.storage.persist().catch(()=>{});
 updateCart();updateWishBadge();syncLayers();loadProds().then(startPolling);initLeadPopup();
 </script>
