@@ -192,6 +192,29 @@ header .logo{width:min(400px,calc(100% - 150px));margin:0 auto 4px}
 .adm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .adm-grid .field{margin:0}
 
+/* ---- reviews ---- */
+.rev-section{margin-top:26px;border-top:1px solid #eee;padding-top:18px}
+.rev-section h4{font-family:'Playfair Display',serif;font-weight:600;margin-bottom:10px}
+.rev-avg{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:#666}
+.rev-avg b{font-size:26px;color:var(--gold-dark);font-family:'Playfair Display',serif}
+.rev-stars{color:var(--gold);letter-spacing:1px}
+.rev-like{margin:6px 0 12px;font-size:13px;font-weight:600;color:#2e7d32}
+.rev-empty{font-size:13px;color:#999;margin-bottom:12px}
+.rev-write{width:100%;padding:11px;border:1px solid var(--gold-dark);background:#fff;color:var(--gold-dark);border-radius:8px;font-weight:700;cursor:pointer;margin-bottom:14px}
+.rev-card{background:var(--ivory);border:1px solid #f0e9d8;border-radius:10px;padding:12px;margin-bottom:10px}
+.rev-top{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.rev-av{width:36px;height:36px;border-radius:50%;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.rev-name{font-size:14px;font-weight:700;color:#222}
+.rev-ver{font-size:10px;color:#2e7d32;font-weight:600;margin-left:4px}
+.rev-meta{font-size:11px;color:#888}
+.rev-text{font-size:14px;line-height:1.55;color:#333;white-space:pre-wrap;word-break:break-word}
+.rev-photo{display:block;width:96px;height:96px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid #ddd;cursor:zoom-in}
+.rev-more{width:100%;padding:10px;background:#fff;border:1px solid #ccc;border-radius:8px;font-weight:600;cursor:pointer}
+#reviewModal{background:rgba(0,0,0,.7);z-index:100002}
+.rv-stars{display:flex;gap:6px;margin:4px 0 10px}
+.rv-star{font-size:30px;color:#ccc;cursor:pointer;line-height:1}
+.rv-star.on{color:var(--gold)}
+
 /* ---- mobile ---- */
 @media(max-width:768px){
 .container{padding:14px 10px}
@@ -279,9 +302,24 @@ footer p{font-size:9px!important}
       <div class="stock-msg" id="modalStock"></div>
       <div class="sticky-add"><button id="modalAddBtn" class="add-btn" data-act="addCart" disabled>ADD TO CART</button></div>
     </div>
+    <div class="rev-section" id="revSection"><h4>Customer Reviews</h4><div id="revSummary"></div><button class="rev-write" data-act="revWrite">✍️ Write a review</button><div id="revList"></div></div>
     <div class="similar-section"><h4>Similar Products</h4><div class="similar-grid" id="similarGrid"></div></div>
   </div>
 </div>
+
+<div id="reviewModal" class="center-modal"><div class="box" style="max-width:420px;max-height:92vh;overflow-y:auto;text-align:left">
+  <h3 style="font-family:'Playfair Display',serif;margin-bottom:4px">Write a Review</h3>
+  <p id="rvTitle" style="font-size:13px;color:#8f7127;margin-bottom:8px"></p>
+  <p style="font-size:12px;color:#777;margin-bottom:10px;line-height:1.5">Only customers who received this product can review it. Your name is taken from your order. A review cannot be edited or deleted later.</p>
+  <input id="rvPhone" class="field" type="tel" inputmode="numeric" maxlength="10" placeholder="Mobile number used for the order *">
+  <div id="rvOrderWrap"></div>
+  <div class="rv-stars"><span class="rv-star" data-act="rvStar" data-v="1">★</span><span class="rv-star" data-act="rvStar" data-v="2">★</span><span class="rv-star" data-act="rvStar" data-v="3">★</span><span class="rv-star" data-act="rvStar" data-v="4">★</span><span class="rv-star" data-act="rvStar" data-v="5">★</span></div>
+  <textarea id="rvComment" class="field" rows="3" maxlength="500" placeholder="Share your experience *"></textarea>
+  <label class="cPick"><span id="rvPhotoName">📷 Add a photo (optional)</span><input type="file" id="rvPhoto" accept="image/*" style="display:none"></label>
+  <div class="cPrev" id="rvPrev" style="margin-top:6px"></div>
+  <button id="rvSubmit" class="gold-btn" data-act="rvSubmit" style="margin-top:10px">SUBMIT REVIEW</button>
+  <div data-act="rvCancel" style="text-align:center;margin-top:12px;font-size:13px;color:#999;cursor:pointer">Cancel</div>
+</div></div>
 
 <div id="cartOverlay" class="overlay" data-act="toggleCart"></div>
 <div id="wishlistOverlay" class="overlay" data-act="toggleWish"></div>
@@ -500,10 +538,30 @@ function toggleSearch(){
   b.classList.add("open");$("filterBar").classList.add("searching");setTimeout(()=>i.focus(),60);
 }
 
+/* ---------- automatic product order ----------
+   1) products pinned with a Priority number in the sheet (1,2,3...)
+   2) newest products (last added in the sheet / newest "Added" date)
+   3) the rest in a random order (changes on every visit, steady while the page is open)
+      with the cheapest third shown last */
+const NEW_COUNT=4,SEED=Math.random().toString(36).slice(2);
+const hashKey=s=>{let h=2166136261;s=String(s)+SEED;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0)/4294967295};
+const shuffleBy=a=>a.slice().sort((x,y)=>hashKey(x.id)-hashKey(y.id));
+function orderProducts(all){
+  const pinned=all.filter(p=>num(p.priority,0)>0).sort((a,b)=>num(a.priority)-num(b.priority));
+  const rest=all.filter(p=>!pinned.includes(p));
+  const live=rest;
+  const age=p=>{const t=Date.parse(p.added);return isNaN(t)?p.idx:t};
+  const byNew=live.slice().sort((a,b)=>age(b)-age(a));
+  const fresh=byNew.slice(0,NEW_COUNT),older=byNew.slice(NEW_COUNT);
+  const byPrice=older.slice().sort((a,b)=>minVariant(b).price-minVariant(a).price),t=Math.ceil(byPrice.length/3);
+  const mixed=[...shuffleBy(byPrice.slice(0,t)),...shuffleBy(byPrice.slice(t,2*t)),...shuffleBy(byPrice.slice(2*t))];
+  return[...pinned,...fresh,...mixed];
+}
+
 /* ---------- product grid ---------- */
 function renderProducts(){
   const q=searchQuery,g=filter.toLowerCase();
-  const list=[...products].sort((a,b)=>(num(a.priority,9999))-(num(b.priority,9999))).filter(p=>p.variants.length&&p.img[0]&&(g==="all"||String(p.gender||"").toLowerCase()===g)&&(!q||String(p.name).toLowerCase().includes(q)));
+  const list=orderProducts(products).filter(p=>p.variants.length&&p.img[0]&&(g==="all"||String(p.gender||"").toLowerCase()===g)&&(!q||String(p.name).toLowerCase().includes(q)));
   if(!list.length){$("productsGrid").innerHTML=products.length?`<p style="grid-column:1/-1;text-align:center;color:#999;padding:40px 0">No products found${q?' for "'+esc(q)+'"':""}.</p>`:"";return}
   $("productsGrid").innerHTML=list.map(p=>{
     const v=minVariant(p),pi=priceInfo(v),src=cardImg(p),oos=imgOos(p,src),w=wishlist.includes(String(p.id));
@@ -549,6 +607,7 @@ function openModal(id){
   const first=gal.imgs.findIndex(s=>!imgOos(p,s));galShow(first<0?0:first);
   pState[p.id]={};
   renderModalOpts(p);updateModalWish();renderSimilar(p);
+  renderReviews(p.id);fetchReviews(p.id);
   $("productModal").style.display="flex";$("productModal").scrollTop=0;
   if(!wasOpen)history.pushState({m:1},"");
   syncLayers();galAuto();
@@ -604,6 +663,71 @@ function renderSimilar(p){
 }
 function openZoom(src){if(!src)return;galManual();$("zoomImg").src=src;$("zoomOverlay").style.display="flex"}
 function closeZoom(){$("zoomOverlay").style.display="none"}
+
+/* ---------- customer reviews ---------- */
+const revCache={},revShown={};
+let rvRating=0,rvBusy=false,rvPhotoFile=null,pollN=0;
+const starStr=n=>"★".repeat(n)+"☆".repeat(5-n);
+async function fetchReviews(pid,force){
+  try{
+    const res=await timedFetch(`${API}?reviews=1&pid=${encodeURIComponent(pid)}&t=${Date.now()}`,{cache:"no-store"},15000);
+    const txt=await res.text();
+    if(!force&&revCache[pid]&&revCache[pid].txt===txt)return;
+    const d=JSON.parse(txt);
+    revCache[pid]={txt,list:Array.isArray(d.reviews)?d.reviews:[]};
+    if(modalOpen()&&String(curId)===String(pid))renderReviews(pid);
+  }catch(e){}
+}
+function renderReviews(pid){
+  const list=((revCache[pid]||{}).list||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  const n=list.length,sum=$("revSummary"),box=$("revList");
+  if(!n){sum.innerHTML='<p class="rev-empty">No reviews yet. Bought this product? Be the first to share your experience!</p>';box.innerHTML="";return}
+  const avg=list.reduce((s,r)=>s+num(r.rating),0)/n,liked=list.filter(r=>num(r.rating)>=4).length;
+  sum.innerHTML=`<div class="rev-avg"><b>${avg.toFixed(1)}</b><span class="rev-stars">${starStr(Math.round(avg))}</span><span>${n} review${n>1?"s":""}</span></div><div class="rev-like">👍 ${liked} of ${n} customers liked this product</div>`;
+  const show=revShown[pid]||3;
+  box.innerHTML=list.slice(0,show).map(r=>`<div class="rev-card"><div class="rev-top"><div class="rev-av">${esc(String(r.name||"C").trim().charAt(0).toUpperCase())}</div><div style="flex:1;min-width:0"><div class="rev-name">${esc(r.name)}${r.verified&&r.verified!=="NO"?' <span class="rev-ver">✔ Verified buyer</span>':""}</div><div class="rev-meta"><span class="rev-stars">${starStr(num(r.rating))}</span> · ${esc(fmtDate(r.date))}</div></div></div><div class="rev-text">${esc(r.comment)}</div>${r.photo?`<img class="rev-photo" src="${esc(r.photo)}" alt="Customer photo" loading="lazy" data-act="revZoom" data-src="${esc(r.photo)}">`:""}</div>`).join("")+(n>show?`<button class="rev-more" data-act="revMore">Show all ${n} reviews</button>`:"");
+}
+function setRvStars(n){rvRating=n;document.querySelectorAll(".rv-star").forEach(x=>x.classList.toggle("on",Number(x.dataset.v)<=n))}
+async function openReviewForm(){
+  const p=findProd(curId);if(!p)return;
+  rvPhotoFile=null;setRvStars(0);
+  $("rvTitle").innerText=p.name;$("rvComment").value="";$("rvPhoto").value="";$("rvPrev").innerHTML="";$("rvPhotoName").textContent="📷 Add a photo (optional)";
+  const a=jget("addr",null)||{};
+  $("rvPhone").value=(acc&&acc.phone)||a.phone||"";$("rvPhone").readOnly=!!acc;
+  $("rvOrderWrap").innerHTML='<input id="rvOid" class="field" placeholder="Order ID *">';
+  $("reviewModal").style.display="flex";
+  if(acc){
+    const r=await accCall("ACC_ORDERS");
+    if(r.status==="SUCCESS"&&Array.isArray(r.orders)){
+      const ok=r.orders.filter(o=>{let it=o.items;if(typeof it==="string"){try{it=JSON.parse(it)}catch(e){it=[]}}return o.status==="Delivered"&&Array.isArray(it)&&it.some(x=>String(x.id)===String(p.id))});
+      if(ok.length)$("rvOrderWrap").innerHTML='<select id="rvOid" class="field">'+ok.map(o=>`<option value="${esc(o.orderId)}">Order ${esc(o.orderId)} (${esc(fmtDate(o.date))})</option>`).join("")+'</select>';
+    }
+  }
+}
+async function shrinkPhoto(file){
+  const img=await new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src=URL.createObjectURL(file)});
+  if(!img)return"";
+  const sc=Math.min(1,800/Math.max(img.width,img.height)),c=document.createElement("canvas");
+  c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
+  const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);
+  return c.toDataURL("image/jpeg",.78).split(",")[1];
+}
+async function submitProductReview(){
+  if(rvBusy)return;const p=findProd(curId);if(!p)return;
+  const phone=$("rvPhone").value.trim(),oid=($("rvOid").value||"").trim(),comment=$("rvComment").value.trim();
+  if(!validPhone(phone))return showToast("Enter your 10-digit mobile number");
+  if(!oid)return showToast("Enter your Order ID");
+  if(!rvRating)return showToast("Please select a star rating");
+  if(comment.length<3)return showToast("Please write a short comment");
+  rvBusy=true;const btn=$("rvSubmit");btn.disabled=true;btn.innerText="Submitting...";
+  try{
+    const photo=rvPhotoFile?await shrinkPhoto(rvPhotoFile):"";
+    const r=await apiPost({type:"PRODUCT_REVIEW",productId:p.id,phone,orderId:oid,rating:rvRating,comment,photo},60000);
+    if(r.status==="SUCCESS"){$("reviewModal").style.display="none";showToast("Thank you! Your review is now live.");fetchReviews(p.id,true)}
+    else showToast(r.message||"Could not submit the review. Please try again.");
+  }catch(e){showToast("Network error. Please try again.")}
+  finally{rvBusy=false;btn.disabled=false;btn.innerText="SUBMIT REVIEW"}
+}
 
 /* ---------- cart ---------- */
 function addToCartFromModal(){
@@ -919,7 +1043,7 @@ function processData(data){
     const g={};
     raw.forEach(row=>{
       const id=String(row.ID||row.id||"").trim();if(!id)return;
-      if(!g[id])g[id]={id,name:row.Name||row.name,gender:row.Gender||row.gender,category:row.Category||row.category||"",priority:row.Priority||row.priority,description:row.Description||row.description,img:[],colorImages:{},sizeChart:{},variants:[]};
+      if(!g[id])g[id]={id,name:row.Name||row.name,gender:row.Gender||row.gender,category:row.Category||row.category||"",added:row.Added||row["Date Added"]||row.Created||"",priority:row.Priority||row.priority,description:row.Description||row.description,img:[],colorImages:{},sizeChart:{},variants:[]};
       const sz=String(row.Size||row.size||"").trim(),chart=row["Size Chart"]||row.sizeChart;
       if(sz&&chart)g[id].sizeChart[sz]=chart;
       let col=row.Colour||row.Color||row.color||row.colour;
@@ -932,8 +1056,8 @@ function processData(data){
     });
     raw=Object.values(g);
   }
-  products=raw.map(p=>{
-    p.id=String(p.id);p.name=String(p.name||"");
+  products=raw.map((p,ix)=>{
+    p.idx=ix;p.id=String(p.id);p.name=String(p.name||"");
     const imgs=Array.isArray(p.img)?p.img.slice():String(p.img||"").split(",").map(s=>s.trim()).filter(Boolean);
     if(p.colorImages)Object.keys(p.colorImages).forEach(c=>colImgs(p,c).forEach(u=>{if(!imgs.includes(u))imgs.push(u)}));
     p.img=imgs;
@@ -981,6 +1105,7 @@ async function pollProds(){
       applyData(data);
     }
     pollFail=0;
+    if(modalOpen()&&++pollN%3===0)fetchReviews(curId);
   }catch(e){pollFail++}
   finally{polling=false}
 }
@@ -1070,21 +1195,21 @@ async function accOrders(){
 }
 
 /* ---------- admin panel ---------- */
-const ADM_TABS=[["📊 Dashboard","DASH"],["Orders","Orders"],["Products","Products"],["+ Add Product","ADD"],["Customers","Customers"],["Returns","Returns"],["Reviews","Reviews"],["Leads","Leads"],["Coupons","Coupons"],["+ Coupon","ADDC"],["Clicks","PRODUCT_CLICKS"]];
+const ADM_TABS=[["📊 Dashboard","DASH"],["Orders","Orders"],["Products","Products"],["+ Add Product","ADD"],["Customers","Customers"],["Returns","Returns"],["Reviews","Reviews"],["Leads","Leads"],["Coupons","Coupons"],["+ Coupon","ADDC"],["Clicks","PRODUCT_CLICKS"],["⭐ Product Reviews","ProductReviews"],["+ Review","ADDREV"]];
 function admOpen(){
   $("admModal").innerHTML=`<div class="adm-top"><span style="display:flex;align-items:center;gap:10px"><span class="logo gold" role="img" aria-label="AK Fashion Hub" style="width:140px;margin:0"></span><span style="font-size:13px">Admin</span></span><span><button data-act="admRefresh" style="background:none;border:0;color:#fff;font-size:18px;cursor:pointer">↻</button> <button data-act="admClose" style="background:none;border:1px solid var(--gold);color:var(--gold-light);padding:5px 12px;border-radius:14px;cursor:pointer">Logout</button></span></div><div class="adm-tabs">${ADM_TABS.map(t=>`<button data-act="admTab" data-v="${t[1]}">${t[0]}</button>`).join("")}</div><div id="admBody"></div><div id="admDet"></div>`;
   $("admModal").style.display="flex";document.body.style.overflow="hidden";admTab("DASH");
 }
 function admTab(k){
   document.querySelectorAll(".adm-tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===k));
-  k==="ADD"?admForm():k==="DASH"?admDash():k==="ADDC"?admCouponForm():admLoad(k);
+  k==="ADD"?admForm():k==="ADDREV"?admReviewForm():k==="DASH"?admDash():k==="ADDC"?admCouponForm():admLoad(k);
 }
 async function admLoad(s){
   admSheet=s;const b=$("admBody");b.innerHTML="<p style='padding:20px'>Loading...</p>";
   const r=await accPost({type:"ADMIN_DATA",sheet:s,token:admTok});
   if(r.status!=="SUCCESS"){b.innerHTML=admErr(r.message);return}
   admRows=r;
-  const ORD=["Placed","Dispatched","Delivered","Cancelled"],RET=["Requested","Approved","Rejected","Completed"],ed=s==="Products"||s==="Coupons";
+  const ORD=["Placed","Dispatched","Delivered","Cancelled"],RET=["Requested","Approved","Rejected","Completed"],ed=s==="Products"||s==="Coupons"||s==="ProductReviews";
   const sel=(o,v)=>`<select class="adS">${(o.includes(v)?o:[v,...o]).map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}</select>`;
   const rows=r.rows.map((row,ri)=>{
     const c=row.c,key=s==="Returns"?c[1]:c[0];
@@ -1109,7 +1234,7 @@ function admFilter(){
 /* ---------- add product (colours x sizes) ---------- */
 function admForm(){
   const i=(id,ph,ty)=>`<input id="${id}" class="field" ${ty?`type="${ty}" `:""}placeholder="${ph}">`;
-  $("admBody").innerHTML=`<div class="adm-box"><b>1. Product Details</b><div class="adm-grid" style="margin-top:8px">${i("pName","Product Name *")}<select id="pGen" class="field"><option>Men</option><option>Women</option></select>${i("pPrio","Display priority (1 = shown first)","number")}${i("pId","Product ID (leave blank to auto-generate)")}</div><textarea id="pDesc" class="field" rows="4" placeholder="Description (one detail per line, e.g. Fabric: Cotton)"></textarea></div>
+  $("admBody").innerHTML=`<div class="adm-box"><b>1. Product Details</b><div class="adm-grid" style="margin-top:8px">${i("pName","Product Name *")}<select id="pGen" class="field"><option>Men</option><option>Women</option></select>${i("pPrio","Pin to top: priority 1,2,3 (blank = automatic)","number")}${i("pId","Product ID (leave blank to auto-generate)")}</div><textarea id="pDesc" class="field" rows="4" placeholder="Description (one detail per line, e.g. Fabric: Cotton)"></textarea></div>
   <div class="adm-box"><b>2. Colours and Sizes</b><p style="font-size:12px;color:#777;margin:6px 0 2px">Type every colour and size separated by commas, then tap the button below. Photo upload boxes will appear for each colour.</p>${i("pCols","Colours: Black, Navy Blue, Red")}${i("pSizes","Sizes: S, M, L, XL")}<button class="gold-btn" data-act="admGen">NEXT: ADD PHOTOS, SIZE CHART &amp; PRICES</button></div><div id="admGen"></div><p id="admMsg" style="margin:10px 0;font-size:13px"></p>`;
 }
 function admGen(){
@@ -1165,6 +1290,19 @@ async function admDash(){
   const s=r.stats,card=(t,v,c)=>`<div class="adm-box" style="margin:0;text-align:center"><div style="font-size:12px;color:#777">${t}</div><div style="font-size:24px;font-weight:700;color:${c||"#8f7127"}">${esc(v)}</div></div>`;
   b.innerHTML=`<div class="adm-grid">${card("Orders Today",s.ordersToday)}${card("Sales Today","₹"+s.salesToday)}${card("Orders This Month",s.ordersMonth)}${card("Sales This Month","₹"+s.salesMonth)}${card("New Orders (Placed)",s.placed,s.placed?"#c0392b":"")}${card("Dispatched",s.dispatched)}${card("Return Requests",s.returnsPending,s.returnsPending?"#c0392b":"")}${card("Low Stock (5 or fewer)",s.lowStock,s.lowStock?"#e67e22":"")}${card("Out of Stock",s.outOfStock,s.outOfStock?"#c0392b":"")}${card("Customers",s.customers)}${card("Products",s.products)}</div><p style="font-size:12px;color:#777;margin-top:12px">Cancelled orders are excluded from sales. Cancelling an order automatically returns its items to stock.</p>`;
 }
+function admReviewForm(){
+  admSheet="ADDREV";
+  $("admBody").innerHTML=`<div class="adm-box"><b>Add a Review (no order needed)</b>
+  <select id="rProd" class="field">${products.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} (${esc(p.id)})</option>`).join("")}</select>
+  <input id="rName" class="field" placeholder="Customer name *">
+  <select id="rRate" class="field"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+  <textarea id="rComment" class="field" rows="3" placeholder="Review comment *"></textarea>
+  <label class="cPick"><span id="rPhotoName">📷 Choose photo</span><input type="file" id="rPhoto" accept="image/*" style="display:none"></label>
+  <input id="rPhotoUrl" class="field" placeholder="or paste a photo link (optional)">
+  <input id="rDate" class="field" type="date" title="Review date (optional)">
+  <button class="gold-btn" style="margin-top:8px" data-act="admRSave">SAVE REVIEW</button></div>
+  <p style="font-size:12px;color:#777">To edit or delete a review, open the "Product Reviews" tab: tap a cell to edit, or press Delete. Set the Visible column to NO to hide a review without deleting it.</p>`;
+}
 function admCouponForm(){
   admSheet="ADDC";
   $("admBody").innerHTML=`<div class="adm-box"><b>New Coupon / Offer</b>
@@ -1219,6 +1357,15 @@ const AC={
   async admBlock(t){
     const r=await accPost({type:"ADMIN_CUST",token:admTok,phone:t.dataset.p,action:t.dataset.b});
     if(r.status==="SUCCESS")admLoad("Customers");else showToast(r.message||"Failed");
+  },
+  async admRSave(t){
+    const name=$("rName").value.trim(),comment=$("rComment").value.trim();
+    if(!name||!comment)return showToast("Please enter the name and the comment");
+    t.disabled=true;let photo=$("rPhotoUrl").value.trim();
+    const f=$("rPhoto").files[0];if(f){showToast("Uploading photo...");photo=await admUp(f);if(!photo){t.disabled=false;return}}
+    const r=await accPost({type:"ADMIN_ADDREVIEW",token:admTok,productId:$("rProd").value,name,rating:$("rRate").value,comment,photo,date:$("rDate").value});
+    t.disabled=false;
+    if(r.status==="SUCCESS"){showToast("Review added ✓");admReviewForm()}else showToast(r.message||"Failed");
   },
   async admCSave(t){
     t.disabled=true;
@@ -1288,6 +1435,12 @@ document.addEventListener("click",e=>{
     case"saveLead":saveLeadNumber();break;
     case"closeLead":$("leadModal").style.display="none";break;
     case"retry":loadProds();break;
+    case"revWrite":openReviewForm();break;
+    case"revMore":revShown[curId]=999;renderReviews(curId);break;
+    case"revZoom":openZoom(t.dataset.src);break;
+    case"rvStar":setRvStars(Number(v));break;
+    case"rvSubmit":submitProductReview();break;
+    case"rvCancel":$("reviewModal").style.display="none";break;
     default:if(Object.prototype.hasOwnProperty.call(AC,a))AC[a](t,e);
   }
 });
@@ -1303,6 +1456,13 @@ document.addEventListener("keydown",e=>{
 document.addEventListener("change",async e=>{
   const t=e.target;
   if(t.id==="admF"){admFilter();return}
+  if(t.id==="rvPhoto"||t.id==="rPhoto"){
+    const f=t.files[0],pre=t.id==="rvPhoto";
+    if(pre)rvPhotoFile=f||null;
+    $(pre?"rvPhotoName":"rPhotoName").textContent=f?"✓ "+f.name:"📷 Choose photo";
+    if(pre){$("rvPrev").innerHTML="";if(f){const im=document.createElement("img");im.src=URL.createObjectURL(f);$("rvPrev").appendChild(im)}}
+    return;
+  }
   if(t.classList&&t.classList.contains("cImg")){
     const n=t.files.length,sp=t.parentNode.querySelector("span"),pv=document.querySelector('.cPrev[data-c="'+t.dataset.c+'"]');
     sp.textContent=n?`✓ ${n} photo${n>1?"s":""} selected - tap to change`:"📷 Choose photos";
@@ -1320,6 +1480,7 @@ document.addEventListener("input",e=>{if(e.target.id==="admQ")admFilter()});
 $("searchInput").addEventListener("input",e=>{clearTimeout(searchT);searchT=setTimeout(()=>{searchQuery=e.target.value.trim().toLowerCase();renderProducts()},200)});
 $("searchInput").addEventListener("blur",()=>{setTimeout(()=>{if(!$("searchInput").value.trim())closeSearch()},200)});
 $("searchInput").addEventListener("keydown",e=>{if(e.key==="Escape"){e.target.value="";searchQuery="";renderProducts();closeSearch()}});
+$("rvPhone").addEventListener("input",e=>e.target.value=e.target.value.replace(/\D/g,""));
 $("leadPhone").addEventListener("input",e=>e.target.value=e.target.value.replace(/\D/g,""));
 $("orderPhone").addEventListener("input",e=>e.target.value=e.target.value.replace(/\D/g,""));
 setupSuggestions();
