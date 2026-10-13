@@ -274,6 +274,22 @@ footer p{font-size:9px!important}
 .share-link input{flex:1;min-width:0;border:0;background:none;font:13px 'Jost',sans-serif;color:#555;outline:none;-webkit-user-select:text;user-select:text}
 .share-link button{flex-shrink:0;background:var(--grad);color:#fff;border:0;border-radius:8px;padding:9px 16px;font:600 13px 'Jost',sans-serif;cursor:pointer}
 .share-link button.done{background:#2e8b57}
+
+/* ---- pre-order ---- */
+.oos-ov span small{display:block;font-size:9px;letter-spacing:1px;opacity:.85;margin-top:3px;font-weight:500}
+.add-btn.pre{background:linear-gradient(135deg,#1c1c1e,#3a3a3d);color:var(--gold-light);border:1px solid var(--gold)}
+#preModal{background:rgba(0,0,0,.65);z-index:150000;padding:12px}
+.pre-sum{display:flex;gap:12px;align-items:center;padding:10px;border:1px solid var(--ivory-dark);background:var(--ivory);border-radius:12px;margin-bottom:12px}
+.pre-sum img{width:54px;height:68px;object-fit:cover;border-radius:8px;background:#eee;flex-shrink:0}
+.pre-sum .n{font-weight:600;font-size:14px;color:#1a1a1a;line-height:1.3}
+.pre-sum .m{font-size:12.5px;color:#666;margin-top:3px}
+.pre-sum .p{font-family:'Playfair Display',serif;font-weight:700;color:var(--gold-dark);margin-top:3px}
+.pre-note{font-size:12px;color:#7a6a3a;background:#fbf5e4;border:1px solid #efe0b4;border-radius:8px;padding:9px 11px;line-height:1.5;margin-bottom:10px}
+.pre-qty{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:14px}
+.pre-qty button{width:34px;height:34px;border-radius:50%;border:1px solid var(--gold);background:#fff;color:var(--gold-dark);font-size:18px;font-weight:700;cursor:pointer}
+.pre-qty b{min-width:22px;text-align:center}
+.pre-ok{text-align:center;padding:6px 0}
+.pre-ok .tick{width:56px;height:56px;border-radius:50%;background:#2e8b57;color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
 </style>
 </head>
 <body>
@@ -338,6 +354,10 @@ footer p{font-size:9px!important}
     <div class="similar-section"><h4>Similar Products</h4><div class="similar-grid" id="similarGrid"></div></div>
   </div>
 </div>
+
+<div id="preModal" class="center-modal" role="dialog" aria-modal="true" aria-labelledby="preTitle"><div class="box" style="max-width:420px;max-height:92vh;overflow-y:auto;text-align:left">
+  <div id="preBody"></div>
+</div></div>
 
 <div id="shareSheet" class="share-ov" data-act="shareClose" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
   <div class="share-box">
@@ -615,7 +635,7 @@ function renderProducts(){
   if(!list.length){$("productsGrid").innerHTML=products.length?`<p style="grid-column:1/-1;text-align:center;color:#999;padding:40px 0">No products found${q?' for "'+esc(q)+'"':""}.</p>`:"";return}
   $("productsGrid").innerHTML=list.map(p=>{
     const v=minVariant(p),pi=priceInfo(v),src=cardImg(p),oos=imgOos(p,src),w=wishlist.includes(String(p.id));
-    return`<div class="card" data-act="open" data-id="${esc(p.id)}"><div class="wishlist-heart ${w?"active":""}" data-act="wl" data-id="${esc(p.id)}" role="button" aria-label="Wishlist">${w?"♥":"♡"}</div><img src="${esc(src)}" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.opacity=.2">${oos?'<div class="oos-ov"><span>OUT OF STOCK</span></div>':""}<div class="price-overlay"><span class="mrp-tag">MRP ₹${pi.mrp}</span><span class="final-tag">₹${pi.final}</span><div class="name-tag">${esc(p.name)}</div></div></div>`}).join("");
+    return`<div class="card" data-act="open" data-id="${esc(p.id)}"><div class="wishlist-heart ${w?"active":""}" data-act="wl" data-id="${esc(p.id)}" role="button" aria-label="Wishlist">${w?"♥":"♡"}</div><img src="${esc(src)}" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.opacity=.2">${oos?'<div class="oos-ov"><span>OUT OF STOCK<small>PRE-ORDER AVAILABLE</small></span></div>':""}<div class="price-overlay"><span class="mrp-tag">MRP ₹${pi.mrp}</span><span class="final-tag">₹${pi.final}</span><div class="name-tag">${esc(p.name)}</div></div></div>`}).join("");
 }
 
 /* ---------- product modal + 5s auto slider ---------- */
@@ -685,7 +705,7 @@ function shareInfo(p){
 }
 function shareText(p){
   const s=shareInfo(p);
-  return `${p.name}\n${s.from?"From ":""}₹${s.pi.final}${s.off?` (MRP ₹${s.pi.mrp} · ${s.off}% OFF)`:""}\nAvailable at AK Fashion Hub:`;
+  return `${p.name}\n${s.from?"From ":""}₹${s.pi.final}${s.off?` (MRP ₹${s.pi.mrp} · ${s.off}% OFF)`:""}\nShop now at AK Fashion Hub:`;
 }
 async function copyText(t){
   try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(t);return true}}catch(e){}
@@ -727,7 +747,7 @@ async function shareCopy(){
 }
 async function shareVia(k){
   const p=findProd(curId);if(!p)return;
-  const s=shareInfo(p),txt=shareText(p),full=txt+" "+s.url,eu=encodeURIComponent(s.url),et=encodeURIComponent(txt),ef=encodeURIComponent(full);
+  const s=shareInfo(p),txt=shareText(p),full=txt+"\n"+s.url+"\n\n— AK Fashion Hub, Hapur",eu=encodeURIComponent(s.url),et=encodeURIComponent(txt),ef=encodeURIComponent(full);
   const go=u=>{const w=window.open(u,"_blank","noopener");if(!w&&IS_MOBILE)location.href=u};
   switch(k){
     case"whatsapp":go("https://wa.me/?text="+ef);break;
@@ -748,15 +768,80 @@ async function shareVia(k){
 }
 /* a shared link (?p=ID) opens that product straight away */
 let deepDone=false;
+/* Chat apps sometimes glue a space, bracket, full stop or line break onto the end of a link, so the id is matched leniently:
+   exact id, then the id without trailing symbols, then the longest real product id the text starts with. */
+function matchSharedId(raw){
+  const clean=s=>String(s==null?"":s).replace(/[​-‏⁠﻿]/g,"").trim().toLowerCase();
+  const r=clean(raw);if(!r)return null;
+  let p=products.find(x=>clean(x.id)===r);if(p)return p;
+  const t=r.replace(/[^a-z0-9]+$/,"");
+  if(t&&(p=products.find(x=>clean(x.id)===t)))return p;
+  let best=null;
+  products.forEach(x=>{
+    const id=clean(x.id);
+    if(id&&r.startsWith(id)&&!/[a-z0-9]/.test(r.charAt(id.length)||" ")&&(!best||id.length>clean(best.id).length))best=x;
+  });
+  return best;
+}
 function openDeepLink(fromCache){
   if(deepDone||!products.length)return;
   let id=null;try{id=new URLSearchParams(location.search).get("p")}catch(e){}
   if(!id){deepDone=true;return}
-  const p=findProd(id);
+  const p=matchSharedId(id);
   if(!p&&fromCache)return;   // wait for the live product list before saying it is missing
   deepDone=true;
   try{history.replaceState(null,"",location.pathname)}catch(e){}
   if(p)openModal(p.id);else showToast("This product is no longer available.");
+}
+
+/* ================= PRE-ORDER (out-of-stock items) ================= */
+let preState=null,preBusy=false;
+function openPreOrder(){
+  const p=findProd(curId);if(!p)return;const st=pState[p.id]||{};
+  if(!st.size||!st.color){showToast("Please select a size and colour first");return}
+  const v=p.variants.find(x=>x.size===st.size&&x.color===st.color);
+  if(!v){showToast("Please select a size and colour first");return}
+  if(v.stock>0){showToast("This item is in stock now. Please add it to your cart.");renderModalOpts(p);return}
+  const a=jget("addr",null)||{};
+  preState={pid:p.id,name:p.name,size:st.size,color:st.color,price:v.price,mrp:priceInfo(v).mrp,qty:1,img:colImgs(p,st.color)[0]||cardImg(p)||""};
+  $("preBody").innerHTML=`<h3 style="font-family:'Playfair Display',serif;margin-bottom:10px">Pre-Order</h3>
+  <div class="pre-sum"><img src="${esc(preState.img)}" alt="" onerror="this.style.visibility='hidden'"><div style="min-width:0"><div class="n">${esc(p.name)}</div><div class="m">Size: ${esc(st.size)} &nbsp;|&nbsp; Colour: ${esc(st.color)}</div><div class="p">₹${v.price}${preState.mrp>v.price?`<s style="font-family:'Jost',sans-serif;font-weight:400;color:#999;font-size:12px;margin-left:6px">₹${preState.mrp}</s>`:""}</div></div></div>
+  <div class="pre-note">This item is currently out of stock. Leave your details and our team will contact you on your mobile number about availability. No payment is required now.</div>
+  <div class="pre-qty"><span>Quantity</span><button type="button" data-act="preQty" data-v="-1" aria-label="Decrease quantity">&minus;</button><b id="preQtyVal">1</b><button type="button" data-act="preQty" data-v="1" aria-label="Increase quantity">+</button></div>
+  <input id="preName" class="field" maxlength="100" placeholder="Your name *" autocomplete="name">
+  <input id="prePhone" class="field" type="tel" inputmode="numeric" maxlength="10" placeholder="Mobile number *" autocomplete="tel">
+  <textarea id="preMsg" class="field" rows="3" maxlength="300" placeholder="Message for our team (optional), e.g. needed by a date, colour or size alternatives"></textarea>
+  <div style="font-size:11px;color:#999;text-align:right;margin:-4px 0 8px"><span id="preCount">0</span>/300</div>
+  <button id="preSubmit" class="gold-btn" data-act="preSubmit">SUBMIT PRE-ORDER</button>
+  <div data-act="preClose" style="text-align:center;margin-top:12px;font-size:13px;color:#999;cursor:pointer">Cancel</div>`;
+  $("preName").value=(acc&&acc.name)||a.name||"";
+  $("prePhone").value=(acc&&acc.phone)||a.phone||"";
+  $("prePhone").addEventListener("input",e=>e.target.value=e.target.value.replace(/\D/g,""));
+  $("preMsg").addEventListener("input",e=>$("preCount").textContent=e.target.value.length);
+  $("preModal").style.display="flex";
+}
+function closePreOrder(){$("preModal").style.display="none";preState=null}
+async function submitPreOrder(){
+  if(!preState||preBusy)return;
+  const name=$("preName").value.trim(),phone=$("prePhone").value.trim(),message=$("preMsg").value.trim();
+  if(name.length<2){showToast("Please enter your name");$("preName").focus();return}
+  if(!validPhone(phone)){showToast("Please enter a valid 10-digit mobile number");$("prePhone").focus();return}
+  preBusy=true;$("toast").classList.remove("show");const b=$("preSubmit");b.disabled=true;b.innerText="Please wait...";
+  let r;
+  try{r=await apiPost({type:"PRE_ORDER",name,phone,productId:preState.pid,size:preState.size,color:preState.color,qty:preState.qty,message},25000)}
+  catch(e){r={status:"FAILED",message:"Network error. Please check your connection and try again."}}
+  preBusy=false;
+  if(!r||r.status!=="SUCCESS"){
+    b.disabled=false;b.innerText="SUBMIT PRE-ORDER";
+    showToast((r&&r.message)||"Something went wrong. Please try again.");
+    if(r&&r.code==="IN_STOCK"){closePreOrder();loadProds(true)}
+    return;
+  }
+  const s=preState;$("toast").classList.remove("show");
+  $("preBody").innerHTML=`<div class="pre-ok"><div class="tick">✓</div><h3 style="font-family:'Playfair Display',serif;margin-bottom:6px">Pre-Order Received</h3>
+  <p style="font-size:14px;color:#555;line-height:1.6;margin-bottom:10px">Thank you, ${esc(name)}. We have noted your request for <b>${esc(s.name)}</b> (${esc(s.size)}, ${esc(s.color)}) x${s.qty}. Our team will contact you on <b>${esc(phone)}</b> about availability.</p>
+  <p style="font-size:13px;color:#8f7127;margin-bottom:14px">Pre-order ID: <b class="selectable">${esc(r.id||"")}</b></p>
+  <button class="gold-btn" data-act="preClose">DONE</button></div>`;
 }
 function toggleDesc(){
   const d=$("modalDesc"),t=$("descToggle");
@@ -773,22 +858,27 @@ function renderModalOpts(p){
   const colors=[...new Set(vs.map(v=>v.color))];
   const cOk=c=>vs.some(v=>v.color===c&&v.stock>0);
   if(st.color&&!colors.includes(st.color))delete st.color;
-  if(st.size&&!st.color){const ok=colors.filter(cOk);if(ok.length===1)st.color=ok[0]}
+  if(st.size&&!st.color){const ok=colors.filter(cOk);if(ok.length===1)st.color=ok[0];else if(!ok.length&&colors.length===1)st.color=colors[0]}   // a size with a single (sold-out) colour is selected for the customer
   const v=st.size&&st.color?p.variants.find(x=>x.size===st.size&&x.color===st.color):null;
   const canAdd=!!(v&&v.stock>0),none=allOos(p);
+  const preMode=!canAdd&&(!!v||none);   // out of stock: the customer can pre-order instead of adding to cart
   let msg;
-  if(none)msg="Out of stock";
+  if(none&&!v)msg="Currently out of stock. Select a size and colour to pre-order.";
+  else if(none)msg="Currently out of stock. You can pre-order this item.";
   else if(canAdd)msg=v.stock<=5?`Hurry! Only ${v.stock} left.`:"In stock ✓";
-  else if(v)msg="This variant is out of stock";
+  else if(v)msg="This variant is out of stock. You can pre-order it or choose another size or colour.";
   else msg=st.size?"Please select a Color":"Please select a Size";
   const pi=priceInfo(v||minVariant(p));
   $("modalPrice").innerHTML=`<span style="text-decoration:line-through;font-size:14px;color:#999;font-family:'Jost',sans-serif;font-weight:400">MRP ₹${pi.mrp}</span> ₹${pi.final}`;
   $("modalSizes").innerHTML=sizes.map(s=>`<div class="opt-btn ${st.size===s?"selected":""} ${sOk(s)?"":"oos"}" data-act="size" data-v="${esc(s)}">${esc(s)}</div>`).join("");
   $("modalColors").innerHTML=!st.size?"<span style='font-size:12px;color:#999'>Select Size first</span>":colors.map(c=>`<div class="opt-btn ${st.color===c?"selected":""} ${cOk(c)?"":"oos"}" data-act="color" data-v="${esc(c)}">${esc(c)}</div>`).join("");
-  const se=$("modalStock");se.innerText=msg;se.style.color=canAdd?"#2e7d32":(none||v)?"#c0392b":"#555";
+  const se=$("modalStock");se.innerText=msg;se.style.color=canAdd?"#2e7d32":preMode?"#b26a00":"#555";
   $("sizeInfoDisplay").innerText=st.size&&p.sizeChart&&p.sizeChart[st.size]?`${st.size}: ${p.sizeChart[st.size]}`:"";
-  $("modalAddBtn").disabled=!canAdd;
-  $("modalAddBtn").innerText=(none||(v&&!canAdd))?"OUT OF STOCK":"ADD TO CART";
+  const ab=$("modalAddBtn");
+  ab.disabled=!(canAdd||preMode);
+  ab.innerText=preMode?"PRE-ORDER":"ADD TO CART";
+  ab.dataset.act=preMode?"preOrder":"addCart";
+  ab.classList.toggle("pre",preMode);
 }
 function selOpt(type,val){
   const p=findProd(curId);if(!p)return;const st=pState[p.id]||(pState[p.id]={});
@@ -1342,7 +1432,7 @@ async function accOrders(){
 }
 
 /* ---------- admin panel ---------- */
-const ADM_TABS=[["📊 Dashboard","DASH"],["Orders","Orders"],["Products","Products"],["+ Add Product","ADD"],["Customers","Customers"],["Returns","Returns"],["Reviews","Reviews"],["Leads","Leads"],["Coupons","Coupons"],["+ Coupon","ADDC"],["Clicks","PRODUCT_CLICKS"],["⭐ Product Reviews","ProductReviews"],["+ Review","ADDREV"]];
+const ADM_TABS=[["📊 Dashboard","DASH"],["Orders","Orders"],["Products","Products"],["+ Add Product","ADD"],["Customers","Customers"],["Returns","Returns"],["Pre-Orders","PreOrders"],["Reviews","Reviews"],["Leads","Leads"],["Coupons","Coupons"],["+ Coupon","ADDC"],["Clicks","PRODUCT_CLICKS"],["⭐ Product Reviews","ProductReviews"],["+ Review","ADDREV"]];
 function admOpen(){
   $("admModal").innerHTML=`<div class="adm-top"><span style="display:flex;align-items:center;gap:10px"><span class="logo gold" role="img" aria-label="AK Fashion Hub" style="width:140px;margin:0"></span><span style="font-size:13px">Admin</span></span><span><button data-act="admRefresh" style="background:none;border:0;color:#fff;font-size:18px;cursor:pointer">↻</button> <button data-act="admClose" style="background:none;border:1px solid var(--gold);color:var(--gold-light);padding:5px 12px;border-radius:14px;cursor:pointer">Logout</button></span></div><div class="adm-tabs">${ADM_TABS.map(t=>`<button data-act="admTab" data-v="${t[1]}">${t[0]}</button>`).join("")}</div><div id="admBody"></div><div id="admDet"></div>`;
   $("admModal").style.display="flex";document.body.style.overflow="hidden";admTab("DASH");
@@ -1356,7 +1446,7 @@ async function admLoad(s){
   const r=await accPost({type:"ADMIN_DATA",sheet:s,token:admTok});
   if(r.status!=="SUCCESS"){b.innerHTML=admErr(r.message);return}
   admRows=r;
-  const ORD=["Placed","Dispatched","Delivered","Cancelled"],RET=["Requested","Approved","Rejected","Completed"],ed=s==="Products"||s==="Coupons"||s==="ProductReviews";
+  const ORD=["Placed","Dispatched","Delivered","Cancelled"],RET=["Requested","Approved","Rejected","Completed"],PRE=["New","Contacted","Confirmed","Fulfilled","Cancelled"],ed=s==="Products"||s==="Coupons"||s==="ProductReviews";
   const sel=(o,v)=>`<select class="adS">${(o.includes(v)?o:[v,...o]).map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}</select>`;
   const rows=r.rows.map((row,ri)=>{
     const c=row.c,key=s==="Returns"?c[1]:c[0];
@@ -1364,13 +1454,14 @@ async function admLoad(s){
       if(s==="Orders"&&i===11)return`<td>${sel(ORD,v)}</td>`;
       if(s==="Orders"&&i===12)return`<td>${esc(v)}<br><input type="date" class="adD"></td>`;
       if(s==="Returns"&&i===6)return`<td>${sel(RET,v)}</td>`;
+      if(s==="PreOrders"&&i===11)return`<td>${sel(PRE,v)}</td>`;
       if(ed)return`<td class="ed" data-act="admCell" data-n="${row.n}" data-i="${i}" data-e="${esc(c[0])}">${esc(v)}</td>`;
       return`<td title="${esc(v)}">${esc(v)}</td>`}).join("");
     const vb=`<button data-act="admView" data-k="${ri}">View</button> `;
     const act0=s==="Customers"?`<button data-act="admPw" data-p="${esc(c[0])}">Reset Password</button> <button data-act="admBlock" data-p="${esc(c[0])}" data-b="${c[c.length-1]==="Blocked"?"unblock":"block"}">${c[c.length-1]==="Blocked"?"Unblock":"Block"}</button>`:
       ed?`<button data-act="admDel" data-n="${row.n}" data-e="${esc(c[0])}">Delete</button>`:"";
     return`<tr data-k="${esc(key)}" data-q="${esc(c.join(" ").toLowerCase())}">${tds}<td>${vb}${act0}</td></tr>`}).join("");
-  b.innerHTML=`<div style="display:flex;gap:8px;margin-bottom:8px"><input id="admQ" class="field" placeholder="🔍 Search..." style="margin:0">${s==="Orders"?'<select id="admF" class="field" style="margin:0;width:auto"><option value="">All status</option><option>Placed</option><option>Dispatched</option><option>Delivered</option><option>Cancelled</option></select>':""}</div><p style="font-size:12px;color:#666;margin-bottom:8px">${r.rows.length} rows (newest first).${ed?" Tap any cell to edit it.":""}${s==="Orders"?" Status and date changes are saved automatically.":""}</p><div style="overflow:auto;max-height:calc(100vh - 170px)"><table class="adm-tbl"><tr>${r.head.map(h=>`<th>${esc(h)}</th>`).join("")}<th>Action</th></tr>${rows}</table></div>`;
+  b.innerHTML=`<div style="display:flex;gap:8px;margin-bottom:8px"><input id="admQ" class="field" placeholder="🔍 Search..." style="margin:0">${s==="Orders"?'<select id="admF" class="field" style="margin:0;width:auto"><option value="">All status</option><option>Placed</option><option>Dispatched</option><option>Delivered</option><option>Cancelled</option></select>':""}</div><p style="font-size:12px;color:#666;margin-bottom:8px">${r.rows.length} rows (newest first).${ed?" Tap any cell to edit it.":""}${s==="Orders"?" Status and date changes are saved automatically.":""}${s==="PreOrders"?" Status changes are saved automatically. Tap View to read the customer message and call or WhatsApp them.":""}</p><div style="overflow:auto;max-height:calc(100vh - 170px)"><table class="adm-tbl"><tr>${r.head.map(h=>`<th>${esc(h)}</th>`).join("")}<th>Action</th></tr>${rows}</table></div>`;
 }
 function admFilter(){
   const q=($("admQ")?$("admQ").value:"").toLowerCase().trim(),f=$("admF")?$("admF").value:"";
@@ -1435,7 +1526,7 @@ async function admDash(){
   const r=await accPost({type:"ADMIN_STATS",token:admTok});
   if(r.status!=="SUCCESS"){b.innerHTML=admErr(r.message);return}
   const s=r.stats,card=(t,v,c)=>`<div class="adm-box" style="margin:0;text-align:center"><div style="font-size:12px;color:#777">${t}</div><div style="font-size:24px;font-weight:700;color:${c||"#8f7127"}">${esc(v)}</div></div>`;
-  b.innerHTML=`<div class="adm-grid">${card("Orders Today",s.ordersToday)}${card("Sales Today","₹"+s.salesToday)}${card("Orders This Month",s.ordersMonth)}${card("Sales This Month","₹"+s.salesMonth)}${card("New Orders (Placed)",s.placed,s.placed?"#c0392b":"")}${card("Dispatched",s.dispatched)}${card("Return Requests",s.returnsPending,s.returnsPending?"#c0392b":"")}${card("Low Stock (5 or fewer)",s.lowStock,s.lowStock?"#e67e22":"")}${card("Out of Stock",s.outOfStock,s.outOfStock?"#c0392b":"")}${card("Customers",s.customers)}${card("Products",s.products)}</div><p style="font-size:12px;color:#777;margin-top:12px">Cancelled orders are excluded from sales. Cancelling an order automatically returns its items to stock.</p>`;
+  b.innerHTML=`<div class="adm-grid">${card("Orders Today",s.ordersToday)}${card("Sales Today","₹"+s.salesToday)}${card("Orders This Month",s.ordersMonth)}${card("Sales This Month","₹"+s.salesMonth)}${card("New Orders (Placed)",s.placed,s.placed?"#c0392b":"")}${card("Dispatched",s.dispatched)}${card("Return Requests",s.returnsPending,s.returnsPending?"#c0392b":"")}${card("New Pre-Orders",s.preOrdersNew||0,s.preOrdersNew?"#c0392b":"")}${card("Low Stock (5 or fewer)",s.lowStock,s.lowStock?"#e67e22":"")}${card("Out of Stock",s.outOfStock,s.outOfStock?"#c0392b":"")}${card("Customers",s.customers)}${card("Products",s.products)}</div><p style="font-size:12px;color:#777;margin-top:12px">Cancelled orders are excluded from sales. Cancelling an order automatically returns its items to stock.</p>`;
 }
 function admReviewForm(){
   admSheet="ADDREV";
@@ -1544,6 +1635,10 @@ document.addEventListener("click",e=>{
     case"filter":filter=v;document.querySelectorAll(".filter-btn").forEach(b=>b.classList.toggle("active",b===t));renderProducts();break;
     case"searchToggle":toggleSearch();break;
     case"closeModal":closeModal();break;
+    case"preOrder":openPreOrder();break;
+    case"preQty":if(preState){preState.qty=Math.min(10,Math.max(1,preState.qty+Number(v)));$("preQtyVal").textContent=preState.qty}break;
+    case"preSubmit":submitPreOrder();break;
+    case"preClose":closePreOrder();break;
     case"shareOpen":openShare();break;
     case"shareClose":if(t.tagName==="BUTTON"||e.target===t)closeShare();break;
     case"shareVia":shareVia(v);break;
@@ -1596,6 +1691,7 @@ document.addEventListener("click",e=>{
   }
 });
 document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&$("preModal").style.display==="flex"){closePreOrder();return}
   if(e.key==="Escape"&&shareShown){closeShare();return}
   if(e.key==="Enter"&&e.target.id==="couponInput"){e.target.blur();applyCoupon()}
   if(e.key!=="Escape")return;
@@ -1623,7 +1719,7 @@ document.addEventListener("change",async e=>{
   }
   if(!t.matches||!t.matches(".adS,.adD"))return;
   const tr=t.closest("tr"),dd=tr.querySelector(".adD"),st=tr.querySelector(".adS").value;
-  const r=await accPost(admSheet==="Orders"?{type:"ADMIN_ORDER",token:admTok,orderId:tr.dataset.k,status:st,deliveryDate:dd?dd.value:""}:{type:"ADMIN_RETURN",token:admTok,orderId:tr.dataset.k,status:st});
+  const r=await accPost(admSheet==="Orders"?{type:"ADMIN_ORDER",token:admTok,orderId:tr.dataset.k,status:st,deliveryDate:dd?dd.value:""}:admSheet==="PreOrders"?{type:"ADMIN_PREORDER",token:admTok,preId:tr.dataset.k,status:st}:{type:"ADMIN_RETURN",token:admTok,orderId:tr.dataset.k,status:st});
   showToast(r.status==="SUCCESS"?"Saved ✓":r.message||"Failed");
 });
 document.addEventListener("input",e=>{if(e.target.id==="admQ")admFilter()});
