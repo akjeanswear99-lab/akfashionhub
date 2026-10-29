@@ -216,13 +216,38 @@ header .logo{width:min(270px,calc(100% - 150px));margin:0 auto 4px}
 .rv-star{font-size:30px;color:#ccc;cursor:pointer;line-height:1}
 .rv-star.on{color:var(--gold)}
 
+/* ---- laptop / desktop: product page in two columns ---- */
+@media(min-width:900px){
+#productModal .content{max-width:1120px;padding:28px 32px 40px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"img det" "thumbs det" "rev rev" "sim sim";column-gap:44px;align-items:start}
+#productModal .main-image-box{grid-area:img;position:sticky;top:84px;border-radius:12px;display:flex;align-items:center;justify-content:center;min-height:360px}
+#productModal .main-image-box img{max-height:calc(100vh - 190px);width:auto}
+#productModal .thumbs{grid-area:thumbs;position:sticky;top:calc(84px + min(100vh - 190px, 700px));justify-content:flex-start;flex-wrap:wrap;margin:6px 0 0}
+#productModal .thumb{width:70px;height:70px}
+#productModal .details{grid-area:det;padding-top:4px}
+#productModal .price-big{font-size:32px}
+#productModal .desc{font-size:15px}
+#productModal .rev-section{grid-area:rev}
+#productModal .similar-section{grid-area:sim}
+.similar-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+}
+@media(min-width:1000px){
+.floating{width:46px;height:46px;padding:0;border-radius:50%;background:rgba(12,12,14,.6);top:58px;font-size:21px}
+#floatingCart{left:max(20px,calc(50% - 600px))}
+#floatingAcc{right:max(20px,calc(50% - 600px))}
+#floatingWishlist{right:max(72px,calc(50% - 600px + 54px))}
+.floating:hover{background:rgba(12,12,14,.85)}
+}
+.thumbs:empty{display:none}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 /* ---- mobile ---- */
 @media(max-width:768px){
 .container{padding:14px 10px}
 .products{grid-template-columns:repeat(2,1fr);gap:10px}
 .card{border-radius:8px}
 #productModal .content{padding:12px}
-#productModal .main-image-box img{max-height:60vh}
+#productModal .main-image-box img{max-height:52vh}
+.thumbs{margin:10px 0 6px}
 .opt-btn{padding:10px 16px;min-width:44px;text-align:center}
 .qty-btn{width:34px;height:34px}
 .add-btn{padding:16px}
@@ -290,6 +315,61 @@ footer p{font-size:9px!important}
 .pre-qty b{min-width:22px;text-align:center}
 .pre-ok{text-align:center;padding:6px 0}
 .pre-ok .tick{width:56px;height:56px;border-radius:50%;background:#2e8b57;color:#fff;font-size:30px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+
+/* ---- product filters ---- */
+.filter-bar{margin-bottom:12px}
+.tool-row{display:flex;gap:10px;align-items:center;justify-content:center;margin-bottom:10px}
+.filter-bar{flex-wrap:wrap;row-gap:10px}
+.filter-bar .tool-row{flex-basis:100%;margin-bottom:0}
+@media(min-width:900px){.filter-bar .tool-row{flex-basis:auto}.filter-bar{margin-bottom:14px}}
+
+.tool-btn{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;background:#fff;border:1px solid var(--gold);color:var(--gold-dark);border-radius:20px;font:600 13px 'Jost',sans-serif;cursor:pointer;white-space:nowrap}
+.tool-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tool-btn b{min-width:18px;height:18px;border-radius:9px;background:var(--grad);color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}
+.tool-btn.on{background:var(--grad);color:#fff;border-color:var(--gold-dark)}
+.tool-btn.on b{background:#fff;color:var(--gold-dark)}
+.tool-sort{display:inline-flex;align-items:center;height:38px;border:1px solid var(--gold);background:#fff;border-radius:20px;padding:0 6px 0 14px;color:var(--gold-dark);font:600 13px 'Jost',sans-serif;min-width:0}
+.tool-sort select{border:0;background:transparent;font:600 13px 'Jost',sans-serif;color:#1a1a1a;padding:8px 2px 8px 6px;outline:none;max-width:150px;cursor:pointer;-webkit-user-select:text;user-select:text}
+.f-chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.f-chips:empty{display:none}
+.f-chips::-webkit-scrollbar{display:none}
+.f-chip-x{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--gold);color:var(--gold-dark);border-radius:16px;padding:5px 8px 5px 12px;font:500 12px 'Jost',sans-serif;cursor:pointer;white-space:nowrap}
+.f-chip-x i{font-style:normal;font-size:16px;line-height:1;color:#999}
+.f-count{font-size:12.5px;color:var(--text-soft);text-align:center;margin-bottom:14px;min-height:16px}
+.f-count button{background:none;border:0;color:var(--gold-dark);font:700 12.5px 'Jost',sans-serif;text-decoration:underline;cursor:pointer;margin-left:8px}
+.fbox{display:flex;flex-direction:column;padding:10px 0 0;max-height:90vh;overflow:hidden;max-width:520px}
+.fbox .share-head{padding:0 20px;margin-bottom:4px}
+#fBody{overflow-y:auto;flex:1;min-height:0;padding:0 20px 8px;-webkit-overflow-scrolling:touch}
+.f-sec{padding:14px 0;border-bottom:1px solid #f0e9d8}
+.f-sec:last-child{border-bottom:0}
+.f-sec h5{font:700 12px 'Jost',sans-serif;letter-spacing:1.2px;text-transform:uppercase;color:#555;margin-bottom:10px}
+.f-grid{display:flex;flex-wrap:wrap;gap:8px}
+.fchip{padding:8px 14px;border:1px solid #d9d2c0;background:#fff;border-radius:18px;font:500 13px 'Jost',sans-serif;color:#333;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.fchip.on{background:var(--grad);border-color:var(--gold-dark);color:#fff}
+.fchip .dot{width:12px;height:12px;border-radius:50%;border:1px solid rgba(0,0,0,.28);flex-shrink:0}
+.f-price{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.f-price label{flex:1;display:flex;align-items:center;gap:6px;border:1px solid #d9d2c0;border-radius:8px;padding:0 10px;background:#fff}
+.f-price label span{color:#888;font-size:13px}
+.f-price input{width:100%;min-width:0;border:0;outline:0;padding:10px 0;font:600 14px 'Jost',sans-serif;background:transparent;-webkit-user-select:text;user-select:text}
+.f-price em{color:#aaa;font-style:normal;font-size:12px}
+.rng{position:relative;height:30px;margin:4px 0 2px}
+.rtrack{position:absolute;left:11px;right:11px;top:13px;height:4px;background:#e8e0cc;border-radius:2px}
+.rfill{position:absolute;top:0;height:4px;background:var(--grad);border-radius:2px}
+.rng input[type=range]{position:absolute;left:0;top:0;width:100%;height:30px;margin:0;background:none;pointer-events:none;-webkit-appearance:none;appearance:none;outline:none}
+.rng input[type=range]::-webkit-slider-runnable-track{background:transparent;height:30px;-webkit-appearance:none}
+.rng input[type=range]::-moz-range-track{background:transparent;height:30px}
+.rng input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:22px;height:22px;margin-top:4px;border-radius:50%;background:#fff;border:2px solid var(--gold-dark);box-shadow:0 1px 5px rgba(0,0,0,.3);cursor:pointer}
+.rng input[type=range]::-moz-range-thumb{pointer-events:auto;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--gold-dark);box-shadow:0 1px 5px rgba(0,0,0,.3);cursor:pointer}
+.f-rl{display:flex;justify-content:space-between;font-size:11.5px;color:#999;margin-bottom:10px}
+.f-sw{display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:14px;color:#333;gap:12px}
+.f-sw small{display:block;color:#999;font-size:11.5px;margin-top:2px}
+.f-sw i{position:relative;width:44px;height:26px;border-radius:13px;background:#ccc;transition:.2s;flex-shrink:0}
+.f-sw i::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.f-sw.on i{background:var(--gold-dark)}
+.f-sw.on i::after{left:21px}
+.f-foot{display:flex;gap:10px;padding:12px 20px max(14px,env(safe-area-inset-bottom));border-top:1px solid #eee;background:#fff;flex-shrink:0}
+.f-foot .f-clear{flex:0 0 auto;padding:12px 16px;border:1px solid var(--gold);background:#fff;color:var(--gold-dark);border-radius:6px;font:700 13px 'Jost',sans-serif;cursor:pointer}
+.f-foot .gold-btn{flex:1}
 </style>
 </head>
 <body>
@@ -358,6 +438,15 @@ footer p{font-size:9px!important}
 <div id="preModal" class="center-modal" role="dialog" aria-modal="true" aria-labelledby="preTitle"><div class="box" style="max-width:420px;max-height:92vh;overflow-y:auto;text-align:left">
   <div id="preBody"></div>
 </div></div>
+
+<div id="filterSheet" class="share-ov" data-act="filterClose" role="dialog" aria-modal="true" aria-labelledby="fTitle">
+  <div class="share-box fbox">
+    <div class="share-grab"></div>
+    <div class="share-head"><h4 id="fTitle">Filter &amp; Sort</h4><button class="share-x" data-act="filterClose" aria-label="Close">&times;</button></div>
+    <div id="fBody"></div>
+    <div class="f-foot"><button class="f-clear" data-act="filterClear">Clear all</button><button class="gold-btn" id="fShow" data-act="filterClose">Show products</button></div>
+  </div>
+</div>
 
 <div id="shareSheet" class="share-ov" data-act="shareClose" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
   <div class="share-box">
@@ -437,6 +526,10 @@ footer p{font-size:9px!important}
     <div style="position:relative"><input id="aCity" class="field" placeholder="City *" autocomplete="off"><div id="citySuggestions" class="suggestion-dropdown" style="top:42px"></div></div>
     <div style="position:relative"><input id="aPin" class="field" type="tel" inputmode="numeric" placeholder="Pincode *" maxlength="6" autocomplete="off"><div id="pinSuggestions" class="suggestion-dropdown" style="top:42px"></div></div>
     <div style="position:relative"><input id="aState" class="field" placeholder="State *" autocomplete="off"><div id="stateSuggestions" class="suggestion-dropdown" style="top:42px"></div></div>
+    <div id="aAccRow" style="display:none;gap:10px;align-items:center;margin-bottom:10px;font-size:13px;flex-wrap:wrap">
+      <select id="aLabel" class="field" style="width:auto;margin:0;padding:8px"><option>Home</option><option>Work</option><option>Other</option></select>
+      <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="aDef"> Make this my default address</label>
+    </div>
     <button class="gold-btn" data-act="saveAddr">SAVE ADDRESS</button>
   </div>
 </div>
@@ -450,7 +543,13 @@ footer p{font-size:9px!important}
       <button class="sbar-ico" data-act="searchToggle" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
       <input type="search" id="searchInput" placeholder="Search products..." autocomplete="off">
     </div>
+  <div class="tool-row" id="toolRow" style="display:none">
+    <button class="tool-btn" id="fOpenBtn" data-act="filterOpen" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span>Filters</span><b id="fBadge" style="display:none">0</b></button>
+    <label class="tool-sort"><span>Sort</span><select id="sortSel" aria-label="Sort products"></select></label>
   </div>
+  </div>
+  <div class="f-chips" id="fChips"></div>
+  <div class="f-count" id="fCount"></div>
   <div class="products" id="productsGrid"></div>
 </div>
 
@@ -515,7 +614,7 @@ const isOpen=id=>$(id).classList.contains("open");
 const modalOpen=()=>$("productModal").style.display==="flex";
 function syncLayers(){
   const any=modalOpen()||isOpen("cartPanel")||isOpen("wishlistPanel");
-  document.body.style.overflow=any?"hidden":"";
+  document.body.style.overflow=(any||$("filterSheet").style.display==="flex")?"hidden":"";
   const show=!any&&$("loaderWrap").style.display!=="flex";
   $("floatingCart").style.display=show?"block":"none";
   $("floatingWishlist").style.display=show?"block":"none";
@@ -563,7 +662,7 @@ const cardImg=p=>p.img.find(s=>!imgOos(p,s))||p.img[0];
 function toggleWishlist(id){
   const i=wishlist.indexOf(id);
   if(i>-1){wishlist.splice(i,1);showToast("Removed from wishlist")}else{wishlist.push(id);showToast("Added to wishlist")}
-  jset("wishlist",wishlist);renderProducts();updateWishBadge();
+  jset("wishlist",wishlist);accSyncWish();renderProducts();updateWishBadge();
   if(isOpen("wishlistPanel"))renderWishlistItems();
   if(modalOpen())updateModalWish();
 }
@@ -628,15 +727,172 @@ function orderProducts(all){
   return[...pinned,...added,...known];
 }
 
-/* ---------- product grid ---------- */
+/* ---------- product filters (price, type, size, colour, discount, stock) + sorting ----------
+   A product is shown when at least ONE of its size/colour variants satisfies every selected variant filter,
+   so "Size M + Blue + up to Rs 1000" only returns products that really exist in that exact combination. */
+const FS={pmin:null,pmax:null,sizes:new Set(),colors:new Set(),cats:new Set(),inStock:false,disc:0,sort:"rec"};
+const SORTS=[["rec","Recommended"],["pl","Price: Low to High"],["ph","Price: High to Low"],["new","Newest First"],["disc","Biggest Discount"]];
+const CAT_LABEL={tshirt:"T-Shirts",shirt:"Shirts",jeans:"Jeans",kurti:"Kurtas & Kurtis",lower:"Lowers & Joggers",trouser:"Trousers",shorts:"Shorts",top:"Tops",dress:"Dresses",saree:"Sarees",suit:"Suits & Sets",jacket:"Jackets & Hoodies"};
+const catLabel=k=>CAT_LABEL[k]||(k?k.charAt(0).toUpperCase()+k.slice(1):"Other");
+const COLOR_HEX={black:"#111",white:"#fff","off white":"#f4efe4",cream:"#f3e9d2",beige:"#d9c7a3",khaki:"#b5a26a",brown:"#6d4c41",coffee:"#5b3a29",rust:"#b7410e",red:"#d32f2f",maroon:"#7b1e2b",wine:"#722f37",pink:"#f06292",rose:"#e75480",magenta:"#c2185b",peach:"#ffb590",orange:"#f08a24",mustard:"#d4a017",yellow:"#f4d03f",gold:"#c9a24d",green:"#2e8b57",olive:"#6b6b2a",mint:"#98e0c0",teal:"#17898a",turquoise:"#2cc3c1",cyan:"#26c6da",blue:"#1e63c6",navy:"#1b2a52","sky blue":"#7ec8f0","light blue":"#9ccbf0","dark blue":"#123a7a","navy blue":"#1b2a52","royal blue":"#2250b5","bottle green":"#0b4d2e","dark green":"#14532d","light green":"#98d98e",purple:"#7e4aa8",lavender:"#b9a7e0",violet:"#6a3fa0",grey:"#8e8e93",gray:"#8e8e93",charcoal:"#36454f",silver:"#c0c0c0"};
+const colorHex=n=>{const k=String(n).trim().toLowerCase();if(COLOR_HEX[k])return COLOR_HEX[k];const w=k.split(/\s+/).pop();return COLOR_HEX[w]||""};
+const prodAge=p=>{const t=Date.parse(p.added);return isNaN(t)?num(p.idx,0):t};
+const variantPct=v=>{const pi=priceInfo(v);return pi.mrp>pi.final?(1-pi.final/pi.mrp)*100:0};
+const fAnyFilter=()=>FS.pmin!=null||FS.pmax!=null||FS.sizes.size>0||FS.colors.size>0||FS.cats.size>0||FS.inStock||FS.disc>0;
+const fAny=()=>fAnyFilter()||FS.sort!=="rec";
+const fCountActive=()=>(FS.pmin!=null||FS.pmax!=null?1:0)+FS.sizes.size+FS.colors.size+FS.cats.size+(FS.inStock?1:0)+(FS.disc?1:0);
+const fOpen=()=>$("filterSheet").style.display==="flex";
+function fVariantOk(v){
+  if(FS.pmin!=null&&v.price<FS.pmin)return false;
+  if(FS.pmax!=null&&v.price>FS.pmax)return false;
+  if(FS.sizes.size&&!FS.sizes.has(v.size))return false;
+  if(FS.colors.size&&!FS.colors.has(v.color))return false;
+  if(FS.inStock&&!(v.stock>0))return false;
+  if(FS.disc&&variantPct(v)<FS.disc)return false;
+  return true;
+}
+function fMatch(p){   // returns the variant to show on the card (cheapest matching, in-stock preferred) or null
+  if(FS.cats.size&&!FS.cats.has(catOf(p)))return null;
+  const ok=p.variants.filter(fVariantOk);if(!ok.length)return null;
+  const s=ok.filter(v=>v.stock>0),a=s.length?s:ok;
+  return a.reduce((m,v)=>v.price<m.price?v:m,a[0]);
+}
+function fBounds(){
+  let lo=Infinity,hi=0;
+  products.forEach(p=>{if(!p.img[0])return;p.variants.forEach(v=>{if(v.price>0){lo=Math.min(lo,v.price);hi=Math.max(hi,v.price)}})});
+  if(!isFinite(lo))return{lo:0,hi:0};
+  lo=Math.floor(lo/50)*50;hi=Math.ceil(hi/50)*50;if(hi<=lo)hi=lo+50;
+  return{lo,hi};
+}
+function fChipList(){
+  const c=[];
+  if(FS.pmin!=null||FS.pmax!=null){const b=fBounds();c.push([`₹${FS.pmin!=null?FS.pmin:b.lo} – ₹${FS.pmax!=null?FS.pmax:b.hi}`,"price",""])}
+  FS.cats.forEach(v=>c.push([catLabel(v),"cat",v]));
+  FS.sizes.forEach(v=>c.push(["Size "+v,"size",v]));
+  FS.colors.forEach(v=>c.push([v,"color",v]));
+  if(FS.disc)c.push([FS.disc+"% off & above","disc",""]);
+  if(FS.inStock)c.push(["In stock only","stock",""]);
+  if(FS.sort!=="rec")c.push(["Sort: "+(SORTS.find(s=>s[0]===FS.sort)||[])[1],"sort",""]);
+  return c;
+}
+function fMeta(n){
+  const tr=$("toolRow");tr.style.display=products.length?"flex":"none";
+  const na=fCountActive(),bd=$("fBadge");
+  bd.textContent=na;bd.style.display=na?"inline-flex":"none";$("fOpenBtn").classList.toggle("on",na>0);
+  const ss=$("sortSel");if(!ss.options.length)ss.innerHTML=SORTS.map(s=>`<option value="${s[0]}">${s[1]}</option>`).join("");
+  ss.value=FS.sort;
+  $("fChips").innerHTML=fChipList().map(c=>`<button class="f-chip-x" data-act="fRemove" data-k="${c[1]}" data-v="${esc(c[2])}" aria-label="Remove filter ${esc(c[0])}">${esc(c[0])}<i>&times;</i></button>`).join("");
+  $("fCount").innerHTML=products.length?`${n} product${n===1?"":"s"}${fAny()?'<button data-act="filterClear">Clear all</button>':""}`:"";
+  $("fShow").textContent=n?`Show ${n} product${n===1?"":"s"}`:"No products match";
+}
 function renderProducts(){
-  const q=searchQuery,g=filter.toLowerCase();
-  const list=orderProducts(products).filter(p=>p.variants.length&&p.img[0]&&(g==="all"||String(p.gender||"").toLowerCase()===g)&&(!q||String(p.name).toLowerCase().includes(q)));
-  if(!list.length){$("productsGrid").innerHTML=products.length?`<p style="grid-column:1/-1;text-align:center;color:#999;padding:40px 0">No products found${q?' for "'+esc(q)+'"':""}.</p>`:"";return}
-  $("productsGrid").innerHTML=list.map(p=>{
-    const v=minVariant(p),pi=priceInfo(v),src=cardImg(p),oos=imgOos(p,src),w=wishlist.includes(String(p.id));
+  const q=searchQuery,g=filter.toLowerCase(),rows=[];
+  orderProducts(products).forEach(p=>{
+    if(!(p.variants.length&&p.img[0]&&(g==="all"||String(p.gender||"").toLowerCase()===g)&&(!q||String(p.name).toLowerCase().includes(q))))return;
+    const v=fMatch(p);if(v)rows.push({p,v});
+  });
+  if(FS.sort==="pl")rows.sort((a,b)=>a.v.price-b.v.price);
+  else if(FS.sort==="ph")rows.sort((a,b)=>b.v.price-a.v.price);
+  else if(FS.sort==="new")rows.sort((a,b)=>prodAge(b.p)-prodAge(a.p));
+  else if(FS.sort==="disc")rows.sort((a,b)=>variantPct(b.v)-variantPct(a.v));
+  fMeta(rows.length);
+  if(!rows.length){
+    $("productsGrid").innerHTML=products.length?`<div style="grid-column:1/-1;text-align:center;color:#999;padding:40px 0"><p>No products found${q?' for "'+esc(q)+'"':""}${fAnyFilter()?" with the selected filters":""}.</p>${fAny()?'<button class="gold-btn" style="width:auto;padding:10px 24px;margin-top:14px" data-act="filterClear">Clear all filters</button>':""}</div>`:"";
+    return}
+  $("productsGrid").innerHTML=rows.map(({p,v})=>{
+    const pi=priceInfo(v),src=(FS.colors.size&&colImgs(p,v.color)[0])||cardImg(p),oos=imgOos(p,src),w=wishlist.includes(String(p.id));
     return`<div class="card" data-act="open" data-id="${esc(p.id)}"><div class="wishlist-heart ${w?"active":""}" data-act="wl" data-id="${esc(p.id)}" role="button" aria-label="Wishlist">${w?"♥":"♡"}</div><img src="${esc(src)}" alt="${esc(p.name)}" loading="lazy" decoding="async" onerror="this.style.opacity=.2">${oos?'<div class="oos-ov"><span>OUT OF STOCK<small>PRE-ORDER AVAILABLE</small></span></div>':""}<div class="price-overlay"><span class="mrp-tag">MRP ₹${pi.mrp}</span><span class="final-tag">₹${pi.final}</span><div class="name-tag">${esc(p.name)}</div></div></div>`}).join("");
 }
+
+/* ---------- filter sheet ---------- */
+let fTimer=null;
+const fApply=()=>{clearTimeout(fTimer);fTimer=setTimeout(renderProducts,60)};
+function fBuild(){
+  const body=$("fBody"),keep=body.scrollTop,vs=[];
+  products.forEach(p=>{if(p.variants.length&&p.img[0])p.variants.forEach(v=>vs.push([p,v]))});
+  const sizes=sortSizes([...new Set(vs.map(x=>x[1].size))]);
+  const colors=[...new Set(vs.map(x=>x[1].color))].filter(c=>c&&c!=="Standard").sort((a,b)=>a.localeCompare(b));
+  const cats={};products.forEach(p=>{if(p.variants.length&&p.img[0]){const k=catOf(p);if(k)cats[k]=(cats[k]||0)+1}});
+  const catKeys=Object.keys(cats).sort((a,b)=>catLabel(a).localeCompare(catLabel(b)));
+  const maxPct=Math.floor(Math.max(0,...vs.map(x=>variantPct(x[1]))));
+  const discs=[10,20,30,40,50,60].filter(d=>d<=maxPct);
+  const b=fBounds(),a0=FS.pmin!=null?FS.pmin:b.lo,b0=FS.pmax!=null?FS.pmax:b.hi;
+  const cand=[300,500,700,1000,1500,2000,3000,5000].filter(x=>x>b.lo&&x<b.hi);
+  const bps=cand.length>3?[0,1,2].map(i=>cand[Math.round(i*(cand.length-1)/2)]):cand;
+  const quick=bps.length?[[b.lo,bps[0],"Up to ₹"+bps[0]],...bps.slice(1).map((x,i)=>[bps[i],x,`₹${bps[i]} – ₹${x}`]),[bps[bps.length-1],b.hi,"₹"+bps[bps.length-1]+" & above"]]:[];
+  const chip=(k,v,label,on,extra)=>`<button class="fchip${on?" on":""}" data-act="fChip" data-k="${k}" data-v="${esc(v)}">${extra||""}${esc(label)}</button>`;
+  let h="";
+  h+=`<div class="f-sec"><h5>Sort By</h5><div class="f-grid">${SORTS.map(s=>chip("sort",s[0],s[1],FS.sort===s[0])).join("")}</div></div>`;
+  if(b.hi>0)h+=`<div class="f-sec"><h5>Price Range</h5>
+    <div class="f-price"><label><span>₹</span><input id="fPmin" type="number" inputmode="numeric" min="${b.lo}" max="${b.hi}" value="${a0}" aria-label="Minimum price"></label><em>to</em><label><span>₹</span><input id="fPmax" type="number" inputmode="numeric" min="${b.lo}" max="${b.hi}" value="${b0}" aria-label="Maximum price"></label></div>
+    <div class="rng" id="fRng"><div class="rtrack"><div class="rfill" id="fFill"></div></div><input type="range" id="fRmin" min="${b.lo}" max="${b.hi}" step="10" value="${a0}" aria-label="Minimum price slider"><input type="range" id="fRmax" min="${b.lo}" max="${b.hi}" step="10" value="${b0}" aria-label="Maximum price slider"></div>
+    <div class="f-rl"><span>₹${b.lo}</span><span>₹${b.hi}</span></div>
+    ${quick.length?`<div class="f-grid">${quick.map(q=>`<button class="fchip" data-act="fQuick" data-a="${q[0]}" data-b="${q[1]}">${esc(q[2])}</button>`).join("")}</div>`:""}</div>`;
+  if(catKeys.length>1)h+=`<div class="f-sec"><h5>Product Type</h5><div class="f-grid">${catKeys.map(k=>chip("cat",k,catLabel(k),FS.cats.has(k))).join("")}</div></div>`;
+  if(sizes.length)h+=`<div class="f-sec"><h5>Size</h5><div class="f-grid">${sizes.map(s=>chip("size",s,s,FS.sizes.has(s))).join("")}</div></div>`;
+  if(colors.length)h+=`<div class="f-sec"><h5>Colour</h5><div class="f-grid">${colors.map(c=>{const hx=colorHex(c);return chip("color",c,c,FS.colors.has(c),hx?`<span class="dot" style="background:${hx}"></span>`:"")}).join("")}</div></div>`;
+  if(discs.length)h+=`<div class="f-sec"><h5>Discount</h5><div class="f-grid">${discs.map(d=>chip("disc",String(d),d+"% & above",FS.disc===d)).join("")}</div></div>`;
+  h+=`<div class="f-sec"><div class="f-sw${FS.inStock?" on":""}" id="fSw" data-act="fStock" role="switch" aria-checked="${FS.inStock}" tabindex="0"><span>Show in-stock items only<small>Out-of-stock items can still be pre-ordered</small></span><i></i></div></div>`;
+  body.innerHTML=h;body.scrollTop=keep;
+  if(b.hi>0)fPriceUI("init");
+}
+function fPriceUI(src){
+  const rmin=$("fRmin"),rmax=$("fRmax");if(!rmin)return;
+  const lo=+rmin.min,hi=+rmin.max;let a=+rmin.value,b=+rmax.value;
+  if(a>b){if(src==="min")a=b;else b=a;rmin.value=a;rmax.value=b}
+  if(src!=="init"){FS.pmin=a<=lo?null:a;FS.pmax=b>=hi?null:b}
+  $("fPmin").value=a;$("fPmax").value=b;
+  const span=hi-lo||1,f=$("fFill");f.style.left=((a-lo)/span*100)+"%";f.style.width=((b-a)/span*100)+"%";
+  rmin.style.zIndex=(a===b&&a>lo)?3:1;rmax.style.zIndex=(a===b&&a<=lo)?3:2;
+  document.querySelectorAll('#fBody [data-act="fQuick"]').forEach(x=>x.classList.toggle("on",Number(x.dataset.a)===a&&Number(x.dataset.b)===b));
+}
+function fPriceSet(a,b,src){const lo=+$("fRmin").min,hi=+$("fRmin").max;$("fRmin").value=Math.max(lo,Math.min(hi,a));$("fRmax").value=Math.max(lo,Math.min(hi,b));fPriceUI(src);fApply()}
+function openFilter(){
+  if(!products.length)return;
+  fBuild();$("filterSheet").style.display="flex";syncLayers();
+  try{history.pushState({f:1},"")}catch(e){}
+}
+function hideFilter(){$("filterSheet").style.display="none";syncLayers()}
+function closeFilter(){if(history.state&&history.state.f)history.back();else hideFilter()}
+function fClear(){
+  FS.pmin=FS.pmax=null;FS.sizes.clear();FS.colors.clear();FS.cats.clear();FS.inStock=false;FS.disc=0;FS.sort="rec";
+  if(fOpen())fBuild();renderProducts();
+}
+function fRemove(k,v){
+  if(k==="price")FS.pmin=FS.pmax=null;
+  else if(k==="size")FS.sizes.delete(v);
+  else if(k==="color")FS.colors.delete(v);
+  else if(k==="cat")FS.cats.delete(v);
+  else if(k==="disc")FS.disc=0;
+  else if(k==="stock")FS.inStock=false;
+  else if(k==="sort")FS.sort="rec";
+  if(fOpen())fBuild();renderProducts();
+}
+function fChipClick(t){
+  const k=t.dataset.k,v=t.dataset.v;
+  if(k==="size"||k==="color"||k==="cat"){const S=k==="size"?FS.sizes:k==="color"?FS.colors:FS.cats;S.has(v)?S.delete(v):S.add(v);t.classList.toggle("on",S.has(v))}
+  else if(k==="disc"){const n=Number(v);FS.disc=FS.disc===n?0:n;document.querySelectorAll('#fBody [data-k="disc"]').forEach(x=>x.classList.toggle("on",Number(x.dataset.v)===FS.disc))}
+  else if(k==="sort"){FS.sort=v;document.querySelectorAll('#fBody [data-k="sort"]').forEach(x=>x.classList.toggle("on",x.dataset.v===v))}
+  fApply();
+}
+function fStockToggle(){FS.inStock=!FS.inStock;const s=$("fSw");s.classList.toggle("on",FS.inStock);s.setAttribute("aria-checked",String(FS.inStock));fApply()}
+document.addEventListener("input",e=>{
+  const id=e.target.id;
+  if(id==="fRmin")fPriceUI("min"),fApply();
+  else if(id==="fRmax")fPriceUI("max"),fApply();
+});
+document.addEventListener("change",e=>{
+  const id=e.target.id;
+  if(id==="sortSel"){FS.sort=e.target.value;if(fOpen())fBuild();renderProducts()}
+  else if(id==="fPmin"||id==="fPmax"){
+    const lo=+$("fRmin").min,hi=+$("fRmin").max;let a=parseFloat($("fPmin").value),b=parseFloat($("fPmax").value);
+    if(isNaN(a))a=lo;if(isNaN(b))b=hi;
+    a=Math.max(lo,Math.min(hi,a));b=Math.max(lo,Math.min(hi,b));
+    if(a>b){if(id==="fPmin")a=b;else b=a}
+    fPriceSet(a,b,id==="fPmin"?"min":"max");
+  }
+});
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.id==="fSw"){e.preventDefault();fStockToggle()}});
 
 /* ---------- product modal + 5s auto slider ---------- */
 const gal={imgs:[],i:0,t:null,manual:false,cur:null};
@@ -684,7 +940,7 @@ function openModal(id){
 }
 function hideModal(){galStop();$("productModal").style.display="none";syncLayers()}
 function closeModal(){if(history.state&&history.state.m)history.back();else hideModal()}
-window.addEventListener("popstate",()=>{if(shareShown){hideShare();return}if(modalOpen())hideModal()});
+window.addEventListener("popstate",()=>{if(fOpen()){hideFilter();return}if(shareShown){hideShare();return}if(modalOpen())hideModal()});
 
 /* ================= SHARE (product link) ================= */
 const SHARE_PATHS={
@@ -1092,13 +1348,29 @@ async function confirmYes(){
 function closeThanks(){$("thankYouModal").style.display="none"}
 
 /* ---------- address ---------- */
-function openAddr(){
+let book=jget("addrBook",[]),editAddrId=null,addrFromAcc=false;
+if(!Array.isArray(book))book=[];
+const mkId=()=>"a"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+function openAddr(id){
+  if(acc&&id===undefined&&book.length){accView("addrs");$("accModal").style.display="flex";return}
+  let x;
+  if(id==="new"){x={name:acc?acc.name:"",phone:acc?acc.phone:""};editAddrId=null}
+  else if(id){x=book.find(a=>a.id===id)||{};editAddrId=x.id||null}
+  else{x=jget("addr",{})||{};const m=acc&&x.id&&book.find(a=>a.id===x.id);editAddrId=m?m.id:null}
   $("addressModal").style.display="flex";
-  const s=jget("addr",{})||{};
-  $("aName").value=s.name||"";$("aPhone").value=s.phone||"";$("aAddr").value=s.address||"";
-  $("aCity").value=s.city||"";$("aPin").value=s.pin||"";$("aState").value=s.state||"";
+  $("aName").value=x.name||"";$("aPhone").value=x.phone||"";$("aAddr").value=x.address||"";
+  $("aCity").value=x.city||"";$("aPin").value=x.pin||"";$("aState").value=x.state||"";
+  $("aAccRow").style.display=acc?"flex":"none";
+  $("aLabel").value=x.label||"Home";$("aDef").checked=!!x.def||(acc&&!book.length);
 }
-function closeAddr(){$("addressModal").style.display="none"}
+function closeAddr(){$("addressModal").style.display="none";if(addrFromAcc&&acc){addrFromAcc=false;accView("addrs");$("accModal").style.display="flex"}}
+function accSyncBook(silent){
+  if(!acc)return;
+  accCall("ACC_ADDRS",{addrs:book}).then(r=>{
+    if(r.status==="SUCCESS"){book=r.addrs;jset("addrBook",book);const c=jget("addr",null);if(c&&c.id){const m=book.find(a=>a.id===c.id);if(m)jset("addr",m)}}
+    else if(!silent&&r.message)showToast(r.message);
+  });
+}
 function saveAddress(){
   const d={name:$("aName").value.trim(),phone:$("aPhone").value.trim(),address:$("aAddr").value.trim(),city:$("aCity").value.trim(),pin:$("aPin").value.trim(),state:$("aState").value.trim()};
   if(!d.name)return alert("Enter Full Name");
@@ -1109,7 +1381,23 @@ function saveAddress(){
   if(!d.state)return alert("Enter State");
   const old=jget("addr",null);
   if(!old||old.phone!==d.phone)apiPost({type:"CHECKOUT_LEAD",phone:d.phone,name:d.name,address:`${d.address}, ${d.city}`,cart:"Lead",total:"Lead"}).catch(()=>{});
-  jset("addr",d);accSyncAddr(d);closeAddr();updateCart();showToast("Address saved!");
+  if(acc){
+    d.label=$("aLabel").value||"Home";
+    let e=editAddrId&&book.find(a=>a.id===editAddrId),isNew=!e;
+    if(e)Object.assign(e,d);
+    else{
+      if(book.length>=5)return alert("You can save up to 5 addresses. Please delete one to add a new address.");
+      d.id=mkId();d.def=!book.length;book.push(d);e=d;
+    }
+    if($("aDef").checked){book.forEach(a=>a.def=false);e.def=true}
+    if(!book.some(a=>a.def))book[0].def=true;
+    const wasActive=old&&old.id===e.id;
+    if(!addrFromAcc||isNew||wasActive)jset("addr",e);
+    jset("addrBook",book);accSyncBook();
+  }else jset("addr",d);
+  $("addressModal").style.display="none";
+  if(addrFromAcc&&acc){addrFromAcc=false;accView("addrs");$("accModal").style.display="flex"}
+  updateCart();showToast("Address saved!");
 }
 function setupSuggestions(){
   const ci=$("aCity"),si=$("aState"),pi=$("aPin"),cs=$("citySuggestions"),ss=$("stateSuggestions"),ps=$("pinSuggestions");
@@ -1360,23 +1648,15 @@ const accPost=async d=>{
     }
   }
 };
-/* silent re-login with the saved credentials when the server session expires */
-async function reLogin(){
-  const c=jget("accCred",null);if(!c)return false;
-  let pw;try{pw=decodeURIComponent(escape(atob(c.w)))}catch(e){return false}
-  const r=await accPost({type:"LOGIN",phone:c.p,password:pw});
-  if(r.status!=="SUCCESS")return false;
-  acc={phone:r.phone,name:r.name,token:r.token};jset("acc",acc);return true;
+/* a session lasts 30 days after the last visit; the password is never stored on the device */
+function forgetLogin(){
+  acc=null;jdel("acc");jdel("accCred");jdel("addr");jdel("addrBook");jdel("wishlist");book=[];wishlist=[];
+  try{updateCart();updateWishBadge();renderProducts()}catch(e){}
 }
-function forgetLogin(){acc=null;jdel("acc");jdel("accCred")}
 async function accCall(type,extra){
-  if(!acc)return{status:"FAILED",message:"Please login first."};
-  const mk=()=>({type,phone:acc.phone,token:acc.token,...(extra||{})});
-  let r=await accPost(mk());
-  if(r.status!=="SUCCESS"&&/expire|invalid|token|session|login/i.test(r.message||"")){
-    if(await reLogin())r=await accPost(mk());
-    else{forgetLogin();r={status:"FAILED",message:"Session ended. Please login again."}}
-  }
+  if(!acc)return{status:"FAILED",message:"Please sign in first."};
+  const r=await accPost({type,phone:acc.phone,token:acc.token,...(extra||{})});
+  if(r.status!=="SUCCESS"&&/session has expired|session ended/i.test(r.message||"")){forgetLogin();if($("accModal").style.display==="flex")accView("login");return{status:"FAILED",message:"Your session has expired. Please sign in again.",expired:true}}
   return r;
 }
 const admErr=m=>`<div style="padding:20px"><p style="color:#c0392b;margin-bottom:12px">${esc(m||"Something went wrong.")}</p><button class="gold-btn" style="max-width:200px" data-act="admRefresh">Retry</button></div>`;
@@ -1392,7 +1672,15 @@ function accView(v){
     `<p style="margin-top:12px;font-size:13px">Already have an account? ${lnk("login","Login")}</p>`+xClose;
   else if(v==="forgot")h=H("Forgot Password")+`<p style="font-size:14px;color:#555;line-height:1.6;margin-bottom:14px">To reset your password, please contact our Customer Support team by phone or WhatsApp. We will verify your details and update your password for you.</p><a class="gold-btn" style="display:block;text-decoration:none;padding:12px;margin-bottom:8px" href="tel:${SUPPORT_NO}">📞 ${SUPPORT_NO}</a><a style="display:block;text-decoration:none;padding:12px;background:#25D366;color:#fff;border-radius:6px;font-weight:700" target="_blank" rel="noopener" href="https://wa.me/91${SUPPORT_NO}?text=Hello%20AK%20Fashion%20Hub%2C%20I%20would%20like%20to%20reset%20my%20password.">WhatsApp Support</a><p style="margin-top:12px;font-size:13px">${lnk("login","← Back to Login")}</p>`+xClose;
   else if(v==="admin")h=H("Admin Login")+'<input id="adPass" class="field" type="password" placeholder="Step 1: Admin Password" autocomplete="off"><input id="adPin" class="field" type="password" inputmode="numeric" placeholder="Step 2: Secret PIN" autocomplete="off"><button class="gold-btn" data-act="admLogin">LOGIN AS ADMIN</button>'+`<p style="margin-top:12px;font-size:13px">${lnk("login","← Back")}</p>`+xClose;
-  else h=H("Welcome, "+esc(acc.name))+`<p style="font-size:14px;color:#555;margin-bottom:16px">📱 ${esc(acc.phone)}</p><button class="gold-btn" data-act="accOrders" style="margin-bottom:8px">MY ORDERS</button><button class="gold-btn" data-act="accAddr" style="margin-bottom:8px">DELIVERY ADDRESS</button><button data-act="accLogout" style="width:100%;padding:12px;background:#fff;color:#c0392b;border:1px solid #c0392b;border-radius:6px;font-weight:700;cursor:pointer">LOGOUT</button>`+xClose;
+  else if(v==="profile")h=H("Edit Profile")+`<p style="font-size:13px;color:#777;margin-bottom:10px;text-align:left">Mobile: ${esc(acc.phone)} (cannot be changed)</p><input id="pfName" class="field" placeholder="Full Name" autocomplete="name" value="${esc(acc.name)}"><input id="pfEmail" class="field" type="email" placeholder="Email (optional)" autocomplete="email" value="${esc(acc.email||"")}"><button class="gold-btn" data-act="accProfileSave">SAVE CHANGES</button><p style="margin-top:12px;font-size:13px">${lnk("me","← Back to My Account")}</p>`;
+  else if(v==="pass")h=H("Change Password")+'<input id="pwCur" class="field" type="password" placeholder="Current password" autocomplete="current-password"><input id="pwNew" class="field" type="password" placeholder="New password (minimum 6 characters)" autocomplete="new-password"><input id="pwNew2" class="field" type="password" placeholder="Confirm new password" autocomplete="new-password"><button class="gold-btn" data-act="accPassSave">UPDATE PASSWORD</button><p style="font-size:12px;color:#777;margin-top:10px">For your security, you will be signed out of all your other devices.</p>'+`<p style="margin-top:10px;font-size:13px">${lnk("me","← Back to My Account")}</p>`;
+  else if(v==="addrs"){
+    const cards=book.map(a=>`<div style="text-align:left;border:1px solid ${a.def?"#c9a24d":"#e5e5e5"};border-radius:8px;padding:12px;margin-bottom:10px"><div style="font-size:12px;margin-bottom:4px"><b style="background:#f3ead2;color:#8f7127;padding:2px 8px;border-radius:10px">${esc(a.label||"Home")}</b>${a.def?' <b style="color:#2e7d32">✔ Default</b>':""}</div><div style="font-size:14px;font-weight:600">${esc(a.name)} · ${esc(a.phone)}</div><div style="font-size:13px;color:#555;line-height:1.5;margin:4px 0 8px">${esc(a.address)}, ${esc(a.city)}, ${esc(a.state)} - ${esc(a.pin)}</div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="gold-btn" style="width:auto;padding:7px 12px;font-size:12px" data-act="accAddrUse" data-id="${esc(a.id)}">DELIVER HERE</button><button data-act="accAddrEdit" data-id="${esc(a.id)}" style="padding:7px 12px;font-size:12px;border:1px solid #c9a24d;background:#fff;color:#8f7127;border-radius:6px;cursor:pointer;font-weight:700">Edit</button>${a.def?"":`<button data-act="accAddrDef" data-id="${esc(a.id)}" style="padding:7px 12px;font-size:12px;border:1px solid #ccc;background:#fff;color:#444;border-radius:6px;cursor:pointer">Set as default</button>`}<button data-act="accAddrDel" data-id="${esc(a.id)}" style="padding:7px 12px;font-size:12px;border:1px solid #e0b4b4;background:#fff;color:#c0392b;border-radius:6px;cursor:pointer">Delete</button></div></div>`).join("");
+    h=H("Saved Addresses")+(cards||'<p style="font-size:14px;color:#777;margin-bottom:12px">You have no saved addresses yet.</p>')+(book.length<5?'<button class="gold-btn" data-act="accAddrNew" style="margin-bottom:8px">+ ADD NEW ADDRESS</button>':'<p style="font-size:12px;color:#777;margin-bottom:8px">You can save up to 5 addresses.</p>')+`<p style="margin-top:6px;font-size:13px">${lnk("me","← Back to My Account")}</p>`;
+  }
+  else h=H("Welcome, "+esc(acc.name))+`<p style="font-size:14px;color:#555;margin-bottom:16px">📱 ${esc(acc.phone)}${acc.email?"<br>✉️ "+esc(acc.email):""}</p>`+
+    '<button class="gold-btn" data-act="accOrders" style="margin-bottom:8px">MY ORDERS</button><button class="gold-btn" data-act="accWish" style="margin-bottom:8px">MY WISHLIST ('+wishlist.length+')</button><button class="gold-btn" data-act="accAddr" style="margin-bottom:8px">SAVED ADDRESSES ('+book.length+')</button><button class="gold-btn" data-act="accProfile" style="margin-bottom:8px">EDIT PROFILE</button><button class="gold-btn" data-act="accPass" style="margin-bottom:8px">CHANGE PASSWORD</button>'+
+    '<button data-act="accLogout" style="width:100%;padding:12px;background:#fff;color:#c0392b;border:1px solid #c0392b;border-radius:6px;font-weight:700;cursor:pointer">LOGOUT</button><p style="margin-top:12px;font-size:12px"><b data-act="accLogoutAll" style="color:#777;cursor:pointer;text-decoration:underline">Sign out of all devices</b></p>'+xClose;
   $("accBox").innerHTML='<div class="logo" role="img" aria-label="AK Fashion Hub" style="width:170px;margin-bottom:14px"></div>'+h;
   ["acPhone"].forEach(i=>{const e=$(i);if(e)e.addEventListener("input",()=>e.value=e.value.replace(/\D/g,""))});
 }
@@ -1416,14 +1704,38 @@ async function accAuth(btn,type){
   jdel("accCred");   // the password is never stored; the session renews itself on every visit
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   try{localStorage.setItem("lead_verified","true")}catch(e){}
-  let a=null;try{a=JSON.parse(r.address)}catch(e){}
-  if(a&&a.phone)jset("addr",a);else if(!jget("addr",null))jset("addr",{name:acc.name,phone:acc.phone});
+  acc.email=r.email||"";jset("acc",acc);accApply(r,true);
   updateCart();$("accModal").style.display="none";syncLayers();
   renderProducts();updateWishBadge();if(isOpen("wishlistPanel"))renderWishlistItems();
   if(!products.length)loadProds();else loadProds(true);   // show / refresh the products right after signing in
   showToast(type==="SIGNUP"?"Welcome! Your account has been created.":"Signed in successfully.");
 }
-function accSyncAddr(d){if(acc)accCall("ACC_SAVE",{addr:d})}
+/* ---------- wishlist sync + account data ---------- */
+let wishT=0,wishBusy=false;
+function accSyncWish(){if(!acc)return;wishBusy=true;clearTimeout(wishT);wishT=setTimeout(()=>accCall("ACC_WISH",{list:wishlist}).then(()=>{if(!wishT)wishBusy=false}),700)}
+function accApply(r,fresh){
+  book=Array.isArray(r.addrs)?r.addrs:[];
+  const loc=jget("addr",null),def=book.find(a=>a.def)||book[0];
+  if(!book.length&&addrOk(loc)){book=[{...loc,id:mkId(),label:"Home",def:true}];jset("addrBook",book);accSyncBook(true)}   // a saved address moves into the account
+  const cur=jget("addr",null);
+  if(fresh&&def)jset("addr",def);
+  else if(!addrOk(cur)){if(def)jset("addr",def);else if(!cur)jset("addr",{name:acc.name,phone:acc.phone})}
+  else if(cur.id){const m=book.find(a=>a.id===cur.id);jset("addr",m||def||cur)}
+  jset("addrBook",book);
+  if(!fresh&&wishBusy)return;   // a wishlist change is still being saved; do not overwrite it with older server data
+  const sw=Array.isArray(r.wishlist)?r.wishlist:[],merged=[...new Set([...sw,...wishlist])];
+  wishlist=merged;jset("wishlist",wishlist);
+  if(merged.length!==sw.length)accSyncWish();
+}
+async function accRefresh(){
+  if(!acc)return;
+  const r=await accCall("ACC_PROFILE");
+  if(r.expired){showToast("Your session has expired. Please sign in again.");return}
+  if(r.status!=="SUCCESS")return;
+  acc.name=r.name;acc.email=r.email||"";jset("acc",acc);
+  accApply(r,false);updateCart();renderProducts();updateWishBadge();if(isOpen("wishlistPanel"))renderWishlistItems();
+}
+setTimeout(accRefresh,1200);
 async function accOrders(){
   $("accModal").style.display="none";
   if(!isOpen("cartPanel"))toggleCart();
@@ -1561,9 +1873,44 @@ const AC={
   accView(t){accView(t.dataset.v)},
   accLogin(t){accAuth(t,"LOGIN")},
   accSignup(t){accAuth(t,"SIGNUP")},
-  accLogout(){forgetLogin();accView("login");showToast("You have been signed out.")},
+  accLogout(){if(acc)accPost({type:"ACC_LOGOUT",phone:acc.phone,token:acc.token});forgetLogin();accView("login");showToast("You have been signed out.")},
+  accLogoutAll(){if(!acc)return;if(!confirm("Sign out of all devices, including this one?"))return;accPost({type:"ACC_LOGOUT_ALL",phone:acc.phone,token:acc.token});forgetLogin();accView("login");showToast("You have been signed out of all devices.")},
   accOrders(){accOrders()},
-  accAddr(){$("accModal").style.display="none";openAddr()},
+  accWish(){$("accModal").style.display="none";if(!isOpen("wishlistPanel"))toggleWish()},
+  accAddr(){accView("addrs")},
+  accProfile(){accView("profile")},
+  accPass(){accView("pass")},
+  accAddrNew(){addrFromAcc=true;$("accModal").style.display="none";openAddr("new")},
+  accAddrEdit(t){addrFromAcc=true;$("accModal").style.display="none";openAddr(t.dataset.id)},
+  accAddrUse(t){const a=book.find(x=>x.id===t.dataset.id);if(!a)return;jset("addr",a);updateCart();$("accModal").style.display="none";syncLayers();showToast("Delivery address selected")},
+  accAddrDef(t){book.forEach(a=>a.def=a.id===t.dataset.id);jset("addrBook",book);accSyncBook();accView("addrs");showToast("Default address updated")},
+  accAddrDel(t){
+    const id=t.dataset.id,w=book.find(a=>a.id===id);if(!w||!confirm("Delete this address?"))return;
+    book=book.filter(a=>a.id!==id);if(w.def&&book.length)book[0].def=true;
+    jset("addrBook",book);const c=jget("addr",null);
+    if(c&&c.id===id){const d=book.find(a=>a.def)||book[0];if(d)jset("addr",d);else jdel("addr")}
+    accSyncBook();accView("addrs");updateCart();showToast("Address deleted");
+  },
+  async accProfileSave(t){
+    const name=$("pfName").value.trim(),email=$("pfEmail").value.trim();
+    if(name.length<2)return showToast("Please enter your full name");
+    if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))return showToast("Please enter a valid email address");
+    t.disabled=true;const r=await accCall("ACC_UPDATE",{name,email});t.disabled=false;
+    if(r.expired){accView("login");return showToast(r.message)}
+    if(r.status!=="SUCCESS")return showToast(r.message||"Could not save your changes. Please try again.");
+    acc.name=r.name;acc.email=r.email;jset("acc",acc);accView("me");showToast("Profile updated");
+  },
+  async accPassSave(t){
+    const cur=$("pwCur").value,n1=$("pwNew").value,n2=$("pwNew2").value;
+    if(!cur)return showToast("Please enter your current password");
+    if(n1.length<6)return showToast("New password must be at least 6 characters");
+    if(n1!==n2)return showToast("New passwords do not match");
+    if(n1===cur)return showToast("New password must be different from the current password");
+    t.disabled=true;const r=await accCall("ACC_PASSWORD",{currentPassword:cur,newPassword:n1});t.disabled=false;
+    if(r.expired){accView("login");return showToast(r.message)}
+    if(r.status!=="SUCCESS")return showToast(r.message||"Could not update the password. Please try again.");
+    accView("me");showToast("Password updated. Your other devices have been signed out.");
+  },
   accBg(t,e){if(e.target===t)AC.accClose()},
   async admLogin(t){
     const password=$("adPass").value,pin=$("adPin").value;
@@ -1635,6 +1982,13 @@ document.addEventListener("click",e=>{
     case"filter":filter=v;document.querySelectorAll(".filter-btn").forEach(b=>b.classList.toggle("active",b===t));renderProducts();break;
     case"searchToggle":toggleSearch();break;
     case"closeModal":closeModal();break;
+    case"filterOpen":openFilter();break;
+    case"filterClose":if(t.tagName==="BUTTON"||e.target===t)closeFilter();break;
+    case"filterClear":fClear();break;
+    case"fChip":fChipClick(t);break;
+    case"fRemove":fRemove(t.dataset.k,t.dataset.v);break;
+    case"fQuick":fPriceSet(Number(t.dataset.a),Number(t.dataset.b),"quick");break;
+    case"fStock":fStockToggle();break;
     case"preOrder":openPreOrder();break;
     case"preQty":if(preState){preState.qty=Math.min(10,Math.max(1,preState.qty+Number(v)));$("preQtyVal").textContent=preState.qty}break;
     case"preSubmit":submitPreOrder();break;
@@ -1692,6 +2046,7 @@ document.addEventListener("click",e=>{
 });
 document.addEventListener("keydown",e=>{
   if(e.key==="Escape"&&$("preModal").style.display==="flex"){closePreOrder();return}
+  if(e.key==="Escape"&&fOpen()){closeFilter();return}
   if(e.key==="Escape"&&shareShown){closeShare();return}
   if(e.key==="Enter"&&e.target.id==="couponInput"){e.target.blur();applyCoupon()}
   if(e.key!=="Escape")return;
